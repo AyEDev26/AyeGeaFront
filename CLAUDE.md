@@ -48,3 +48,4 @@ Implicaciones prácticas para trabajar en este repo:
 - Las respuestas de spec e implementación deben coincidir con el idioma en el que el usuario escribió la solicitud.
 
 Responde siempre en español.
+Usa frontend-design para diseñar interfaces de usuario
