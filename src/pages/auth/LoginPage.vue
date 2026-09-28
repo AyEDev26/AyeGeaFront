@@ -7,7 +7,7 @@
         <GlassCard class="animate__fadeIn q-pa-sm login-card">
           <q-card-section class="text-center q-pb-none">
             <q-icon name="factory" size="48px" color="teal-9" class="animate__pulse" />
-            <div class="text-h5 text-weight-bolder text-teal-10 font-outfit q-mt-sm">AyeCore</div>
+            <div class="text-h5 text-weight-bolder text-teal-10 font-outfit q-mt-sm">AyeGea</div>
             <div class="text-subtitle2 text-grey-7">{{ t('auth.login.subtitle') }}</div>
           </q-card-section>
 

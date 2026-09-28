@@ -4,9 +4,9 @@ Este archivo proporciona guía a Claude Code (claude.ai/code) al trabajar con c�
 
 ## Objetivo
 
-El objetivo de este proyecto es la creación de un proyacto base que sirva como base para otros proyectos. Este proyecto base contendrá funcionalidades básicoas y trasnversales aplicables a cualquier proyecto futuro.
+El objetivo de este proyecto es la gestión y mantenimiento de activos de una empresa, sean materiales, vehñiculos o equipamiento.
 
-Se trata únicmente de un proyecto de feontend, ya que el backend de este proyecto y los otros proyectos que se cree a partir de esta base se harán en otros repositorios mediante el consumo de una API desarrollada en Laravel.
+Se trata únicmente de un proyecto de frontend, ya que el backend de este proyecto y los otros proyectos que se cree a partir de esta base se harán en otros repositorios mediante el consumo de una API desarrollada en Laravel.
 
 La API usada para este proyecto está definida en:
 https://empresa1.ayecore.es/api/documentation/
@@ -23,7 +23,7 @@ Frontend:
 
 ## Estado del proyecto
 
-Este repositorio aún no tiene código fuente de aplicación — no hay `package.json`, no hay `src/`, y no hay commits de git. Lo que existe hasta ahora:
+Lo que existe hasta ahora:
 
 - Skills de Claude Code instaladas que definen el flujo de desarrollo (ver más abajo).
 - `deploy/` — un script de despliegue (`deploy.sh`) y un `nginx.conf.example` escritos por adelantado para el stack previsto: una **SPA Quasar/Vue 3 construida con Vite**, desplegada vía `rsync`+`ssh` a un servidor con nginx, donde el frontend llama a un backend independiente en `/api/v1/...` (proxied por nginx, mismo origen, Vue Router en modo hash). Trátalos como la arquitectura objetivo una vez se scaffoldee el frontend — `deploy.sh` espera `npm ci` / `npm run build` y un directorio de salida `dist/spa` (la ruta de build SPA por defecto de Quasar).
@@ -46,29 +46,5 @@ Implicaciones prácticas para trabajar en este repo:
 - Una spec debe pasar manualmente de `Draft` a `Approved` por el usuario (no por Claude) antes de que `/spec-impl` toque código.
 - El comportamiento de creación de ramas de `/spec-impl` se controla mediante `specs/.spec-config.yml` (`AutoCreateBranch: true` por defecto — crea/cambia de rama sin preguntar; `false` pide confirmación primero). Este archivo lo siembra `/spec` la primera vez que se usa y no debe sobrescribirse una vez existe.
 - Las respuestas de spec e implementación deben coincidir con el idioma en el que el usuario escribió la solicitud.
-
-## Sincronización con el monorepo AyeCore (GitHub)
-
-Este repositorio (`HomeAyeCore`) es la **fuente** del frontend. El monorepo `https://github.com/AyEDev26/AyeCore.git` (privado, rama base `master`) contiene `backend/` y publica este proyecto como carpeta `frontend/`. El flujo es **unidireccional**: `HomeAyeCore` → GitHub.
-
-- **`frontend/` en GitHub es de solo publicación.** No se edita allí; todo cambio se hace en este repo y se sincroniza. Si alguien edita `frontend/` en GitHub, el siguiente `pull` puede dar conflictos que se resuelven en el clon.
-- **Solo viaja `main`** de este repo. Las ramas `spec-NN-slug` no se publican; integra primero en `main` (los `subtree pull` leen `main`, no la rama de trabajo).
-- **No viajan** `specs/`, `.agents/`, `.claude/`, `.vscode/extensions.json`, `skills-lock.json`, `deploy/` ni `notas-jcn/` (están en `.gitignore` y fuera del índice de git). `CLAUDE.md` sí viaja.
-- Clon local del monorepo: `~/DESARROLLO/AyeCore` (fuera de este repo, para no anidar repositorios). Requiere sesión de GitHub con acceso al repo (`gh auth login`).
-
-Para sincronizar cambios ya integrados en `main` de este repo:
-
-```bash
-cd ~/DESARROLLO/AyeCore
-git switch master && git pull
-git switch -c frontend-sync-YYYYMMDD
-git subtree pull --prefix=frontend /Users/juancardona/DESARROLLO/HomeAyeCore main \
-  -m "chore(frontend): sync desde HomeAyeCore"
-git push -u origin frontend-sync-YYYYMMDD
-```
-
-Después, abre un Pull Request `frontend-sync-YYYYMMDD` → `master` en GitHub y fusiónalo con **"Create a merge commit"**. Nunca con squash ni rebase: reescriben los commits importados y `subtree pull` perdería la base común. Si el `pull` responde _"Already up to date"_, no hay nada que publicar y se descarta la rama.
-
-Limitación conocida de `git subtree`: los commits antiguos importados conservan sus rutas originales (sin el prefijo `frontend/`), así que `git log frontend/<ruta>` en GitHub solo muestra los merges de sincronización.
 
 Responde siempre en español.

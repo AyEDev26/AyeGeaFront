@@ -10,7 +10,7 @@
           :aria-label="t('layout.menuAriaLabel')"
           @click="toggleLeftDrawer"
         />
-        <q-toolbar-title class="font-outfit text-weight-bold">AyeCore</q-toolbar-title>
+        <q-toolbar-title class="font-outfit text-weight-bold">AyeGea</q-toolbar-title>
         <q-badge outline color="white" class="q-px-sm">v{{ appVersion }}</q-badge>
       </q-toolbar>
     </q-header>

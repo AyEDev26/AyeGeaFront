@@ -1,7 +1,7 @@
 {
-  "name": "ayecore-frontend",
+  "name": "ayegea-frontend",
   "version": "0.0.1",
-  "description": "A Quasar Project",
+  "description": "Gea Frontend",
   "productName": "Quasar App",
   "author": "Juan Cardona <juan.cardona@telefonica.net>",
   "type": "module",
