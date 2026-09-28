@@ -47,6 +47,13 @@
 import { useI18n } from 'vue-i18n';
 import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
 import GlassCard from '@/components/common/GlassCard.vue';
+import heroImage from '@/assets/images/home/hero-gestion-activos.jpg';
+import usersImage from '@/assets/images/home/feature-users.jpg';
+import reportsImage from '@/assets/images/home/feature-reports.jpg';
+import notificationsImage from '@/assets/images/home/feature-notifications.jpg';
+import automationImage from '@/assets/images/home/feature-automation.jpg';
+import integrationsImage from '@/assets/images/home/feature-integrations.jpg';
+import securityImage from '@/assets/images/home/feature-security.jpg';
 
 interface HomeFeatureCard {
   key: string;
@@ -64,10 +71,19 @@ const features: HomeFeatureCard[] = [
   { key: 'security', icon: 'shield' },
 ];
 
-const heroImageUrl = 'https://picsum.photos/seed/homeayecore-hero/1200/480';
+const heroImageUrl = heroImage;
+
+const featureImages: Record<string, string> = {
+  users: usersImage,
+  reports: reportsImage,
+  notifications: notificationsImage,
+  automation: automationImage,
+  integrations: integrationsImage,
+  security: securityImage,
+};
 
 function featureImageUrl(key: string): string {
-  return `https://picsum.photos/seed/homeayecore-${key}/600/400`;
+  return featureImages[key] ?? '';
 }
 </script>
 
