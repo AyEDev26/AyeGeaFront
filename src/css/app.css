@@ -1,0 +1,296 @@
+/* app global css — tema visual glassmorphism corporativo */
+
+/* ------------------------------------------------------------------ */
+/* Tipografía                                                         */
+/* ------------------------------------------------------------------ */
+.font-outfit {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* ------------------------------------------------------------------ */
+/* Fondo degradado + formas flotantes                                 */
+/* ------------------------------------------------------------------ */
+.app-gradient-bg {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #cbd5e1 0%, #475569 100%);
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  animation: float 20s infinite alternate ease-in-out;
+}
+
+.shape-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #e0f2f1 0%, #b2dfdb 100%);
+  top: -10%;
+  left: -10%;
+}
+
+.shape-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #e1f5fe 0%, #b3e5fc 100%);
+  bottom: -5%;
+  right: -5%;
+  animation-delay: -5s;
+}
+
+.shape-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #f3e5f5 0%, #e1bee7 100%);
+  top: 50%;
+  left: 30%;
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(30px, 50px) rotate(10deg);
+  }
+  100% {
+    transform: translate(-20px, -30px) rotate(-10deg);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Tarjeta de vidrio                                                  */
+/* ------------------------------------------------------------------ */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+/* ------------------------------------------------------------------ */
+/* Inputs y botones                                                   */
+/* ------------------------------------------------------------------ */
+.elegant-input .q-field__control {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.elegant-btn {
+  border-radius: 8px;
+  font-weight: 600;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.elegant-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px -3px rgba(0, 150, 136, 0.2);
+}
+
+/* ------------------------------------------------------------------ */
+/* Tablas                                                              */
+/* ------------------------------------------------------------------ */
+.elegant-table {
+  background: transparent !important;
+}
+
+.elegant-table thead tr th {
+  background-color: #00695c !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Animaciones                                                        */
+/* ------------------------------------------------------------------ */
+.animate__pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.animate__fadeIn {
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* MainLayout — header, drawer, perfil y navegación                   */
+/* ------------------------------------------------------------------ */
+.app-header {
+  background: #009688;
+}
+
+.app-drawer {
+  background: #263238;
+}
+
+.profile-block {
+  transition: background-color 0.3s ease;
+}
+
+.profile-block:hover {
+  background-color: #37474f;
+}
+
+.drawer-section-header {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #b0bec5;
+}
+
+.drawer-item {
+  margin-right: 12px;
+  border-radius: 0 24px 24px 0;
+  color: #cfd8dc;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.drawer-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.drawer-item--active {
+  background-color: rgba(0, 150, 136, 0.2);
+  color: #4db6ac;
+  font-weight: 600;
+}
+
+.theme-switcher {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ */
+/* Overrides globales de densidad                                     */
+/* ------------------------------------------------------------------ */
+.q-field--dense .q-field__control,
+.q-field--dense .q-field__marginal {
+  height: 48px;
+}
+
+.q-table tbody tr td,
+.q-table tbody tr th {
+  height: 32px;
+  padding: 4px 12px;
+}
+
+.q-item {
+  min-height: 32px;
+  font-size: 0.9rem;
+}
+
+.q-table__bottom {
+  min-height: 32px;
+  font-size: 0.8rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Tema "Claro" (dashboard SaaS plano)                                 */
+/* ------------------------------------------------------------------ */
+
+/* Fondo plano, sin gradiente ni shapes flotantes */
+[data-theme='claro'] .app-gradient-bg {
+  background: #eef1f5;
+}
+
+[data-theme='claro'] .shape {
+  display: none;
+}
+
+/* Tarjetas: opacas, sin blur, más redondeadas, sombra suave */
+[data-theme='claro'] .glass-card {
+  background: #ffffff;
+  backdrop-filter: none;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+/* Header: blanco, texto navy, sombra inferior sutil */
+[data-theme='claro'] .app-header {
+  background: #ffffff;
+  color: #1e293b;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12) !important;
+}
+
+[data-theme='claro'] .app-header .q-badge {
+  color: #1e293b !important;
+}
+
+/* Drawer: navy oscuro con panel de perfil ligeramente más claro */
+[data-theme='claro'] .app-drawer {
+  background: #0f172a;
+}
+
+[data-theme='claro'] .profile-block {
+  background-color: #1e293b !important;
+}
+
+[data-theme='claro'] .profile-block:hover {
+  background-color: #27334a;
+}
+
+[data-theme='claro'] .drawer-item:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+[data-theme='claro'] .drawer-item--active {
+  background-color: rgba(245, 158, 11, 0.16);
+  color: #f59e0b;
+}
+
+/* Tabla: cabecera gris clara con texto oscuro */
+[data-theme='claro'] .elegant-table thead tr th {
+  background-color: #eceff1 !important;
+  color: #263238 !important;
+}
+
+/* Inputs y botones: paleta plana, sin fondos translúcidos */
+[data-theme='claro'] .elegant-input .q-field__control {
+  background: #f5f7fa;
+  border-radius: 6px;
+}
+
+[data-theme='claro'] .elegant-btn {
+  border-radius: 6px;
+}
