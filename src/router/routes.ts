@@ -51,6 +51,26 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true, requiresPermission: 'usuarios.ver' },
       },
       {
+        path: 'admin/departamentos',
+        component: () => import('@/pages/admin/DepartamentosListPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'catalogos.ver' },
+      },
+      {
+        path: 'admin/delegaciones',
+        component: () => import('@/pages/admin/DelegacionesListPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'delegaciones.ver' },
+      },
+      {
+        path: 'admin/ubicaciones',
+        component: () => import('@/pages/admin/UbicacionesListPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'catalogos.ver' },
+      },
+      {
+        path: 'admin/almacenes',
+        component: () => import('@/pages/admin/AlmacenesListPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'catalogos.ver' },
+      },
+      {
         path: 'admin/configuracion',
         component: () => import('@/pages/admin/BusinessConfigPage.vue'),
         meta: { requiresAuth: true, requiresPermission: 'configuracion.ver' },

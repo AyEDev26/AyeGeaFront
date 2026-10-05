@@ -3,7 +3,16 @@
 
 import { defineConfig } from '#q-app';
 
-export default defineConfig((/* ctx */) => {
+export default defineConfig((ctx) => {
+  // Origen del backend para el proxy de desarrollo (sin /api). Se define en .env
+  // (ver .env.example); en producción lo resuelve nginx, no se usa.
+  const backendUrl = import.meta.env.BACKEND_URL ?? '';
+  if (ctx.dev && !backendUrl) {
+    throw new Error(
+      'Falta la variable de entorno BACKEND_URL (ej. https://aye.ayegea.es). Copia .env.example a .env.',
+    );
+  }
+
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -89,8 +98,9 @@ export default defineConfig((/* ctx */) => {
       // Ver deploy/nginx.conf.example.
       proxy: {
         '/api': {
-          // target: 'http://80.240.127.117:8081',
-          target: 'https://empresa1.ayecore.es',
+          // El proxy reenvía la ruta tal cual (/api/v1/...), por lo que BACKEND_URL
+          // es solo el origen, sin /api.
+          target: backendUrl,
           changeOrigin: true,
         },
       },

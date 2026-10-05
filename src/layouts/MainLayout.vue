@@ -101,6 +101,7 @@
         <template
           v-if="
             auth.hasPermission('usuarios.ver') ||
+            hasOrganizationAccess ||
             auth.hasPermission('configuracion.ver') ||
             auth.hasPermission('actividad.ver')
           "
@@ -134,6 +135,68 @@
               <q-item-section>{{ t('layout.nav.rolesPermissions') }}</q-item-section>
             </q-item>
           </template>
+
+          <q-expansion-item
+            v-if="hasOrganizationAccess"
+            :default-opened="isOrganizationRoute"
+            icon="corporate_fare"
+            :label="t('layout.nav.organization')"
+            header-class="drawer-item"
+            expand-icon-class="text-blue-grey-3"
+            :content-inset-level="0.3"
+          >
+            <q-item
+              v-if="auth.hasPermission('catalogos.ver')"
+              clickable
+              to="/admin/departamentos"
+              class="drawer-item"
+              active-class="drawer-item--active"
+            >
+              <q-item-section avatar>
+                <q-icon name="account_tree" />
+              </q-item-section>
+              <q-item-section>{{ t('layout.nav.departamentos') }}</q-item-section>
+            </q-item>
+
+            <q-item
+              v-if="auth.hasPermission('delegaciones.ver')"
+              clickable
+              to="/admin/delegaciones"
+              class="drawer-item"
+              active-class="drawer-item--active"
+            >
+              <q-item-section avatar>
+                <q-icon name="business" />
+              </q-item-section>
+              <q-item-section>{{ t('layout.nav.delegaciones') }}</q-item-section>
+            </q-item>
+
+            <q-item
+              v-if="auth.hasPermission('catalogos.ver')"
+              clickable
+              to="/admin/almacenes"
+              class="drawer-item"
+              active-class="drawer-item--active"
+            >
+              <q-item-section avatar>
+                <q-icon name="warehouse" />
+              </q-item-section>
+              <q-item-section>{{ t('layout.nav.almacenes') }}</q-item-section>
+            </q-item>
+
+            <q-item
+              v-if="auth.hasPermission('catalogos.ver')"
+              clickable
+              to="/admin/ubicaciones"
+              class="drawer-item"
+              active-class="drawer-item--active"
+            >
+              <q-item-section avatar>
+                <q-icon name="place" />
+              </q-item-section>
+              <q-item-section>{{ t('layout.nav.ubicaciones') }}</q-item-section>
+            </q-item>
+          </q-expansion-item>
 
           <q-item
             v-if="auth.hasPermission('configuracion.ver')"
@@ -196,6 +259,19 @@ const auth = useAuthStore();
 const themeStore = useThemeStore();
 
 const leftDrawerOpen = ref(false);
+
+// El grupo "Organización" aparece si hay al menos un permiso .ver de sus 4 ítems.
+const hasOrganizationAccess = computed(
+  () => auth.hasPermission('catalogos.ver') || auth.hasPermission('delegaciones.ver'),
+);
+const organizationPaths = [
+  '/admin/departamentos',
+  '/admin/delegaciones',
+  '/admin/almacenes',
+  '/admin/ubicaciones',
+];
+// Abre el grupo por defecto al cargar directamente en una de sus rutas.
+const isOrganizationRoute = organizationPaths.includes(router.currentRoute.value.path);
 
 const user = computed(() => auth.user);
 const avatarUrl = computed(() => {

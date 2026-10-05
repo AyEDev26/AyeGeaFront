@@ -12,4 +12,7 @@
  *   readonly MY_OTHER_VAR: string;
  * }
  */
-interface ImportMetaEnv {}
+interface ImportMetaEnv {
+  // Origen del backend para el proxy de dev (solo lo lee quasar.config.ts)
+  readonly BACKEND_URL?: string;
+}
