@@ -107,11 +107,18 @@ export const useUbicacionesStore = defineStore('ubicaciones', () => {
   }
 
   // Búsqueda parcial por nombre para los selects de relación (no toca items/meta/filters).
-  async function searchUbicacionesByNombre(nombre: string): Promise<Ubicacion[]> {
+  async function searchUbicacionesByNombre(
+    nombre: string,
+    delegacionId?: number,
+  ): Promise<Ubicacion[]> {
     const response = await api.get<{
       data: { items: UbicacionResource[]; meta: RawPaginationMeta };
     }>('/ubicaciones', {
-      params: { per_page: 10, ...(nombre ? { nombre } : {}) },
+      params: {
+        per_page: 10,
+        ...(nombre ? { nombre } : {}),
+        ...(delegacionId !== undefined ? { delegacion_id: delegacionId } : {}),
+      },
     });
     return response.data.data.items.map(mapUbicacion);
   }

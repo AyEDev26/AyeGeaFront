@@ -46,6 +46,7 @@
             :options="delegacionOptions"
             :loading="searchingDelegaciones"
             @filter="onFilterDelegaciones"
+            @update:model-value="onDelegacionChange"
           >
             <template #no-option>
               <q-item>
@@ -68,6 +69,8 @@
             option-value="id"
             :label="t('admin.almacenForm.ubicacionLabel')"
             :placeholder="t('admin.almacenForm.searchPlaceholder')"
+            :disable="!delegacion"
+            :hint="delegacion ? undefined : t('admin.almacenForm.selectDelegacionFirst')"
             :options="ubicacionOptions"
             :loading="searchingUbicaciones"
             @filter="onFilterUbicaciones"
@@ -202,6 +205,12 @@ watch(visible, (isVisible) => {
   }
 });
 
+// Se vacía desde el evento del select (no con un watch) para no borrar la precarga de edición.
+function onDelegacionChange() {
+  ubicacion.value = null;
+  ubicacionOptions.value = [];
+}
+
 function onFilterDelegaciones(
   value: string,
   update: (callback: () => void) => void,
@@ -228,9 +237,13 @@ function onFilterUbicaciones(
   update: (callback: () => void) => void,
   abort: () => void,
 ) {
+  if (!delegacion.value) {
+    abort();
+    return;
+  }
   searchingUbicaciones.value = true;
   ubicacionesStore
-    .searchUbicacionesByNombre(value)
+    .searchUbicacionesByNombre(value, delegacion.value.id)
     .then((results) => {
       update(() => {
         ubicacionOptions.value = results.map((item) => ({ id: item.id, label: item.nombre }));

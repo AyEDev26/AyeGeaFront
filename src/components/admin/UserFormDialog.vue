@@ -154,6 +154,7 @@
                   :options="delegacionOptions"
                   :loading="searchingDelegacion"
                   @filter="onFilterDelegacion"
+                  @update:model-value="onDelegacionChange"
                 >
                   <template #no-option>
                     <q-item>
@@ -201,6 +202,8 @@
                   option-value="id"
                   :label="t('admin.userForm.almacenLabel')"
                   :placeholder="t('admin.userForm.searchPlaceholder')"
+                  :disable="!delegacion"
+                  :hint="delegacion ? undefined : t('admin.userForm.selectDelegacionFirst')"
                   :options="almacenOptions"
                   :loading="searchingAlmacen"
                   @filter="onFilterAlmacen"
@@ -351,7 +354,16 @@ const {
   searching: searchingAlmacen,
   onFilter: onFilterAlmacen,
   load: loadAlmacen,
-} = useOrgSelect((nombre) => almacenesStore.searchAlmacenesByNombre(nombre));
+} = useOrgSelect((nombre) =>
+  delegacion.value
+    ? almacenesStore.searchAlmacenesByNombre(nombre, delegacion.value.id)
+    : Promise.resolve([]),
+);
+
+// Se vacía desde el evento del select (no con un watch) para no borrar la precarga de edición.
+function onDelegacionChange() {
+  loadAlmacen(null);
+}
 
 const nameRules = [(val: string) => !!val || t('admin.userForm.nameRequired')];
 const emailRules = [

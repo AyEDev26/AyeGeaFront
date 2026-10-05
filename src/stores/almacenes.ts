@@ -117,11 +117,18 @@ export const useAlmacenesStore = defineStore('almacenes', () => {
   }
 
   // Búsqueda parcial por nombre para los selects de relación (no toca items/meta/filters).
-  async function searchAlmacenesByNombre(nombre: string): Promise<Almacen[]> {
+  async function searchAlmacenesByNombre(
+    nombre: string,
+    delegacionId?: number,
+  ): Promise<Almacen[]> {
     const response = await api.get<{
       data: { items: AlmacenResource[]; meta: RawPaginationMeta };
     }>('/almacenes', {
-      params: { per_page: 10, ...(nombre ? { nombre } : {}) },
+      params: {
+        per_page: 10,
+        ...(nombre ? { nombre } : {}),
+        ...(delegacionId !== undefined ? { delegacion_id: delegacionId } : {}),
+      },
     });
     return response.data.data.items.map(mapAlmacen);
   }
