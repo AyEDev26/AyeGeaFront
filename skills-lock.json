@@ -5,19 +5,19 @@
       "source": "anthropics/skills",
       "sourceType": "github",
       "skillPath": "skills/frontend-design/SKILL.md",
-      "computedHash": "4eabc66183767153e404b39d1b839b1c37f2d82d86f0a0d7e880a579d8d62336"
+      "computedHash": "106acf230014cbb43ca34e6410371321b56ca742f9ee0442e8ec05bf02eb0384"
     },
     "spec": {
       "source": "klerith/fernando-skills",
       "sourceType": "github",
       "skillPath": "skills/engineering/spec/SKILL.md",
-      "computedHash": "81cfa08325e8104fbf5868ec47e3f3d8aec5f18927f58178fbceeecdc0036e55"
+      "computedHash": "65b3e5a3383949a4cca0756b3b37ac4b9980bb0fec0b5885fd576da308982a2e"
     },
     "spec-impl": {
       "source": "klerith/fernando-skills",
       "sourceType": "github",
       "skillPath": "skills/engineering/spec-impl/SKILL.md",
-      "computedHash": "18493640ac83a2f3baab75366eba5eab6acabdd893cc63e533a10629e4844ed9"
+      "computedHash": "072b2551ffcc78286a081141f5b549fb52d557345d4afd14902c30ebc35ac1a9"
     }
   }
 }
