@@ -1,7 +1,6 @@
 .agents/
 .claude/
 
-
 # Dependencies
 node_modules/
 notas-jcn/
