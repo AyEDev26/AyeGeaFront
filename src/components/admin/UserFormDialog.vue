@@ -26,9 +26,15 @@
           <q-separator />
 
           <!-- keep-alive: el panel oculto sigue montado para que formRef.validate() lo valide -->
-          <q-tab-panels v-model="activeTab" animated keep-alive class="bg-transparent">
+          <q-tab-panels
+            v-model="activeTab"
+            animated
+            keep-alive
+            class="bg-transparent user-form-panels"
+            :class="{ 'user-form-panels--edit': isEditMode }"
+          >
             <q-tab-panel name="user" class="q-pa-none q-pt-md">
-              <div class="q-gutter-y-md">
+              <div class="q-gutter-y-xs">
                 <AvatarUploader
                   v-if="isEditMode && props.user"
                   :avatar-url="avatarUrl"
@@ -494,3 +500,14 @@ async function onSubmit() {
   }
 }
 </script>
+
+<style scoped>
+/* Alto fijo: el diálogo no cambia de tamaño al alternar entre pestañas. */
+.user-form-panels {
+  height: 460px;
+  overflow-y: auto;
+}
+.user-form-panels--edit {
+  height: 550px;
+}
+</style>
