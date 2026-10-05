@@ -123,11 +123,27 @@ export const useUbicacionesStore = defineStore('ubicaciones', () => {
     return response.data.data.items.map(mapUbicacion);
   }
 
+  // Recorre todas las páginas (per_page=100) sin tocar items/meta/filters.
+  async function fetchAllUbicaciones(): Promise<Ubicacion[]> {
+    const fetchPage = async (page: number) => {
+      const response = await api.get<{
+        data: { items: UbicacionResource[]; meta: RawPaginationMeta };
+      }>('/ubicaciones', { params: { page, per_page: 100 } });
+      return response.data.data;
+    };
+    const first = await fetchPage(1);
+    const rest = await Promise.all(
+      Array.from({ length: Math.max(first.meta.last_page - 1, 0) }, (_, i) => fetchPage(i + 2)),
+    );
+    return [first, ...rest].flatMap((page) => page.items.map(mapUbicacion));
+  }
+
   return {
     items,
     meta,
     filters,
     loading,
+    fetchAllUbicaciones,
     searchUbicacionesByNombre,
     fetchUbicaciones,
     createUbicacion,

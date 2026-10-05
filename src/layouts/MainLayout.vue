@@ -196,6 +196,19 @@
               </q-item-section>
               <q-item-section>{{ t('layout.nav.ubicaciones') }}</q-item-section>
             </q-item>
+
+            <q-item
+              v-if="canViewOrganizationReport"
+              clickable
+              to="/admin/informes/organizacion"
+              class="drawer-item"
+              active-class="drawer-item--active"
+            >
+              <q-item-section avatar>
+                <q-icon name="schema" />
+              </q-item-section>
+              <q-item-section>{{ t('layout.nav.organizationReport') }}</q-item-section>
+            </q-item>
           </q-expansion-item>
 
           <q-item
@@ -260,15 +273,26 @@ const themeStore = useThemeStore();
 
 const leftDrawerOpen = ref(false);
 
-// El grupo "Organización" aparece si hay al menos un permiso .ver de sus 4 ítems.
+// El informe de organización lee usuarios, delegaciones y catálogos: exige los tres permisos .ver.
+const canViewOrganizationReport = computed(
+  () =>
+    auth.hasPermission('usuarios.ver') &&
+    auth.hasPermission('delegaciones.ver') &&
+    auth.hasPermission('catalogos.ver'),
+);
+// El grupo "Organización" aparece si hay al menos un permiso de sus 5 ítems.
 const hasOrganizationAccess = computed(
-  () => auth.hasPermission('catalogos.ver') || auth.hasPermission('delegaciones.ver'),
+  () =>
+    auth.hasPermission('catalogos.ver') ||
+    auth.hasPermission('delegaciones.ver') ||
+    canViewOrganizationReport.value,
 );
 const organizationPaths = [
   '/admin/departamentos',
   '/admin/delegaciones',
   '/admin/almacenes',
   '/admin/ubicaciones',
+  '/admin/informes/organizacion',
 ];
 // Abre el grupo por defecto al cargar directamente en una de sus rutas.
 const isOrganizationRoute = organizationPaths.includes(router.currentRoute.value.path);

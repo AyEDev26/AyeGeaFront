@@ -102,11 +102,27 @@ export const useDelegacionesStore = defineStore('delegaciones', () => {
     return response.data.data.items.map(mapDelegacion);
   }
 
+  // Recorre todas las páginas (per_page=100) sin tocar items/meta/filters.
+  async function fetchAllDelegaciones(): Promise<Delegacion[]> {
+    const fetchPage = async (page: number) => {
+      const response = await api.get<{
+        data: { items: DelegacionResource[]; meta: RawPaginationMeta };
+      }>('/delegaciones', { params: { page, per_page: 100 } });
+      return response.data.data;
+    };
+    const first = await fetchPage(1);
+    const rest = await Promise.all(
+      Array.from({ length: Math.max(first.meta.last_page - 1, 0) }, (_, i) => fetchPage(i + 2)),
+    );
+    return [first, ...rest].flatMap((page) => page.items.map(mapDelegacion));
+  }
+
   return {
     items,
     meta,
     filters,
     loading,
+    fetchAllDelegaciones,
     searchDelegacionesByNombre,
     fetchDelegaciones,
     createDelegacion,

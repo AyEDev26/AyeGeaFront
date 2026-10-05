@@ -210,6 +210,21 @@ export const useUsersStore = defineStore('users', () => {
     }
   }
 
+  // Recorre todas las páginas (per_page=100) sin tocar items/meta/filters.
+  async function fetchAllUsers(): Promise<AdminUser[]> {
+    const fetchPage = async (page: number) => {
+      const response = await api.get<{
+        data: { items: UserResource[]; meta: RawPaginationMeta };
+      }>('/users', { params: { page, per_page: 100 } });
+      return response.data.data;
+    };
+    const first = await fetchPage(1);
+    const rest = await Promise.all(
+      Array.from({ length: Math.max(first.meta.last_page - 1, 0) }, (_, i) => fetchPage(i + 2)),
+    );
+    return [first, ...rest].flatMap((page) => page.items.map(mapUser));
+  }
+
   return {
     items,
     meta,
@@ -217,6 +232,7 @@ export const useUsersStore = defineStore('users', () => {
     loading,
     searchingUsers,
     fetchUsers,
+    fetchAllUsers,
     createUser,
     updateUser,
     deleteUser,
