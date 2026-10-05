@@ -2,6 +2,11 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { api } from '@/boot/axios';
 
+export interface OrgRef {
+  id: number;
+  nombre: string;
+}
+
 export interface AdminUser {
   id: number;
   name: string;
@@ -13,6 +18,12 @@ export interface AdminUser {
   lastLoginAt: string | null;
   roles: string[];
   permissions: string[];
+  departamentoId: number | null;
+  departamento: OrgRef | null;
+  delegacionId: number | null;
+  delegacion: OrgRef | null;
+  almacenId: number | null;
+  almacen: OrgRef | null;
 }
 
 export interface UsersFilters {
@@ -21,6 +32,9 @@ export interface UsersFilters {
   alias?: string;
   isActive?: boolean;
   role?: string; // se manda como query param "roles" (nombre exacto de un rol)
+  departamentoId?: number;
+  delegacionId?: number;
+  almacenId?: number;
 }
 
 export interface PaginationMeta {
@@ -42,6 +56,12 @@ interface UserResource {
   last_login_at: string | null;
   roles: string[];
   permissions: string[];
+  departamento_id: number | null;
+  departamento: OrgRef | null;
+  delegacion_id: number | null;
+  delegacion: OrgRef | null;
+  almacen_id: number | null;
+  almacen: OrgRef | null;
 }
 
 interface RawPaginationMeta {
@@ -63,6 +83,12 @@ function mapUser(resource: UserResource): AdminUser {
     lastLoginAt: resource.last_login_at,
     roles: resource.roles,
     permissions: resource.permissions,
+    departamentoId: resource.departamento_id ?? null,
+    departamento: resource.departamento ?? null,
+    delegacionId: resource.delegacion_id ?? null,
+    delegacion: resource.delegacion ?? null,
+    almacenId: resource.almacen_id ?? null,
+    almacen: resource.almacen ?? null,
   };
 }
 
@@ -82,6 +108,9 @@ export interface CreateUserPayload {
   password: string;
   password_confirmation?: string;
   roles: string[];
+  departamento_id?: number;
+  delegacion_id?: number;
+  almacen_id?: number;
 }
 
 export interface UpdateUserPayload {
@@ -92,6 +121,9 @@ export interface UpdateUserPayload {
   password_confirmation?: string;
   is_active?: boolean;
   roles?: string[];
+  departamento_id?: number | null;
+  delegacion_id?: number | null;
+  almacen_id?: number | null;
 }
 
 export const useUsersStore = defineStore('users', () => {
@@ -107,12 +139,15 @@ export const useUsersStore = defineStore('users', () => {
   const filters = ref<UsersFilters>({});
 
   function buildFilterParams(value: UsersFilters) {
-    const params: Record<string, string | boolean> = {};
+    const params: Record<string, string | number | boolean> = {};
     if (value.name) params.name = value.name;
     if (value.email) params.email = value.email;
     if (value.alias) params.alias = value.alias;
     if (value.isActive !== undefined) params.is_active = value.isActive;
     if (value.role) params.roles = value.role;
+    if (value.departamentoId !== undefined) params.departamento_id = value.departamentoId;
+    if (value.delegacionId !== undefined) params.delegacion_id = value.delegacionId;
+    if (value.almacenId !== undefined) params.almacen_id = value.almacenId;
     return params;
   }
 

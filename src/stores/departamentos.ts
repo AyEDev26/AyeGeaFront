@@ -88,11 +88,22 @@ export const useDepartamentosStore = defineStore('departamentos', () => {
     await fetchDepartamentos(meta.value.currentPage, meta.value.perPage, filters.value);
   }
 
+  // Búsqueda parcial por nombre para los selects de relación (no toca items/meta/filters).
+  async function searchDepartamentosByNombre(nombre: string): Promise<Departamento[]> {
+    const response = await api.get<{
+      data: { items: DepartamentoResource[]; meta: RawPaginationMeta };
+    }>('/departamentos', {
+      params: { per_page: 10, ...(nombre ? { nombre } : {}) },
+    });
+    return response.data.data.items.map(mapDepartamento);
+  }
+
   return {
     items,
     meta,
     filters,
     loading,
+    searchDepartamentosByNombre,
     fetchDepartamentos,
     createDepartamento,
     updateDepartamento,

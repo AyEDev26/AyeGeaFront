@@ -73,7 +73,85 @@
             :options="roleOptions"
           />
         </div>
-        <div class="col-12 col-md-2 row q-gutter-x-sm items-center justify-end">
+        <div class="col-12 col-md-2">
+          <q-select
+            v-model="delegacionFilter"
+            outlined
+            dense
+            clearable
+            use-input
+            hide-dropdown-icon
+            input-debounce="300"
+            class="elegant-input"
+            option-value="id"
+            :label="t('admin.users.filters.delegacionLabel')"
+            :placeholder="t('admin.users.filters.searchPlaceholder')"
+            :options="delegacionOptions"
+            :loading="searchingDelegacion"
+            @filter="onFilterDelegacion"
+          >
+            <template #no-option>
+              <q-item>
+                <q-item-section class="text-grey">
+                  {{ t('admin.users.filters.noResults') }}
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </div>
+        <div class="col-12 col-md-2">
+          <q-select
+            v-model="departamentoFilter"
+            outlined
+            dense
+            clearable
+            use-input
+            hide-dropdown-icon
+            input-debounce="300"
+            class="elegant-input"
+            option-value="id"
+            :label="t('admin.users.filters.departamentoLabel')"
+            :placeholder="t('admin.users.filters.searchPlaceholder')"
+            :options="departamentoOptions"
+            :loading="searchingDepartamento"
+            @filter="onFilterDepartamento"
+          >
+            <template #no-option>
+              <q-item>
+                <q-item-section class="text-grey">
+                  {{ t('admin.users.filters.noResults') }}
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </div>
+        <div class="col-12 col-md-2">
+          <q-select
+            v-model="almacenFilter"
+            outlined
+            dense
+            clearable
+            use-input
+            hide-dropdown-icon
+            input-debounce="300"
+            class="elegant-input"
+            option-value="id"
+            :label="t('admin.users.filters.almacenLabel')"
+            :placeholder="t('admin.users.filters.searchPlaceholder')"
+            :options="almacenOptions"
+            :loading="searchingAlmacen"
+            @filter="onFilterAlmacen"
+          >
+            <template #no-option>
+              <q-item>
+                <q-item-section class="text-grey">
+                  {{ t('admin.users.filters.noResults') }}
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </div>
+        <div class="col-12 col-md-6 row q-gutter-x-sm items-center justify-end">
           <q-btn
             unelevated
             no-caps
@@ -163,6 +241,10 @@
           </q-td>
         </template>
 
+        <template v-for="name in orgColumnNames" :key="name" #[`body-cell-${name}`]="props">
+          <q-td :props="props">{{ props.row[name]?.nombre ?? '—' }}</q-td>
+        </template>
+
         <template #body-cell-actions="props">
           <q-td :props="props" class="text-center q-gutter-x-sm">
             <q-btn
@@ -215,7 +297,10 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
-import { useUsersStore, type AdminUser, type UsersFilters } from '@/stores/users';
+import { useUsersStore, type AdminUser, type OrgRef, type UsersFilters } from '@/stores/users';
+import { useDelegacionesStore } from '@/stores/delegaciones';
+import { useDepartamentosStore } from '@/stores/departamentos';
+import { useAlmacenesStore } from '@/stores/almacenes';
 import { useRolesStore } from '@/stores/roles';
 import { useAuthStore } from '@/stores/auth';
 import { getApiErrorMessage } from '@/utils/api-error';
@@ -229,6 +314,11 @@ const { t } = useI18n();
 const usersStore = useUsersStore();
 const rolesStore = useRolesStore();
 const auth = useAuthStore();
+const delegacionesStore = useDelegacionesStore();
+const departamentosStore = useDepartamentosStore();
+const almacenesStore = useAlmacenesStore();
+
+const orgColumnNames = ['delegacion', 'departamento', 'almacen'] as const;
 
 const columns = computed<QTableColumn<AdminUser>[]>(() => [
   { name: 'avatar', label: t('admin.users.columns.avatar'), field: 'avatarUrl', align: 'center' },
@@ -267,6 +357,13 @@ const columns = computed<QTableColumn<AdminUser>[]>(() => [
     align: 'center',
   },
   { name: 'roles', label: t('admin.users.columns.roles'), field: 'roles', align: 'left' },
+  ...orgColumnNames.map((name) => ({
+    name,
+    label: t(`admin.users.columns.${name}`),
+    field: (row: AdminUser) => row[name]?.nombre ?? '—',
+    align: 'left' as const,
+    sortable: true,
+  })),
   { name: 'actions', label: t('admin.users.columns.actions'), field: 'id', align: 'center' },
 ]);
 
@@ -301,6 +398,57 @@ const filters = ref({
 const isActiveFilter = ref<boolean | null>(null);
 const roleFilter = ref<string | null>(null);
 
+interface OrgOption {
+  id: number;
+  label: string;
+}
+
+// Select de filtro con búsqueda en servidor por nombre (mismo patrón que los selects
+// de relación de los formularios de administración).
+function useOrgFilter(search: (nombre: string) => Promise<OrgRef[]>) {
+  const model = ref<OrgOption | null>(null);
+  const options = ref<OrgOption[]>([]);
+  const searching = ref(false);
+
+  function onFilter(value: string, update: (callback: () => void) => void, abort: () => void) {
+    searching.value = true;
+    search(value)
+      .then((results) => {
+        update(() => {
+          options.value = results.map((item) => ({ id: item.id, label: item.nombre }));
+        });
+      })
+      .catch((error: unknown) => {
+        abort();
+        notifyError(error, t('admin.users.fetchError'));
+      })
+      .finally(() => {
+        searching.value = false;
+      });
+  }
+
+  return { model, options, searching, onFilter };
+}
+
+const {
+  model: delegacionFilter,
+  options: delegacionOptions,
+  searching: searchingDelegacion,
+  onFilter: onFilterDelegacion,
+} = useOrgFilter((nombre) => delegacionesStore.searchDelegacionesByNombre(nombre));
+const {
+  model: departamentoFilter,
+  options: departamentoOptions,
+  searching: searchingDepartamento,
+  onFilter: onFilterDepartamento,
+} = useOrgFilter((nombre) => departamentosStore.searchDepartamentosByNombre(nombre));
+const {
+  model: almacenFilter,
+  options: almacenOptions,
+  searching: searchingAlmacen,
+  onFilter: onFilterAlmacen,
+} = useOrgFilter((nombre) => almacenesStore.searchAlmacenesByNombre(nombre));
+
 // Última combinación de filtros aplicada (vía "Filtrar" o "Limpiar"). Se reutiliza en
 // onRequest para que cambiar de página conserve los filtros activos, sin depender de
 // lo que haya escrito el usuario en los inputs sin haber pulsado "Filtrar" todavía.
@@ -309,6 +457,14 @@ const appliedFilters = ref<UsersFilters>({});
 // El backend no soporta ordenación en servidor: sortBy/descending solo reordenan
 // las filas ya cargadas de la página actual (ver SPEC 14).
 type SortableValue = string | boolean | null;
+
+function getSortValue(user: AdminUser, key: keyof AdminUser): SortableValue {
+  const value = user[key];
+  if (key === 'delegacion' || key === 'departamento' || key === 'almacen') {
+    return (value as OrgRef | null)?.nombre ?? null;
+  }
+  return value as SortableValue;
+}
 
 function compareSortValues(a: SortableValue, b: SortableValue): number {
   if (a === b) {
@@ -334,7 +490,7 @@ const sortedItems = computed(() => {
   const key = sortBy as keyof AdminUser;
   const items = [...usersStore.items];
   items.sort((a, b) => {
-    const result = compareSortValues(a[key] as SortableValue, b[key] as SortableValue);
+    const result = compareSortValues(getSortValue(a, key), getSortValue(b, key));
     return descending ? -result : result;
   });
   return items;
@@ -401,6 +557,15 @@ function buildFilters(): UsersFilters {
   if (roleFilter.value) {
     result.role = roleFilter.value;
   }
+  if (delegacionFilter.value) {
+    result.delegacionId = delegacionFilter.value.id;
+  }
+  if (departamentoFilter.value) {
+    result.departamentoId = departamentoFilter.value.id;
+  }
+  if (almacenFilter.value) {
+    result.almacenId = almacenFilter.value.id;
+  }
   return result;
 }
 
@@ -440,6 +605,9 @@ async function onClearClick() {
   filters.value = { name: '', email: '', alias: '' };
   isActiveFilter.value = null;
   roleFilter.value = null;
+  delegacionFilter.value = null;
+  departamentoFilter.value = null;
+  almacenFilter.value = null;
   appliedFilters.value = {};
   try {
     await usersStore.fetchUsers(1, pagination.value.rowsPerPage, appliedFilters.value);
