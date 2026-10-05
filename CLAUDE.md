@@ -4,12 +4,12 @@ Este archivo proporciona guía a Claude Code (claude.ai/code) al trabajar con c�
 
 ## Objetivo
 
-El objetivo de este proyecto es la gestión y mantenimiento de activos de una empresa, sean materiales, vehñiculos o equipamiento.
+El objetivo de este proyecto es la gestión y mantenimiento de activos de una empresa, sean materiales, vehiculos o equipamiento.
 
-Se trata únicmente de un proyecto de frontend, ya que el backend de este proyecto y los otros proyectos que se cree a partir de esta base se harán en otros repositorios mediante el consumo de una API desarrollada en Laravel.
+Se trata únicamente de un proyecto de frontend, ya que el backend de este proyecto y los otros proyectos que se cree a partir de esta base se harán en otros repositorios mediante el consumo de una API desarrollada en Laravel.
 
 La API usada para este proyecto está definida en:
-https://empresa1.ayecore.es/api/documentation/
+https://aye.ayegea.es/api/documentation/
 
 El stack teconológico para este proyecto es:
 
