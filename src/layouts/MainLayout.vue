@@ -146,6 +146,18 @@
             :content-inset-level="0.3"
           >
             <q-item
+              clickable
+              to="/admin/organizacion"
+              class="drawer-item"
+              active-class="drawer-item--active"
+            >
+              <q-item-section avatar>
+                <q-icon name="dashboard" />
+              </q-item-section>
+              <q-item-section>{{ t('layout.nav.organizationHub') }}</q-item-section>
+            </q-item>
+
+            <q-item
               v-if="auth.hasPermission('catalogos.ver')"
               clickable
               to="/admin/departamentos"
@@ -288,6 +300,7 @@ const hasOrganizationAccess = computed(
     canViewOrganizationReport.value,
 );
 const organizationPaths = [
+  '/admin/organizacion',
   '/admin/departamentos',
   '/admin/delegaciones',
   '/admin/almacenes',

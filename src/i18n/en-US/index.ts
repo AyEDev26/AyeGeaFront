@@ -287,6 +287,34 @@ export default {
       updated: 'Location updated.',
       saveError: 'Could not save the location.',
     },
+    organizationHub: {
+      title: 'Organization',
+      subtitle: 'Access the management of your organization structure.',
+      noAccessTitle: 'No access',
+      noAccessMessage: 'You do not have permission to view any organization section.',
+      cards: {
+        departamentos: {
+          title: 'Departments',
+          description: 'Manage the departments users belong to.',
+        },
+        delegaciones: {
+          title: 'Branches',
+          description: 'Manage the branches of the organization.',
+        },
+        almacenes: {
+          title: 'Warehouses',
+          description: 'Manage warehouses, their locations and managers.',
+        },
+        ubicaciones: {
+          title: 'Locations',
+          description: 'Manage the physical locations of each branch.',
+        },
+        informe: {
+          title: 'Organization report',
+          description: 'View the structure of branches, warehouses and users.',
+        },
+      },
+    },
     organizationReport: {
       title: 'Organization report',
       subtitle: 'Hierarchical structure: branches, warehouses and users.',
@@ -406,6 +434,7 @@ export default {
       users: 'Users',
       rolesPermissions: 'Roles & permissions',
       organization: 'Organization',
+      organizationHub: 'Overview',
       departamentos: 'Departments',
       delegaciones: 'Branches',
       almacenes: 'Warehouses',

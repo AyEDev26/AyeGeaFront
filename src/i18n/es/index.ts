@@ -287,6 +287,34 @@ export default {
       updated: 'Ubicación actualizada.',
       saveError: 'No se pudo guardar la ubicación.',
     },
+    organizationHub: {
+      title: 'Organización',
+      subtitle: 'Accede a la gestión de la estructura de tu organización.',
+      noAccessTitle: 'Sin acceso',
+      noAccessMessage: 'No tienes permisos para ver ninguna sección de organización.',
+      cards: {
+        departamentos: {
+          title: 'Departamentos',
+          description: 'Gestiona los departamentos a los que pertenecen los usuarios.',
+        },
+        delegaciones: {
+          title: 'Delegaciones',
+          description: 'Gestiona las delegaciones de la organización.',
+        },
+        almacenes: {
+          title: 'Almacenes',
+          description: 'Gestiona los almacenes, sus ubicaciones y responsables.',
+        },
+        ubicaciones: {
+          title: 'Ubicaciones',
+          description: 'Gestiona las ubicaciones físicas de cada delegación.',
+        },
+        informe: {
+          title: 'Informe de organización',
+          description: 'Consulta la estructura de delegaciones, almacenes y usuarios.',
+        },
+      },
+    },
     organizationReport: {
       title: 'Informe de organización',
       subtitle: 'Estructura jerárquica: delegaciones, almacenes y usuarios.',
@@ -406,6 +434,7 @@ export default {
       users: 'Usuarios',
       rolesPermissions: 'Roles y permisos',
       organization: 'Organización',
+      organizationHub: 'Resumen',
       departamentos: 'Departamentos',
       delegaciones: 'Delegaciones',
       almacenes: 'Almacenes',
