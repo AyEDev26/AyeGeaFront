@@ -1,6 +1,6 @@
 # SPEC 06 — Página de resumen de Organización con tarjetas de acceso
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 02 (pantallas de Departamentos, Delegaciones, Almacenes y Ubicaciones y grupo "Organización" de `MainLayout.vue`), SPEC 05 (pantalla "Informe de organización")
 > **Date:** 2026-10-14
 > **Objective:** Crear una página `/admin/organizacion` que muestre, a modo de tarjetas, los enlaces a las cinco pantallas que cuelgan del grupo "Organización" del menú, ocultando las que el usuario no puede ver.
