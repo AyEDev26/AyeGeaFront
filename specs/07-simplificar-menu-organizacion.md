@@ -1,6 +1,6 @@
 # SPEC 07 — Simplificar el menú lateral de Organización
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 06 (página `/admin/organizacion` con las tarjetas de acceso y el ítem "Resumen" en `MainLayout.vue`)
 > **Date:** 2026-10-14
 > **Objective:** Sustituir el grupo desplegable "Organización" del menú lateral por un único ítem "Organización" que lleva a la página de resumen y se marca activo también en las cinco pantallas que cuelgan de ella.
