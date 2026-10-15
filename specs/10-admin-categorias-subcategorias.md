@@ -1,6 +1,6 @@
 # SPEC 10 — Administración de categorías y subcategorías
 
-> **Status:** Borrador
+> **Status:** Aprobado
 > **Depends on:** SPEC 02 (patrón de listado + diálogo + store y permisos `catalogos.*`), SPEC 08 (patrón idéntico aplicado a proveedores), `UsersListPage.vue` y `UserFormDialog.vue` como referencia visual. Consume el endpoint `/periodicidades` pero **no** depende de que SPEC 09 esté implementada.
 > **Date:** 2026-10-15
 > **Objective:** Añadir una única pantalla de administración con dos pestañas (Categorías y Subcategorías), cada una con listado paginado y filtros, diálogo de alta/edición y borrado, que consume `/categorias`, `/subcategorias`, `/tipos-elemento-inventario` y `/periodicidades` de la API y replica el aspecto de la página de usuarios.
@@ -146,14 +146,14 @@ Convenciones:
 
 ## Risks
 
-| Risk                                                                                              | Mitigation                                                                                                                  |
-| ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| El backend exige un permiso distinto de `catalogos.*` para `/categorias` o `/subcategorias` (403) | Verificarlo en el paso 5 con un usuario de prueba; si difiere, ajustar la spec.                                             |
-| Un usuario con `catalogos.*` pero sin acceso a `/periodicidades` rompe el select de periodicidad  | Tratar el fallo de `fetchPeriodicidadOptions` como lista vacía con aviso, sin bloquear el diálogo ni la pestaña.            |
-| La sección Administración no se muestra a un usuario con solo `catalogos.ver`                     | Comprobar en el paso 6 que `hasOrganizationAccess` ya cubre ese caso; si no, ampliar la condición de cabecera.              |
-| Muchas categorías (>100) por tipo hacen incompleto o lento el select                              | `fetchAllCategorias` recorre todas las páginas; si resulta lento, hacer el select con búsqueda en servidor en otra spec.    |
+| Risk                                                                                              | Mitigation                                                                                                                    |
+| ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| El backend exige un permiso distinto de `catalogos.*` para `/categorias` o `/subcategorias` (403) | Verificarlo en el paso 5 con un usuario de prueba; si difiere, ajustar la spec.                                               |
+| Un usuario con `catalogos.*` pero sin acceso a `/periodicidades` rompe el select de periodicidad  | Tratar el fallo de `fetchPeriodicidadOptions` como lista vacía con aviso, sin bloquear el diálogo ni la pestaña.              |
+| La sección Administración no se muestra a un usuario con solo `catalogos.ver`                     | Comprobar en el paso 6 que `hasOrganizationAccess` ya cubre ese caso; si no, ampliar la condición de cabecera.                |
+| Muchas categorías (>100) por tipo hacen incompleto o lento el select                              | `fetchAllCategorias` recorre todas las páginas; si resulta lento, hacer el select con búsqueda en servidor en otra spec.      |
 | Una página con dos tablas y dos diálogos crece demasiado y se vuelve difícil de mantener          | Mantener la lógica por pestaña en la misma página con secciones claras; extraer a subcomponentes solo si pasa de ~400 líneas. |
-| Ordenación solo sobre la página cargada puede confundir                                           | Mismo comportamiento ya aceptado en Users, SPEC 02, SPEC 08 y SPEC 09.                                                      |
+| Ordenación solo sobre la página cargada puede confundir                                           | Mismo comportamiento ya aceptado en Users, SPEC 02, SPEC 08 y SPEC 09.                                                        |
 
 ---
 
