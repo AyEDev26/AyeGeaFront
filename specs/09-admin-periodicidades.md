@@ -1,6 +1,6 @@
 # SPEC 09 — Administración de periodicidades
 
-> **Status:** Borrador
+> **Status:** Aprobado@09
 > **Depends on:** SPEC 02 (patrón de listado + diálogo + store y permisos `catalogos.*`), SPEC 08 (patrón idéntico aplicado a proveedores), `UsersListPage.vue` y `UserFormDialog.vue` como referencia visual
 > **Date:** 2026-10-15
 > **Objective:** Añadir una pantalla de administración de periodicidades (listado paginado con filtro por descripción, diálogo de alta/edición y borrado) que consume `/periodicidades` de la API y replica el aspecto de la página de usuarios.
@@ -107,12 +107,12 @@ Convenciones:
 
 ## Risks
 
-| Risk                                                                                 | Mitigation                                                                                                       |
-| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| El backend exige un permiso distinto de `catalogos.*` para `/periodicidades` (403)   | Verificarlo en el paso 4 con un usuario de prueba; si difiere, ajustar la spec.                                  |
-| La sección Administración no se muestra a un usuario con solo `catalogos.ver`        | Comprobar en el paso 5 que `hasOrganizationAccess` ya cubre ese caso; si no, ampliar la condición de cabecera.   |
-| `q-input type="number"` devuelve string o `null` al vaciarse                         | Convertir a entero antes de enviar y validar con regla explícita de entero ≥ 0.                                  |
-| Ordenación solo sobre la página cargada puede confundir                              | Mismo comportamiento ya aceptado en Users, SPEC 02 y SPEC 08.                                                    |
+| Risk                                                                               | Mitigation                                                                                                     |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| El backend exige un permiso distinto de `catalogos.*` para `/periodicidades` (403) | Verificarlo en el paso 4 con un usuario de prueba; si difiere, ajustar la spec.                                |
+| La sección Administración no se muestra a un usuario con solo `catalogos.ver`      | Comprobar en el paso 5 que `hasOrganizationAccess` ya cubre ese caso; si no, ampliar la condición de cabecera. |
+| `q-input type="number"` devuelve string o `null` al vaciarse                       | Convertir a entero antes de enviar y validar con regla explícita de entero ≥ 0.                                |
+| Ordenación solo sobre la página cargada puede confundir                            | Mismo comportamiento ya aceptado en Users, SPEC 02 y SPEC 08.                                                  |
 
 ---
 
