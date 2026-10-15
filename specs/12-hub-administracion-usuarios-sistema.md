@@ -1,6 +1,6 @@
 # SPEC 12 — Usuarios, roles, configuración y log de actividad en el hub de administración
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 11 (hub de administración con secciones y `AdminHubPage.vue`, ítem "Administración" y `adminHubPaths` en `MainLayout.vue`). Debe estar implementada y fusionada antes de implementar esta.
 > **Date:** 2026-10-15
 > **Objective:** Mover Usuarios, Roles y permisos, Configuración y Log de actividad del menú lateral al hub de administración como tarjetas, dejando un único ítem "Administración" sin cabecera de grupo.
