@@ -163,6 +163,19 @@
           </q-item>
 
           <q-item
+            v-if="auth.hasPermission('catalogos.ver')"
+            clickable
+            to="/admin/categorias"
+            class="drawer-item"
+            active-class="drawer-item--active"
+          >
+            <q-item-section avatar>
+              <q-icon name="category" />
+            </q-item-section>
+            <q-item-section>{{ t('layout.nav.categorias') }}</q-item-section>
+          </q-item>
+
+          <q-item
             v-if="hasOrganizationAccess"
             clickable
             to="/admin/organizacion"
