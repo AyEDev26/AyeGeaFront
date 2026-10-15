@@ -63,7 +63,7 @@ interface AdminHubCard {
 }
 
 interface AdminHubSection {
-  key: 'estructura' | 'catalogos';
+  key: 'accesos' | 'estructura' | 'catalogos' | 'sistema';
   titleKey: string;
   cards: AdminHubCard[];
 }
@@ -74,6 +74,28 @@ const auth = useAuthStore();
 // Rutas, iconos y permisos replican los ítems del menú y del router:
 // si cambian allí, hay que cambiarlos aquí.
 const sections: AdminHubSection[] = [
+  {
+    key: 'accesos',
+    titleKey: 'admin.adminHub.sections.accesos',
+    cards: [
+      {
+        key: 'usuarios',
+        to: '/admin/usuarios',
+        icon: 'people',
+        titleKey: 'admin.adminHub.cards.usuarios.title',
+        descriptionKey: 'admin.adminHub.cards.usuarios.description',
+        visible: () => auth.hasPermission('usuarios.ver'),
+      },
+      {
+        key: 'roles',
+        to: '/admin/roles',
+        icon: 'admin_panel_settings',
+        titleKey: 'admin.adminHub.cards.roles.title',
+        descriptionKey: 'admin.adminHub.cards.roles.description',
+        visible: () => auth.hasPermission('usuarios.ver'),
+      },
+    ],
+  },
   {
     key: 'estructura',
     titleKey: 'admin.adminHub.sections.estructura',
@@ -150,6 +172,28 @@ const sections: AdminHubSection[] = [
         titleKey: 'admin.adminHub.cards.periodicidades.title',
         descriptionKey: 'admin.adminHub.cards.periodicidades.description',
         visible: () => auth.hasPermission('catalogos.ver'),
+      },
+    ],
+  },
+  {
+    key: 'sistema',
+    titleKey: 'admin.adminHub.sections.sistema',
+    cards: [
+      {
+        key: 'configuracion',
+        to: '/admin/configuracion',
+        icon: 'tune',
+        titleKey: 'admin.adminHub.cards.configuracion.title',
+        descriptionKey: 'admin.adminHub.cards.configuracion.description',
+        visible: () => auth.hasPermission('configuracion.ver'),
+      },
+      {
+        key: 'actividad',
+        to: '/admin/actividad',
+        icon: 'history',
+        titleKey: 'admin.adminHub.cards.actividad.title',
+        descriptionKey: 'admin.adminHub.cards.actividad.description',
+        visible: () => auth.hasPermission('actividad.ver'),
       },
     ],
   },

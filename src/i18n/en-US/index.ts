@@ -453,10 +453,20 @@ export default {
       noAccessTitle: 'No access',
       noAccessMessage: 'You do not have permission to view any administration section.',
       sections: {
+        accesos: 'Users and access',
         estructura: 'Organization structure',
         catalogos: 'Catalogs',
+        sistema: 'System',
       },
       cards: {
+        usuarios: {
+          title: 'Users',
+          description: 'Manage user accounts and their access.',
+        },
+        roles: {
+          title: 'Roles & permissions',
+          description: 'Manage roles and their permissions.',
+        },
         departamentos: {
           title: 'Departments',
           description: 'Manage the departments users belong to.',
@@ -488,6 +498,14 @@ export default {
         periodicidades: {
           title: 'Periodicities',
           description: 'Manage maintenance periodicities.',
+        },
+        configuracion: {
+          title: 'Settings',
+          description: 'Adjust the business settings.',
+        },
+        actividad: {
+          title: 'Activity log',
+          description: 'View the system activity log.',
         },
       },
     },
@@ -606,12 +624,7 @@ export default {
     nav: {
       menuSection: 'Menu',
       home: 'Home',
-      adminSection: 'Administration',
-      users: 'Users',
-      rolesPermissions: 'Roles & permissions',
       administration: 'Administration',
-      businessConfig: 'Settings',
-      activityLog: 'Activity log',
       userManual: 'User manual',
     },
     logout: 'Sign out',

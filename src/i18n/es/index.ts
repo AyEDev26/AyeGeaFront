@@ -453,10 +453,20 @@ export default {
       noAccessTitle: 'Sin acceso',
       noAccessMessage: 'No tienes permisos para ver ninguna sección de administración.',
       sections: {
+        accesos: 'Usuarios y accesos',
         estructura: 'Estructura de la organización',
         catalogos: 'Catálogos',
+        sistema: 'Sistema',
       },
       cards: {
+        usuarios: {
+          title: 'Usuarios',
+          description: 'Gestiona las cuentas de usuario y su acceso.',
+        },
+        roles: {
+          title: 'Roles y permisos',
+          description: 'Gestiona los roles y los permisos asociados.',
+        },
         departamentos: {
           title: 'Departamentos',
           description: 'Gestiona los departamentos a los que pertenecen los usuarios.',
@@ -488,6 +498,14 @@ export default {
         periodicidades: {
           title: 'Periodicidades',
           description: 'Gestiona las periodicidades de mantenimiento.',
+        },
+        configuracion: {
+          title: 'Configuración',
+          description: 'Ajusta la configuración de negocio.',
+        },
+        actividad: {
+          title: 'Log de actividad',
+          description: 'Consulta el registro de actividad del sistema.',
         },
       },
     },
@@ -606,12 +624,7 @@ export default {
     nav: {
       menuSection: 'Menu',
       home: 'Inicio',
-      adminSection: 'Administración',
-      users: 'Usuarios',
-      rolesPermissions: 'Roles y permisos',
       administration: 'Administración',
-      businessConfig: 'Configuración',
-      activityLog: 'Log de actividad',
       userManual: 'Manual de usuario',
     },
     logout: 'Cerrar sesión',

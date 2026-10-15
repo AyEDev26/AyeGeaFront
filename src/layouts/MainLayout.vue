@@ -98,84 +98,19 @@
           <q-item-section>{{ t('layout.nav.userManual') }}</q-item-section>
         </q-item>
 
-        <template
-          v-if="
-            auth.hasPermission('usuarios.ver') ||
-            hasAdminHubAccess ||
-            auth.hasPermission('configuracion.ver') ||
-            auth.hasPermission('actividad.ver')
-          "
+        <q-item
+          v-if="hasAdminHubAccess"
+          clickable
+          to="/admin/administracion"
+          :active="isAdminHubRoute"
+          class="drawer-item"
+          active-class="drawer-item--active"
         >
-          <q-item-label header class="drawer-section-header q-mt-md">{{
-            t('layout.nav.adminSection')
-          }}</q-item-label>
-
-          <template v-if="auth.hasPermission('usuarios.ver')">
-            <q-item
-              clickable
-              to="/admin/usuarios"
-              class="drawer-item"
-              active-class="drawer-item--active"
-            >
-              <q-item-section avatar>
-                <q-icon name="people" />
-              </q-item-section>
-              <q-item-section>{{ t('layout.nav.users') }}</q-item-section>
-            </q-item>
-
-            <q-item
-              clickable
-              to="/admin/roles"
-              class="drawer-item"
-              active-class="drawer-item--active"
-            >
-              <q-item-section avatar>
-                <q-icon name="admin_panel_settings" />
-              </q-item-section>
-              <q-item-section>{{ t('layout.nav.rolesPermissions') }}</q-item-section>
-            </q-item>
-          </template>
-
-          <q-item
-            v-if="hasAdminHubAccess"
-            clickable
-            to="/admin/administracion"
-            :active="isAdminHubRoute"
-            class="drawer-item"
-            active-class="drawer-item--active"
-          >
-            <q-item-section avatar>
-              <q-icon name="corporate_fare" />
-            </q-item-section>
-            <q-item-section>{{ t('layout.nav.administration') }}</q-item-section>
-          </q-item>
-
-          <q-item
-            v-if="auth.hasPermission('configuracion.ver')"
-            clickable
-            to="/admin/configuracion"
-            class="drawer-item"
-            active-class="drawer-item--active"
-          >
-            <q-item-section avatar>
-              <q-icon name="tune" />
-            </q-item-section>
-            <q-item-section>{{ t('layout.nav.businessConfig') }}</q-item-section>
-          </q-item>
-
-          <q-item
-            v-if="auth.hasPermission('actividad.ver')"
-            clickable
-            to="/admin/actividad"
-            class="drawer-item"
-            active-class="drawer-item--active"
-          >
-            <q-item-section avatar>
-              <q-icon name="history" />
-            </q-item-section>
-            <q-item-section>{{ t('layout.nav.activityLog') }}</q-item-section>
-          </q-item>
-        </template>
+          <q-item-section avatar>
+            <q-icon name="corporate_fare" />
+          </q-item-section>
+          <q-item-section>{{ t('layout.nav.administration') }}</q-item-section>
+        </q-item>
       </q-list>
 
       <q-space />
@@ -223,6 +158,9 @@ const canViewOrganizationReport = computed(
 // El ítem "Administración" aparece si hay al menos un permiso de las pantallas que enlaza el hub.
 const hasAdminHubAccess = computed(
   () =>
+    auth.hasPermission('usuarios.ver') ||
+    auth.hasPermission('configuracion.ver') ||
+    auth.hasPermission('actividad.ver') ||
     auth.hasPermission('catalogos.ver') ||
     auth.hasPermission('delegaciones.ver') ||
     canViewOrganizationReport.value,
@@ -237,6 +175,10 @@ const adminHubPaths = [
   '/admin/proveedores',
   '/admin/categorias',
   '/admin/periodicidades',
+  '/admin/usuarios',
+  '/admin/roles',
+  '/admin/configuracion',
+  '/admin/actividad',
 ];
 // Marca activo el ítem en el hub y en las pantallas que cuelgan de él.
 const isAdminHubRoute = computed(() => adminHubPaths.includes(route.path));
