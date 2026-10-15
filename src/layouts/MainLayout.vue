@@ -136,92 +136,19 @@
             </q-item>
           </template>
 
-          <q-expansion-item
+          <q-item
             v-if="hasOrganizationAccess"
-            :default-opened="isOrganizationRoute"
-            icon="corporate_fare"
-            :label="t('layout.nav.organization')"
-            header-class="drawer-item"
-            expand-icon-class="text-blue-grey-3"
-            :content-inset-level="0.3"
+            clickable
+            to="/admin/organizacion"
+            :active="isOrganizationRoute"
+            class="drawer-item"
+            active-class="drawer-item--active"
           >
-            <q-item
-              clickable
-              to="/admin/organizacion"
-              class="drawer-item"
-              active-class="drawer-item--active"
-            >
-              <q-item-section avatar>
-                <q-icon name="dashboard" />
-              </q-item-section>
-              <q-item-section>{{ t('layout.nav.organizationHub') }}</q-item-section>
-            </q-item>
-
-            <q-item
-              v-if="auth.hasPermission('catalogos.ver')"
-              clickable
-              to="/admin/departamentos"
-              class="drawer-item"
-              active-class="drawer-item--active"
-            >
-              <q-item-section avatar>
-                <q-icon name="account_tree" />
-              </q-item-section>
-              <q-item-section>{{ t('layout.nav.departamentos') }}</q-item-section>
-            </q-item>
-
-            <q-item
-              v-if="auth.hasPermission('delegaciones.ver')"
-              clickable
-              to="/admin/delegaciones"
-              class="drawer-item"
-              active-class="drawer-item--active"
-            >
-              <q-item-section avatar>
-                <q-icon name="business" />
-              </q-item-section>
-              <q-item-section>{{ t('layout.nav.delegaciones') }}</q-item-section>
-            </q-item>
-
-            <q-item
-              v-if="auth.hasPermission('catalogos.ver')"
-              clickable
-              to="/admin/almacenes"
-              class="drawer-item"
-              active-class="drawer-item--active"
-            >
-              <q-item-section avatar>
-                <q-icon name="warehouse" />
-              </q-item-section>
-              <q-item-section>{{ t('layout.nav.almacenes') }}</q-item-section>
-            </q-item>
-
-            <q-item
-              v-if="auth.hasPermission('catalogos.ver')"
-              clickable
-              to="/admin/ubicaciones"
-              class="drawer-item"
-              active-class="drawer-item--active"
-            >
-              <q-item-section avatar>
-                <q-icon name="place" />
-              </q-item-section>
-              <q-item-section>{{ t('layout.nav.ubicaciones') }}</q-item-section>
-            </q-item>
-
-            <q-item
-              v-if="canViewOrganizationReport"
-              clickable
-              to="/admin/informes/organizacion"
-              class="drawer-item"
-              active-class="drawer-item--active"
-            >
-              <q-item-section avatar>
-                <q-icon name="schema" />
-              </q-item-section>
-              <q-item-section>{{ t('layout.nav.organizationReport') }}</q-item-section>
-            </q-item>
-          </q-expansion-item>
+            <q-item-section avatar>
+              <q-icon name="corporate_fare" />
+            </q-item-section>
+            <q-item-section>{{ t('layout.nav.organization') }}</q-item-section>
+          </q-item>
 
           <q-item
             v-if="auth.hasPermission('configuracion.ver')"
@@ -271,7 +198,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
 import { useThemeStore, type VisualTheme } from '@/stores/theme-store';
@@ -279,6 +206,7 @@ import { getAvatarColor, getAvatarInitials } from '@/utils/avatar';
 import { version as appVersion } from '../../package.json';
 
 const router = useRouter();
+const route = useRoute();
 const { t } = useI18n();
 const auth = useAuthStore();
 const themeStore = useThemeStore();
@@ -292,7 +220,7 @@ const canViewOrganizationReport = computed(
     auth.hasPermission('delegaciones.ver') &&
     auth.hasPermission('catalogos.ver'),
 );
-// El grupo "Organización" aparece si hay al menos un permiso de sus 5 ítems.
+// El ítem "Organización" aparece si hay al menos un permiso de las pantallas que enlaza el hub.
 const hasOrganizationAccess = computed(
   () =>
     auth.hasPermission('catalogos.ver') ||
@@ -307,8 +235,8 @@ const organizationPaths = [
   '/admin/ubicaciones',
   '/admin/informes/organizacion',
 ];
-// Abre el grupo por defecto al cargar directamente en una de sus rutas.
-const isOrganizationRoute = organizationPaths.includes(router.currentRoute.value.path);
+// Marca activo el ítem en el hub y en las pantallas que cuelgan de él.
+const isOrganizationRoute = computed(() => organizationPaths.includes(route.path));
 
 const user = computed(() => auth.user);
 const avatarUrl = computed(() => {
