@@ -3,38 +3,45 @@
     <GlassCard class="q-pa-md animate__fadeIn" style="min-height: 50vh">
       <div class="q-mb-md">
         <div class="text-h5 text-weight-bolder text-teal-10 font-outfit">
-          {{ t('admin.organizationHub.title') }}
+          {{ t('admin.adminHub.title') }}
         </div>
         <div class="hub-meta">
-          {{ t('admin.organizationHub.subtitle') }}
+          {{ t('admin.adminHub.subtitle') }}
         </div>
       </div>
 
-      <q-banner v-if="!visibleCards.length" rounded class="bg-orange-1 text-orange-10">
+      <q-banner v-if="!visibleSections.length" rounded class="bg-orange-1 text-orange-10">
         <template #avatar>
           <q-icon name="lock" color="orange-8" />
         </template>
-        <div class="text-weight-medium">{{ t('admin.organizationHub.noAccessTitle') }}</div>
-        <div>{{ t('admin.organizationHub.noAccessMessage') }}</div>
+        <div class="text-weight-medium">{{ t('admin.adminHub.noAccessTitle') }}</div>
+        <div>{{ t('admin.adminHub.noAccessMessage') }}</div>
       </q-banner>
 
-      <div v-else class="row q-col-gutter-md">
-        <div v-for="card in visibleCards" :key="card.key" class="col-12 col-sm-6 col-md-4">
-          <router-link :to="card.to" class="hub-card-link">
-            <q-card flat bordered class="hub-card">
-              <q-card-section class="row items-start no-wrap q-gutter-md">
-                <q-avatar color="teal-1" text-color="teal-9" :icon="card.icon" size="48px" />
-                <div class="hub-card__body">
-                  <div class="text-subtitle1 text-weight-bold text-teal-10 font-outfit">
-                    {{ t(card.titleKey) }}
-                  </div>
-                  <div class="hub-meta">{{ t(card.descriptionKey) }}</div>
-                </div>
-              </q-card-section>
-            </q-card>
-          </router-link>
-        </div>
-      </div>
+      <template v-else>
+        <section v-for="section in visibleSections" :key="section.key" class="q-mb-lg">
+          <div class="text-subtitle1 text-weight-bold text-teal-10 font-outfit q-mb-sm">
+            {{ t(section.titleKey) }}
+          </div>
+          <div class="row q-col-gutter-md">
+            <div v-for="card in section.cards" :key="card.key" class="col-12 col-sm-6 col-md-4">
+              <router-link :to="card.to" class="hub-card-link">
+                <q-card flat bordered class="hub-card">
+                  <q-card-section class="row items-start no-wrap q-gutter-md">
+                    <q-avatar color="teal-1" text-color="teal-9" :icon="card.icon" size="48px" />
+                    <div class="hub-card__body">
+                      <div class="text-subtitle1 text-weight-bold text-teal-10 font-outfit">
+                        {{ t(card.titleKey) }}
+                      </div>
+                      <div class="hub-meta">{{ t(card.descriptionKey) }}</div>
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </router-link>
+            </div>
+          </div>
+        </section>
+      </template>
     </GlassCard>
   </AdminPageWrapper>
 </template>
@@ -46,7 +53,7 @@ import { useAuthStore } from '@/stores/auth';
 import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
 import GlassCard from '@/components/common/GlassCard.vue';
 
-interface OrgHubCard {
+interface AdminHubCard {
   key: string;
   to: string;
   icon: string;
@@ -55,58 +62,104 @@ interface OrgHubCard {
   visible: () => boolean;
 }
 
+interface AdminHubSection {
+  key: 'estructura' | 'catalogos';
+  titleKey: string;
+  cards: AdminHubCard[];
+}
+
 const { t } = useI18n();
 const auth = useAuthStore();
 
-// Rutas, iconos y permisos replican los ítems del grupo "Organización" de MainLayout.vue:
+// Rutas, iconos y permisos replican los ítems del menú y del router:
 // si cambian allí, hay que cambiarlos aquí.
-const cards: OrgHubCard[] = [
+const sections: AdminHubSection[] = [
   {
-    key: 'departamentos',
-    to: '/admin/departamentos',
-    icon: 'account_tree',
-    titleKey: 'admin.organizationHub.cards.departamentos.title',
-    descriptionKey: 'admin.organizationHub.cards.departamentos.description',
-    visible: () => auth.hasPermission('catalogos.ver'),
+    key: 'estructura',
+    titleKey: 'admin.adminHub.sections.estructura',
+    cards: [
+      {
+        key: 'departamentos',
+        to: '/admin/departamentos',
+        icon: 'account_tree',
+        titleKey: 'admin.adminHub.cards.departamentos.title',
+        descriptionKey: 'admin.adminHub.cards.departamentos.description',
+        visible: () => auth.hasPermission('catalogos.ver'),
+      },
+      {
+        key: 'delegaciones',
+        to: '/admin/delegaciones',
+        icon: 'business',
+        titleKey: 'admin.adminHub.cards.delegaciones.title',
+        descriptionKey: 'admin.adminHub.cards.delegaciones.description',
+        visible: () => auth.hasPermission('delegaciones.ver'),
+      },
+      {
+        key: 'almacenes',
+        to: '/admin/almacenes',
+        icon: 'warehouse',
+        titleKey: 'admin.adminHub.cards.almacenes.title',
+        descriptionKey: 'admin.adminHub.cards.almacenes.description',
+        visible: () => auth.hasPermission('catalogos.ver'),
+      },
+      {
+        key: 'ubicaciones',
+        to: '/admin/ubicaciones',
+        icon: 'place',
+        titleKey: 'admin.adminHub.cards.ubicaciones.title',
+        descriptionKey: 'admin.adminHub.cards.ubicaciones.description',
+        visible: () => auth.hasPermission('catalogos.ver'),
+      },
+      {
+        key: 'informe',
+        to: '/admin/informes/organizacion',
+        icon: 'schema',
+        titleKey: 'admin.adminHub.cards.informe.title',
+        descriptionKey: 'admin.adminHub.cards.informe.description',
+        visible: () =>
+          auth.hasPermission('usuarios.ver') &&
+          auth.hasPermission('delegaciones.ver') &&
+          auth.hasPermission('catalogos.ver'),
+      },
+    ],
   },
   {
-    key: 'delegaciones',
-    to: '/admin/delegaciones',
-    icon: 'business',
-    titleKey: 'admin.organizationHub.cards.delegaciones.title',
-    descriptionKey: 'admin.organizationHub.cards.delegaciones.description',
-    visible: () => auth.hasPermission('delegaciones.ver'),
-  },
-  {
-    key: 'almacenes',
-    to: '/admin/almacenes',
-    icon: 'warehouse',
-    titleKey: 'admin.organizationHub.cards.almacenes.title',
-    descriptionKey: 'admin.organizationHub.cards.almacenes.description',
-    visible: () => auth.hasPermission('catalogos.ver'),
-  },
-  {
-    key: 'ubicaciones',
-    to: '/admin/ubicaciones',
-    icon: 'place',
-    titleKey: 'admin.organizationHub.cards.ubicaciones.title',
-    descriptionKey: 'admin.organizationHub.cards.ubicaciones.description',
-    visible: () => auth.hasPermission('catalogos.ver'),
-  },
-  {
-    key: 'informe',
-    to: '/admin/informes/organizacion',
-    icon: 'schema',
-    titleKey: 'admin.organizationHub.cards.informe.title',
-    descriptionKey: 'admin.organizationHub.cards.informe.description',
-    visible: () =>
-      auth.hasPermission('usuarios.ver') &&
-      auth.hasPermission('delegaciones.ver') &&
-      auth.hasPermission('catalogos.ver'),
+    key: 'catalogos',
+    titleKey: 'admin.adminHub.sections.catalogos',
+    cards: [
+      {
+        key: 'proveedores',
+        to: '/admin/proveedores',
+        icon: 'local_shipping',
+        titleKey: 'admin.adminHub.cards.proveedores.title',
+        descriptionKey: 'admin.adminHub.cards.proveedores.description',
+        visible: () => auth.hasPermission('catalogos.ver'),
+      },
+      {
+        key: 'categorias',
+        to: '/admin/categorias',
+        icon: 'category',
+        titleKey: 'admin.adminHub.cards.categorias.title',
+        descriptionKey: 'admin.adminHub.cards.categorias.description',
+        visible: () => auth.hasPermission('catalogos.ver'),
+      },
+      {
+        key: 'periodicidades',
+        to: '/admin/periodicidades',
+        icon: 'schedule',
+        titleKey: 'admin.adminHub.cards.periodicidades.title',
+        descriptionKey: 'admin.adminHub.cards.periodicidades.description',
+        visible: () => auth.hasPermission('catalogos.ver'),
+      },
+    ],
   },
 ];
 
-const visibleCards = computed(() => cards.filter((card) => card.visible()));
+const visibleSections = computed(() =>
+  sections
+    .map((section) => ({ ...section, cards: section.cards.filter((card) => card.visible()) }))
+    .filter((section) => section.cards.length),
+);
 </script>
 
 <style scoped>

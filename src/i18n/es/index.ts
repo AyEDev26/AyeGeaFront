@@ -447,11 +447,15 @@ export default {
       updated: 'Ubicación actualizada.',
       saveError: 'No se pudo guardar la ubicación.',
     },
-    organizationHub: {
-      title: 'Organización',
-      subtitle: 'Accede a la gestión de la estructura de tu organización.',
+    adminHub: {
+      title: 'Administración',
+      subtitle: 'Accede a la gestión de la estructura de tu organización y de los catálogos.',
       noAccessTitle: 'Sin acceso',
-      noAccessMessage: 'No tienes permisos para ver ninguna sección de organización.',
+      noAccessMessage: 'No tienes permisos para ver ninguna sección de administración.',
+      sections: {
+        estructura: 'Estructura de la organización',
+        catalogos: 'Catálogos',
+      },
       cards: {
         departamentos: {
           title: 'Departamentos',
@@ -472,6 +476,18 @@ export default {
         informe: {
           title: 'Informe de organización',
           description: 'Consulta la estructura de delegaciones, almacenes y usuarios.',
+        },
+        proveedores: {
+          title: 'Proveedores',
+          description: 'Gestiona los proveedores de la organización.',
+        },
+        categorias: {
+          title: 'Categorías',
+          description: 'Gestiona las categorías y subcategorías de los activos.',
+        },
+        periodicidades: {
+          title: 'Periodicidades',
+          description: 'Gestiona las periodicidades de mantenimiento.',
         },
       },
     },
@@ -592,11 +608,8 @@ export default {
       home: 'Inicio',
       adminSection: 'Administración',
       users: 'Usuarios',
-      proveedores: 'Proveedores',
-      periodicidades: 'Periodicidades',
-      categorias: 'Categorías',
       rolesPermissions: 'Roles y permisos',
-      organization: 'Organización',
+      administration: 'Administración',
       businessConfig: 'Configuración',
       activityLog: 'Log de actividad',
       userManual: 'Manual de usuario',

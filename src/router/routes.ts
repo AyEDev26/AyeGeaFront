@@ -43,10 +43,11 @@ const routes: RouteRecordRaw[] = [
       {
         // Sin requiresPermission: el guard solo admite un permiso y el hub se abre con cualquiera
         // de varios; la propia página oculta las tarjetas sin permiso.
-        path: 'admin/organizacion',
-        component: () => import('@/pages/admin/OrganizationHubPage.vue'),
+        path: 'admin/administracion',
+        component: () => import('@/pages/admin/AdminHubPage.vue'),
         meta: { requiresAuth: true },
       },
+      { path: 'admin/organizacion', redirect: '/admin/administracion' },
       {
         path: 'admin/usuarios',
         component: () => import('@/pages/admin/UsersListPage.vue'),

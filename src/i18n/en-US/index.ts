@@ -447,11 +447,15 @@ export default {
       updated: 'Location updated.',
       saveError: 'Could not save the location.',
     },
-    organizationHub: {
-      title: 'Organization',
-      subtitle: 'Access the management of your organization structure.',
+    adminHub: {
+      title: 'Administration',
+      subtitle: 'Access the management of your organization structure and catalogs.',
       noAccessTitle: 'No access',
-      noAccessMessage: 'You do not have permission to view any organization section.',
+      noAccessMessage: 'You do not have permission to view any administration section.',
+      sections: {
+        estructura: 'Organization structure',
+        catalogos: 'Catalogs',
+      },
       cards: {
         departamentos: {
           title: 'Departments',
@@ -472,6 +476,18 @@ export default {
         informe: {
           title: 'Organization report',
           description: 'View the structure of branches, warehouses and users.',
+        },
+        proveedores: {
+          title: 'Suppliers',
+          description: 'Manage the organization suppliers.',
+        },
+        categorias: {
+          title: 'Categories',
+          description: 'Manage asset categories and subcategories.',
+        },
+        periodicidades: {
+          title: 'Periodicities',
+          description: 'Manage maintenance periodicities.',
         },
       },
     },
@@ -592,11 +608,8 @@ export default {
       home: 'Home',
       adminSection: 'Administration',
       users: 'Users',
-      proveedores: 'Suppliers',
-      periodicidades: 'Frequencies',
-      categorias: 'Categories',
       rolesPermissions: 'Roles & permissions',
-      organization: 'Organization',
+      administration: 'Administration',
       businessConfig: 'Settings',
       activityLog: 'Activity log',
       userManual: 'User manual',

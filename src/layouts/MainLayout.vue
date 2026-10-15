@@ -101,7 +101,7 @@
         <template
           v-if="
             auth.hasPermission('usuarios.ver') ||
-            hasOrganizationAccess ||
+            hasAdminHubAccess ||
             auth.hasPermission('configuracion.ver') ||
             auth.hasPermission('actividad.ver')
           "
@@ -137,56 +137,17 @@
           </template>
 
           <q-item
-            v-if="auth.hasPermission('catalogos.ver')"
+            v-if="hasAdminHubAccess"
             clickable
-            to="/admin/proveedores"
-            class="drawer-item"
-            active-class="drawer-item--active"
-          >
-            <q-item-section avatar>
-              <q-icon name="local_shipping" />
-            </q-item-section>
-            <q-item-section>{{ t('layout.nav.proveedores') }}</q-item-section>
-          </q-item>
-
-          <q-item
-            v-if="auth.hasPermission('catalogos.ver')"
-            clickable
-            to="/admin/periodicidades"
-            class="drawer-item"
-            active-class="drawer-item--active"
-          >
-            <q-item-section avatar>
-              <q-icon name="schedule" />
-            </q-item-section>
-            <q-item-section>{{ t('layout.nav.periodicidades') }}</q-item-section>
-          </q-item>
-
-          <q-item
-            v-if="auth.hasPermission('catalogos.ver')"
-            clickable
-            to="/admin/categorias"
-            class="drawer-item"
-            active-class="drawer-item--active"
-          >
-            <q-item-section avatar>
-              <q-icon name="category" />
-            </q-item-section>
-            <q-item-section>{{ t('layout.nav.categorias') }}</q-item-section>
-          </q-item>
-
-          <q-item
-            v-if="hasOrganizationAccess"
-            clickable
-            to="/admin/organizacion"
-            :active="isOrganizationRoute"
+            to="/admin/administracion"
+            :active="isAdminHubRoute"
             class="drawer-item"
             active-class="drawer-item--active"
           >
             <q-item-section avatar>
               <q-icon name="corporate_fare" />
             </q-item-section>
-            <q-item-section>{{ t('layout.nav.organization') }}</q-item-section>
+            <q-item-section>{{ t('layout.nav.administration') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -259,23 +220,26 @@ const canViewOrganizationReport = computed(
     auth.hasPermission('delegaciones.ver') &&
     auth.hasPermission('catalogos.ver'),
 );
-// El ítem "Organización" aparece si hay al menos un permiso de las pantallas que enlaza el hub.
-const hasOrganizationAccess = computed(
+// El ítem "Administración" aparece si hay al menos un permiso de las pantallas que enlaza el hub.
+const hasAdminHubAccess = computed(
   () =>
     auth.hasPermission('catalogos.ver') ||
     auth.hasPermission('delegaciones.ver') ||
     canViewOrganizationReport.value,
 );
-const organizationPaths = [
-  '/admin/organizacion',
+const adminHubPaths = [
+  '/admin/administracion',
   '/admin/departamentos',
   '/admin/delegaciones',
   '/admin/almacenes',
   '/admin/ubicaciones',
   '/admin/informes/organizacion',
+  '/admin/proveedores',
+  '/admin/categorias',
+  '/admin/periodicidades',
 ];
 // Marca activo el ítem en el hub y en las pantallas que cuelgan de él.
-const isOrganizationRoute = computed(() => organizationPaths.includes(route.path));
+const isAdminHubRoute = computed(() => adminHubPaths.includes(route.path));
 
 const user = computed(() => auth.user);
 const avatarUrl = computed(() => {
