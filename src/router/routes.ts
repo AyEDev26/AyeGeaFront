@@ -63,6 +63,11 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true, requiresPermission: 'catalogos.ver' },
       },
       {
+        path: 'admin/proveedores',
+        component: () => import('@/pages/admin/ProveedoresListPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'catalogos.ver' },
+      },
+      {
         path: 'admin/delegaciones',
         component: () => import('@/pages/admin/DelegacionesListPage.vue'),
         meta: { requiresAuth: true, requiresPermission: 'delegaciones.ver' },

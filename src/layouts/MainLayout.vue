@@ -137,6 +137,19 @@
           </template>
 
           <q-item
+            v-if="auth.hasPermission('catalogos.ver')"
+            clickable
+            to="/admin/proveedores"
+            class="drawer-item"
+            active-class="drawer-item--active"
+          >
+            <q-item-section avatar>
+              <q-icon name="local_shipping" />
+            </q-item-section>
+            <q-item-section>{{ t('layout.nav.proveedores') }}</q-item-section>
+          </q-item>
+
+          <q-item
             v-if="hasOrganizationAccess"
             clickable
             to="/admin/organizacion"
