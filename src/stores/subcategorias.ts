@@ -144,6 +144,33 @@ export const useSubcategoriasStore = defineStore('subcategorias', () => {
     await fetchSubcategorias(meta.value.currentPage, meta.value.perPage, filters.value);
   }
 
+  // Recorre todas las páginas (per_page=100) sin tocar items/meta/filters.
+  // Filtrable por categoría o por tipo de elemento de inventario.
+  async function fetchAllSubcategorias(
+    opts: { categoriaId?: number; tipoElementoInventarioId?: number } = {},
+  ): Promise<Subcategoria[]> {
+    const fetchPage = async (page: number) => {
+      const response = await api.get<{
+        data: { items: SubcategoriaResource[]; meta: RawPaginationMeta };
+      }>('/subcategorias', {
+        params: {
+          page,
+          per_page: 100,
+          ...(opts.categoriaId ? { categoria_id: opts.categoriaId } : {}),
+          ...(opts.tipoElementoInventarioId
+            ? { tipo_elemento_inventario_id: opts.tipoElementoInventarioId }
+            : {}),
+        },
+      });
+      return response.data.data;
+    };
+    const first = await fetchPage(1);
+    const rest = await Promise.all(
+      Array.from({ length: Math.max(first.meta.last_page - 1, 0) }, (_, i) => fetchPage(i + 2)),
+    );
+    return [first, ...rest].flatMap((page) => page.items.map(mapSubcategoria));
+  }
+
   // Lectura de GET /periodicidades recorriendo todas las páginas (per_page=100), solo para selects.
   // No depende del store de periodicidades de SPEC 09.
   async function fetchPeriodicidadOptions(): Promise<PeriodicidadOption[]> {
@@ -171,6 +198,7 @@ export const useSubcategoriasStore = defineStore('subcategorias', () => {
     createSubcategoria,
     updateSubcategoria,
     deleteSubcategoria,
+    fetchAllSubcategorias,
     fetchPeriodicidadOptions,
   };
 });

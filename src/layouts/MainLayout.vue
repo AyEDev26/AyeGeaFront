@@ -99,6 +99,20 @@
         </q-item>
 
         <q-item
+          v-for="item in inventoryNavItems"
+          :key="item.to"
+          clickable
+          :to="item.to"
+          class="drawer-item"
+          active-class="drawer-item--active"
+        >
+          <q-item-section avatar>
+            <q-icon :name="item.icon" />
+          </q-item-section>
+          <q-item-section>{{ t(item.label) }}</q-item-section>
+        </q-item>
+
+        <q-item
           v-if="hasAdminHubAccess"
           clickable
           to="/admin/administracion"
@@ -154,6 +168,16 @@ const canViewOrganizationReport = computed(
     auth.hasPermission('usuarios.ver') &&
     auth.hasPermission('delegaciones.ver') &&
     auth.hasPermission('catalogos.ver'),
+);
+// Listados de inventario: tres ítems sueltos visibles con elementos_inventario.ver.
+const inventoryNavItems = computed(() =>
+  auth.hasPermission('elementos_inventario.ver')
+    ? [
+        { to: '/inventario/vehiculos', icon: 'directions_car', label: 'layout.nav.vehicles' },
+        { to: '/inventario/maquinaria', icon: 'construction', label: 'layout.nav.machinery' },
+        { to: '/inventario/epis', icon: 'health_and_safety', label: 'layout.nav.epis' },
+      ]
+    : [],
 );
 // El ítem "Administración" aparece si hay al menos un permiso de las pantallas que enlaza el hub.
 const hasAdminHubAccess = computed(

@@ -1,6 +1,6 @@
 # SPEC 13 — Listados de inventario: vehículos, maquinaria y EPIs
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 10 (stores de categorías, subcategorías y tipos de elemento), SPEC 08 (patrón de listado paginado con filtros), `ProveedoresListPage.vue` y `UsersListPage.vue` como referencia visual. Usa stores de delegaciones, ubicaciones, departamentos y proveedores ya existentes.
 > **Date:** 2026-10-23
 > **Objective:** Añadir tres pantallas de solo lectura (Vehículos, Maquinaria y EPIs) que listan los elementos de inventario de cada tipo con paginación en servidor y filtros, replicando el aspecto de las tablas de administración existentes.

@@ -115,11 +115,20 @@ export const useCategoriasStore = defineStore('categorias', () => {
   }
 
   // Recorre todas las páginas (per_page=100) sin tocar items/meta/filters.
-  async function fetchAllCategorias(): Promise<Categoria[]> {
+  // Con tipoElementoInventarioId, solo las categorías de ese tipo.
+  async function fetchAllCategorias(tipoElementoInventarioId?: number): Promise<Categoria[]> {
     const fetchPage = async (page: number) => {
       const response = await api.get<{
         data: { items: CategoriaResource[]; meta: RawPaginationMeta };
-      }>('/categorias', { params: { page, per_page: 100 } });
+      }>('/categorias', {
+        params: {
+          page,
+          per_page: 100,
+          ...(tipoElementoInventarioId
+            ? { tipo_elemento_inventario_id: tipoElementoInventarioId }
+            : {}),
+        },
+      });
       return response.data.data;
     };
     const first = await fetchPage(1);

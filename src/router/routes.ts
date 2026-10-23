@@ -41,6 +41,21 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
+        path: 'inventario/vehiculos',
+        component: () => import('@/pages/inventario/VehiculosListPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.ver' },
+      },
+      {
+        path: 'inventario/maquinaria',
+        component: () => import('@/pages/inventario/MaquinariaListPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.ver' },
+      },
+      {
+        path: 'inventario/epis',
+        component: () => import('@/pages/inventario/EpisListPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.ver' },
+      },
+      {
         // Sin requiresPermission: el guard solo admite un permiso y el hub se abre con cualquiera
         // de varios; la propia página oculta las tarjetas sin permiso.
         path: 'admin/administracion',
