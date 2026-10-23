@@ -1,6 +1,6 @@
 # SPEC 15 — Carpetas en el detalle de inventario: vehículos, maquinaria y EPIs
 
-> **Status:** Aprobado
+> **Status:** 
 > **Depends on:** SPEC 14 (formularios de inventario, `InventarioForm.vue`, rutas `inventario/*/:id/editar`), SPEC 13 (listados y `TipoElemInventarioId`). Fuente de requisitos: `notas-jcn/tabs.md`.
 > **Date:** 2026-10-23
 > **Objective:** Añadir a la pantalla de edición de vehículos, maquinaria y EPIs un layout de carpetas (pestañas horizontales) con la carpeta «Información» (el formulario actual) y una carpeta por cada entidad relacionada, cada una con un skeleton no animado hasta que existan esas entidades.

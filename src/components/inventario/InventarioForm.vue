@@ -1,7 +1,7 @@
 <template>
-  <AdminPageWrapper wide align-top>
-    <GlassCard class="q-pa-md animate__fadeIn" style="min-height: 50vh">
-      <div class="row items-center justify-between q-mb-md">
+  <component :is="embedded ? 'div' : AdminPageWrapper" v-bind="wrapperAttrs">
+    <component :is="embedded ? 'div' : GlassCard" v-bind="cardAttrs">
+      <div v-if="!embedded" class="row items-center justify-between q-mb-md">
         <div class="text-h5 text-weight-bolder text-teal-10 font-outfit">
           {{ pageTitle }}
         </div>
@@ -938,8 +938,8 @@
           />
         </div>
       </q-form>
-    </GlassCard>
-  </AdminPageWrapper>
+    </component>
+  </component>
 </template>
 
 <script setup lang="ts">
@@ -968,6 +968,8 @@ import GlassCard from '@/components/common/GlassCard.vue';
 
 const props = defineProps<{
   tipoId: TipoElemInventarioId;
+  /** Se renderiza dentro de la carpeta «Información»: sin título, wrapper ni card propios. */
+  embedded?: boolean;
 }>();
 
 const $q = useQuasar();
@@ -984,6 +986,11 @@ const proveedoresStore = useProveedoresStore();
 const auxiliaresStore = useAuxiliaresInventarioStore();
 const periodicidadesStore = usePeriodicidadesStore();
 const usersStore = useUsersStore();
+
+const wrapperAttrs = computed(() => (props.embedded ? {} : { wide: true, alignTop: true }));
+const cardAttrs = computed(() =>
+  props.embedded ? {} : { class: 'q-pa-md animate__fadeIn', style: 'min-height: 50vh' },
+);
 
 const TIPO_KEYS = { 1: 'vehiculos', 2: 'maquinaria', 3: 'epis' } as const;
 const tipoKey = computed(() => TIPO_KEYS[props.tipoId]);
