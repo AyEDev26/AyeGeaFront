@@ -26,6 +26,16 @@ export interface AdminUser {
   almacen: OrgRef | null;
 }
 
+export interface UserSelectorOption {
+  id: number;
+  name: string;
+}
+
+export interface UserSelectorOption {
+  id: number;
+  name: string;
+}
+
 export interface UsersFilters {
   name?: string;
   email?: string;
@@ -225,6 +235,12 @@ export const useUsersStore = defineStore('users', () => {
     return [first, ...rest].flatMap((page) => page.items.map(mapUser));
   }
 
+  // Usuarios activos sin paginar, para selects (GET /users/selector).
+  async function fetchUsersSelector(): Promise<UserSelectorOption[]> {
+    const response = await api.get<{ data: UserSelectorOption[] }>('/users/selector');
+    return response.data.data.map((u) => ({ id: u.id, name: u.name }));
+  }
+
   return {
     items,
     meta,
@@ -233,6 +249,7 @@ export const useUsersStore = defineStore('users', () => {
     searchingUsers,
     fetchUsers,
     fetchAllUsers,
+    fetchUsersSelector,
     createUser,
     updateUser,
     deleteUser,

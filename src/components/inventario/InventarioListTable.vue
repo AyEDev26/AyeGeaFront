@@ -5,6 +5,16 @@
         <div class="text-h5 text-weight-bolder text-teal-10 font-outfit">
           {{ title }}
         </div>
+        <q-btn
+          v-if="auth.hasPermission('elementos_inventario.crear')"
+          unelevated
+          no-caps
+          color="primary"
+          icon="add"
+          :label="t('inventario.actions.new')"
+          class="elegant-btn"
+          @click="goToNew"
+        />
       </div>
 
       <div class="row q-col-gutter-sm q-mb-md items-start">
@@ -180,6 +190,34 @@
             </q-chip>
           </q-td>
         </template>
+        <template #body-cell-actions="props">
+          <q-td :props="props" class="text-center q-gutter-x-sm">
+            <q-btn
+              v-if="auth.hasPermission('elementos_inventario.editar')"
+              flat
+              round
+              dense
+              size="sm"
+              color="primary"
+              icon="edit"
+              @click="goToEdit(props.row)"
+            >
+              <q-tooltip>{{ t('inventario.actions.edit') }}</q-tooltip>
+            </q-btn>
+            <q-btn
+              v-if="auth.hasPermission('elementos_inventario.eliminar')"
+              flat
+              round
+              dense
+              size="sm"
+              color="negative"
+              icon="delete"
+              @click="onDeleteConfirm(props.row)"
+            >
+              <q-tooltip>{{ t('inventario.actions.delete') }}</q-tooltip>
+            </q-btn>
+          </q-td>
+        </template>
       </q-table>
     </GlassCard>
   </AdminPageWrapper>
@@ -187,6 +225,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, type Ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import {
@@ -195,6 +234,7 @@ import {
   type ElemsInventarioFilters,
   type TipoElemInventarioId,
 } from '@/stores/elemsInventario';
+import { useAuthStore } from '@/stores/auth';
 import { useCategoriasStore } from '@/stores/categorias';
 import { useSubcategoriasStore, type Subcategoria } from '@/stores/subcategorias';
 import { useDelegacionesStore } from '@/stores/delegaciones';
@@ -212,6 +252,8 @@ const props = defineProps<{
 
 const $q = useQuasar();
 const { t, locale } = useI18n();
+const router = useRouter();
+const auth = useAuthStore();
 const elemsStore = useElemsInventarioStore();
 const categoriasStore = useCategoriasStore();
 const subcategoriasStore = useSubcategoriasStore();
@@ -390,7 +432,7 @@ function marcaModelo(marca: string | null | undefined, modelo: string | null | u
   return [marca, modelo].filter(Boolean).join(' ') || null;
 }
 
-const columns = computed<QTableColumn<ElemInventario>[]>(() => {
+const dataColumns = computed<QTableColumn<ElemInventario>[]>(() => {
   const col = (
     name: string,
     field: (row: ElemInventario) => string | number | null | undefined,
@@ -456,6 +498,25 @@ const pagination = ref<{
 
 // El backend ordena por nombre y no soporta ordenación en servidor: sortBy/descending
 // solo reordenan las filas ya cargadas de la página actual.
+// La columna de acciones solo aparece si el usuario puede editar o eliminar.
+const columns = computed<QTableColumn<ElemInventario>[]>(() => {
+  if (
+    !auth.hasPermission('elementos_inventario.editar') &&
+    !auth.hasPermission('elementos_inventario.eliminar')
+  ) {
+    return dataColumns.value;
+  }
+  return [
+    ...dataColumns.value,
+    {
+      name: 'actions',
+      label: t('inventario.actions.columnLabel'),
+      field: 'id',
+      align: 'center',
+    },
+  ];
+});
+
 const sortedItems = computed(() => {
   const { sortBy, descending } = pagination.value;
   const column = sortBy ? columns.value.find((c) => c.name === sortBy) : undefined;
@@ -519,6 +580,43 @@ async function onRequest(requestProps: {
 
   await fetchPage(page, rowsPerPage);
   hasLoadedOnce.value = true;
+}
+
+const TIPO_PATHS = { 1: 'vehiculos', 2: 'maquinaria', 3: 'epis' } as const;
+const basePath = computed(() => `/inventario/${TIPO_PATHS[props.tipoId]}`);
+
+function goToNew() {
+  void router.push(`${basePath.value}/nuevo`);
+}
+
+function goToEdit(row: ElemInventario) {
+  void router.push(`${basePath.value}/${row.id}/editar`);
+}
+
+function onDeleteConfirm(row: ElemInventario) {
+  $q.dialog({
+    title: t('inventario.delete.title'),
+    message: t('inventario.delete.message', { nombre: row.nombre }),
+    ok: { label: t('inventario.delete.confirm'), color: 'negative', flat: true, noCaps: true },
+    cancel: { label: t('common.cancel'), flat: true, noCaps: true, color: 'grey-7' },
+    persistent: true,
+  }).onOk(() => {
+    void onDelete(row);
+  });
+}
+
+async function onDelete(row: ElemInventario) {
+  // El borrado invalida el estado del tipo: se guarda la página y los filtros para recargarla.
+  const { page, rowsPerPage } = pagination.value;
+  const targetPage = state.value.items.length === 1 && page > 1 ? page - 1 : page;
+  try {
+    await elemsStore.deleteElem(row.id, props.tipoId);
+    $q.notify({ type: 'positive', color: 'teal-9', message: t('inventario.delete.success') });
+  } catch (error) {
+    notifyError(error, t('inventario.delete.error'));
+    return;
+  }
+  await fetchPage(targetPage, rowsPerPage);
 }
 
 async function onFilterClick() {

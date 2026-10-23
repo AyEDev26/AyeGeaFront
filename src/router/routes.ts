@@ -56,6 +56,36 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.ver' },
       },
       {
+        path: 'inventario/vehiculos/nuevo',
+        component: () => import('@/pages/inventario/VehiculoFormPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.crear' },
+      },
+      {
+        path: 'inventario/vehiculos/:id/editar',
+        component: () => import('@/pages/inventario/VehiculoFormPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.editar' },
+      },
+      {
+        path: 'inventario/maquinaria/nuevo',
+        component: () => import('@/pages/inventario/MaquinariaFormPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.crear' },
+      },
+      {
+        path: 'inventario/maquinaria/:id/editar',
+        component: () => import('@/pages/inventario/MaquinariaFormPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.editar' },
+      },
+      {
+        path: 'inventario/epis/nuevo',
+        component: () => import('@/pages/inventario/EpiFormPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.crear' },
+      },
+      {
+        path: 'inventario/epis/:id/editar',
+        component: () => import('@/pages/inventario/EpiFormPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.editar' },
+      },
+      {
         // Sin requiresPermission: el guard solo admite un permiso y el hub se abre con cualquiera
         // de varios; la propia página oculta las tarjetas sin permiso.
         path: 'admin/administracion',
