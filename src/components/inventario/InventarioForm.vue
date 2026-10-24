@@ -12,6 +12,53 @@
       </div>
 
       <q-form v-else ref="formRef" class="q-gutter-y-md" @submit.prevent="onSubmit">
+        <div class="form-actions row justify-end q-mb-md q-gutter-x-sm">
+          <q-btn
+            v-if="isEditMode"
+            outline
+            no-caps
+            color="teal-9"
+            class="elegant-btn"
+            icon="picture_as_pdf"
+            :label="t('inventario.pdf.button')"
+            :loading="generatingPdf"
+            :disable="saving"
+            @click="onGeneratePdf"
+          >
+            <q-tooltip>{{ t('inventario.pdf.tooltip') }}</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-if="isEditMode && canDuplicate"
+            outline
+            no-caps
+            color="teal-9"
+            class="elegant-btn"
+            icon="content_copy"
+            :label="t('inventario.duplicar.button')"
+            :disable="saving"
+            @click="duplicarVisible = true"
+          >
+            <q-tooltip>{{ t('inventario.duplicar.tooltip') }}</q-tooltip>
+          </q-btn>
+          <q-btn
+            flat
+            no-caps
+            color="grey-7"
+            :label="t('common.cancel')"
+            :disable="saving"
+            @click="goToList"
+          />
+          <q-btn
+            unelevated
+            no-caps
+            color="primary"
+            class="elegant-btn px-lg"
+            type="submit"
+            :label="t('common.save')"
+            :loading="saving"
+          />
+        </div>
+
         <!-- Datos generales -->
         <section class="form-section form-section--general">
           <div class="form-section__title text-subtitle1 text-weight-bold font-outfit q-mb-sm">
@@ -917,41 +964,13 @@
             </div>
           </div>
         </section>
-
-        <div class="row justify-end q-gutter-x-sm">
-          <q-btn
-            v-if="isEditMode"
-            outline
-            no-caps
-            color="teal-9"
-            class="elegant-btn"
-            icon="picture_as_pdf"
-            :label="t('inventario.pdf.button')"
-            :loading="generatingPdf"
-            :disable="saving"
-            @click="onGeneratePdf"
-          >
-            <q-tooltip>{{ t('inventario.pdf.tooltip') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            flat
-            no-caps
-            color="grey-7"
-            :label="t('common.cancel')"
-            :disable="saving"
-            @click="goToList"
-          />
-          <q-btn
-            unelevated
-            no-caps
-            color="primary"
-            class="elegant-btn px-lg"
-            type="submit"
-            :label="t('common.save')"
-            :loading="saving"
-          />
-        </div>
       </q-form>
+      <InventarioDuplicarDialog
+        v-if="canDuplicate && elemId !== null"
+        v-model="duplicarVisible"
+        :tipo-id="tipoId"
+        :elem-id="elemId"
+      />
     </component>
   </component>
 </template>
@@ -978,6 +997,8 @@ import { usePeriodicidadesStore } from '@/stores/periodicidades';
 import { useUsersStore } from '@/stores/users';
 import { getApiErrorMessage } from '@/utils/api-error';
 import { useInventarioPdf } from '@/composables/useInventarioPdf';
+import { useAuthStore } from '@/stores/auth';
+import InventarioDuplicarDialog from '@/components/inventario/InventarioDuplicarDialog.vue';
 import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
 import GlassCard from '@/components/common/GlassCard.vue';
 
@@ -1002,6 +1023,9 @@ const auxiliaresStore = useAuxiliaresInventarioStore();
 const periodicidadesStore = usePeriodicidadesStore();
 const usersStore = useUsersStore();
 const { loading: generatingPdf, generate: generatePdf } = useInventarioPdf();
+const auth = useAuthStore();
+const canDuplicate = computed(() => auth.hasPermission('elementos_inventario.crear'));
+const duplicarVisible = ref(false);
 
 const wrapperAttrs = computed(() => (props.embedded ? {} : { wide: true, alignTop: true }));
 const cardAttrs = computed(() =>
@@ -1440,6 +1464,20 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.form-actions {
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #00695c;
+  box-shadow: 0 2px 8px rgba(0, 77, 64, 0.35);
+}
+/* Fondo oscuro: las clases de color de Quasar usan !important, así que se sobrescriben igual. */
+.form-actions :deep(.q-btn) {
+  color: #fff !important;
+}
+.form-actions :deep(.q-btn[type='submit']) {
+  background: #fff !important;
+  color: #004d40 !important;
+}
 .form-section {
   padding: 12px 16px;
   border-radius: 8px;

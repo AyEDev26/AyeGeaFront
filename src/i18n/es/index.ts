@@ -756,6 +756,19 @@ export default {
       imageWarning: 'No se pudo incluir la imagen en el PDF.',
       error: 'No se pudo generar el PDF.',
     },
+    duplicar: {
+      button: 'Duplicar',
+      tooltip: 'Duplica el elemento con los datos guardados',
+      title: 'Duplicar elemento',
+      description:
+        'Se creará un elemento nuevo con los datos guardados del original. El número de serie, la matrícula, la baja y la imagen no se copian.',
+      referencia: 'Referencia del nuevo elemento',
+      referenciaRequired: 'La referencia es obligatoria',
+      cancel: 'Cancelar',
+      confirm: 'Duplicar',
+      success: 'Elemento duplicado.',
+      error: 'No se pudo duplicar el elemento.',
+    },
     carpetas: {
       ariaLabel: 'Carpetas del elemento',
       comingSoon: 'Próximamente',

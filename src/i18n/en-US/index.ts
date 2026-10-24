@@ -756,6 +756,19 @@ export default {
       imageWarning: 'The image could not be included in the PDF.',
       error: 'Could not generate the PDF.',
     },
+    duplicar: {
+      button: 'Duplicate',
+      tooltip: 'Duplicates the item with its saved data',
+      title: 'Duplicate item',
+      description:
+        'A new item will be created with the saved data of the original. The serial number, license plate, deregistration and image are not copied.',
+      referencia: 'Reference of the new item',
+      referenciaRequired: 'Reference is required',
+      cancel: 'Cancel',
+      confirm: 'Duplicate',
+      success: 'Item duplicated.',
+      error: 'Could not duplicate the item.',
+    },
     carpetas: {
       ariaLabel: 'Item folders',
       comingSoon: 'Coming soon',

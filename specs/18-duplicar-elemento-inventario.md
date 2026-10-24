@@ -1,4 +1,4 @@
-# SPEC 17 — Duplicar elemento de inventario: vehículos, maquinaria y EPIs
+# SPEC 18 — Duplicar elemento de inventario: vehículos, maquinaria y EPIs
 
 > **Status:** Aprobado
 > **Depends on:** SPEC 14 (formularios de inventario, `InventarioForm.vue`, store `elemsInventario.ts` con `fetchElem` / `createElem`), SPEC 15 (carpeta «Información» dentro de `InventarioTabs`, edición en `inventario/*/:id/editar`), SPEC 16 (barra de acciones con el botón «Generar PDF»).
@@ -116,7 +116,7 @@ Convenciones:
 - **Botón en la barra de acciones de «Información» con permiso `crear`** (decisión del usuario) frente a la cabecera de página: acompaña a «Generar PDF», solo existe donde hay datos que copiar y el permiso refleja que se crea un elemento.
 - **Sin permiso nuevo:** `elementos_inventario.crear` ya existe y describe exactamente la acción.
 - **Imagen no copiada:** copiarla exigiría descargarla y volver a subirla (con el riesgo de CORS visto en la SPEC 16); se deja para otra spec si se necesita.
-- **El estado de la spec se escribe en español** (`Borrador`), siguiendo las SPEC anteriores.
+- **El estado de la spec se escribe en español** (`Aprobado`), siguiendo las SPEC anteriores.
 
 ---
 
