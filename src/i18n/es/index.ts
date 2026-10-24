@@ -769,6 +769,22 @@ export default {
       success: 'Elemento duplicado.',
       error: 'No se pudo duplicar el elemento.',
     },
+    export: {
+      button: 'Exportar',
+      excel: 'Excel (.xlsx)',
+      pdf: 'PDF',
+      titles: {
+        vehiculos: 'Listado de vehículos',
+        maquinaria: 'Listado de maquinaria',
+        epis: 'Listado de EPIs',
+      },
+      noFilters: 'Sin filtros',
+      filtersTitle: 'Filtros aplicados',
+      generatedAt: 'Generado el {date}',
+      footerPage: 'Página {page} de {pages}',
+      success: 'Listado exportado.',
+      error: 'No se pudo exportar el listado.',
+    },
     carpetas: {
       ariaLabel: 'Carpetas del elemento',
       comingSoon: 'Próximamente',

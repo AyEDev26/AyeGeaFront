@@ -548,6 +548,44 @@ export const useElemsInventarioStore = defineStore('elemsInventario', () => {
     );
   }
 
+  // Todos los elementos de un tipo que cumplen los filtros, recorriendo las páginas
+  // (per_page=100; las posteriores a la primera, en lotes de 5), sin tocar byTipo.
+  // Si alguna petición falla se propaga el error y no se devuelve nada parcial.
+  async function fetchAllElems(
+    tipoId: TipoElemInventarioId,
+    filters: ElemsInventarioFilters = {},
+  ): Promise<ElemInventario[]> {
+    const fetchPage = async (page: number) => {
+      const response = await api.get<{
+        data: { items: ElemInventarioResource[]; meta: RawPaginationMeta };
+      }>('/elems-inventario', {
+        params: {
+          tipo_elemento_inventario_id: tipoId,
+          page,
+          per_page: 100,
+          ...buildFilterParams(tipoId, filters),
+        },
+      });
+      return response.data.data;
+    };
+    const first = await fetchPage(1);
+    const pages = [first];
+    const batchSize = 5;
+    for (let start = 2; start <= first.meta.last_page; start += batchSize) {
+      const end = Math.min(start + batchSize - 1, first.meta.last_page);
+      const batch = await Promise.all(
+        Array.from({ length: end - start + 1 }, (_, i) => fetchPage(start + i)),
+      );
+      pages.push(...batch);
+    }
+    // Los datos pueden cambiar entre peticiones: se deduplica por id.
+    const byId = new Map<number, ElemInventario>();
+    for (const page of pages) {
+      for (const resource of page.items) byId.set(resource.id, mapElem(resource));
+    }
+    return [...byId.values()];
+  }
+
   // Busca por referencia exacta (sin distinguir mayúsculas) en los 3 tipos, sin tocar byTipo.
   // El filtro de la API puede ser parcial: la igualdad exacta se comprueba en cliente.
   // Si alguna petición falla se propaga el error y no se devuelve ningún resultado.
@@ -584,6 +622,7 @@ export const useElemsInventarioStore = defineStore('elemsInventario', () => {
     deleteElem,
     uploadImagen,
     fetchAllVehiculos,
+    fetchAllElems,
     findElemByReferencia,
   };
 });

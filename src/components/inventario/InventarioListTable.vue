@@ -157,6 +157,34 @@
             :label="t('inventario.filters.clearButton')"
             @click="onClearClick"
           />
+          <q-btn
+            v-if="auth.hasPermission('elementos_inventario.ver')"
+            unelevated
+            no-caps
+            color="teal-9"
+            icon="download"
+            class="elegant-btn"
+            :label="t('inventario.export.button')"
+            :loading="exporting"
+            :disable="state.loading || state.meta.total === 0"
+          >
+            <q-menu auto-close>
+              <q-list dense style="min-width: 150px">
+                <q-item clickable @click="exportList('excel')">
+                  <q-item-section avatar>
+                    <q-icon name="table_view" color="teal-9" />
+                  </q-item-section>
+                  <q-item-section>{{ t('inventario.export.excel') }}</q-item-section>
+                </q-item>
+                <q-item clickable @click="exportList('pdf')">
+                  <q-item-section avatar>
+                    <q-icon name="picture_as_pdf" color="teal-9" />
+                  </q-item-section>
+                  <q-item-section>{{ t('inventario.export.pdf') }}</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
         </div>
       </div>
 
@@ -241,6 +269,7 @@ import { useDelegacionesStore } from '@/stores/delegaciones';
 import { useUbicacionesStore } from '@/stores/ubicaciones';
 import { useDepartamentosStore } from '@/stores/departamentos';
 import { useProveedoresStore } from '@/stores/proveedores';
+import { useInventarioListExport } from '@/composables/useInventarioListExport';
 import { getApiErrorMessage } from '@/utils/api-error';
 import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
 import GlassCard from '@/components/common/GlassCard.vue';
@@ -480,6 +509,22 @@ const dataColumns = computed<QTableColumn<ElemInventario>[]>(() => {
     ];
   }
   return [...common, col('stockMinimo', (r) => r.epi?.stockMinimo), estado];
+});
+
+// --- Exportación ---------------------------------------------------------------
+
+const { exporting, exportList } = useInventarioListExport({
+  tipoId: () => props.tipoId,
+  dataColumns,
+  appliedFilters,
+  filterOptions: () => ({
+    categoriaId: categoriaSelect.all.value,
+    subcategoriaId: allSubcategorias.value,
+    delegacionId: delegacionSelect.all.value,
+    ubicacionId: ubicacionSelect.all.value,
+    departamentoId: departamentoSelect.all.value,
+    proveedorId: proveedorSelect.all.value,
+  }),
 });
 
 // --- Paginación, orden y carga ------------------------------------------------

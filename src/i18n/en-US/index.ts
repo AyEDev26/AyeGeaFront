@@ -769,6 +769,22 @@ export default {
       success: 'Item duplicated.',
       error: 'Could not duplicate the item.',
     },
+    export: {
+      button: 'Export',
+      excel: 'Excel (.xlsx)',
+      pdf: 'PDF',
+      titles: {
+        vehiculos: 'Vehicle list',
+        maquinaria: 'Machinery list',
+        epis: 'PPE list',
+      },
+      noFilters: 'No filters',
+      filtersTitle: 'Applied filters',
+      generatedAt: 'Generated on {date}',
+      footerPage: 'Page {page} of {pages}',
+      success: 'List exported.',
+      error: 'Could not export the list.',
+    },
     carpetas: {
       ariaLabel: 'Item folders',
       comingSoon: 'Coming soon',

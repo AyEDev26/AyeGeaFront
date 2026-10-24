@@ -43,11 +43,11 @@ const COLOR_MUTED = '#607d8b';
 
 const HEADER_BOX = 110;
 
-function unwrapDefault<T>(mod: T | { default: T }): T {
+export function unwrapDefault<T>(mod: T | { default: T }): T {
   return (mod as { default?: T }).default ?? (mod as T);
 }
 
-async function loadPdfMake() {
+export async function loadPdfMake() {
   const [pdfMakeMod, vfsMod] = await Promise.all([
     import('pdfmake/build/pdfmake'),
     import('pdfmake/build/vfs_fonts'),
