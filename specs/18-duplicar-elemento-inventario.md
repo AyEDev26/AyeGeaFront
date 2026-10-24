@@ -1,6 +1,6 @@
 # SPEC 17 — Duplicar elemento de inventario: vehículos, maquinaria y EPIs
 
-> **Status:** Borrador
+> **Status:** Aprobado
 > **Depends on:** SPEC 14 (formularios de inventario, `InventarioForm.vue`, store `elemsInventario.ts` con `fetchElem` / `createElem`), SPEC 15 (carpeta «Información» dentro de `InventarioTabs`, edición en `inventario/*/:id/editar`), SPEC 16 (barra de acciones con el botón «Generar PDF»).
 > **Date:** 2026-10-24
 > **Objective:** Añadir a la carpeta «Información» de la edición de vehículos, maquinaria y EPIs un botón «Duplicar» que pida la referencia del nuevo elemento y cree, con los demás datos guardados del original, un elemento nuevo del mismo tipo, abriendo después su pantalla de edición.
