@@ -920,6 +920,20 @@
 
         <div class="row justify-end q-gutter-x-sm">
           <q-btn
+            v-if="isEditMode"
+            outline
+            no-caps
+            color="teal-9"
+            class="elegant-btn"
+            icon="picture_as_pdf"
+            :label="t('inventario.pdf.button')"
+            :loading="generatingPdf"
+            :disable="saving"
+            @click="onGeneratePdf"
+          >
+            <q-tooltip>{{ t('inventario.pdf.tooltip') }}</q-tooltip>
+          </q-btn>
+          <q-btn
             flat
             no-caps
             color="grey-7"
@@ -963,6 +977,7 @@ import { useAuxiliaresInventarioStore } from '@/stores/auxiliaresInventario';
 import { usePeriodicidadesStore } from '@/stores/periodicidades';
 import { useUsersStore } from '@/stores/users';
 import { getApiErrorMessage } from '@/utils/api-error';
+import { useInventarioPdf } from '@/composables/useInventarioPdf';
 import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
 import GlassCard from '@/components/common/GlassCard.vue';
 
@@ -986,6 +1001,7 @@ const proveedoresStore = useProveedoresStore();
 const auxiliaresStore = useAuxiliaresInventarioStore();
 const periodicidadesStore = usePeriodicidadesStore();
 const usersStore = useUsersStore();
+const { loading: generatingPdf, generate: generatePdf } = useInventarioPdf();
 
 const wrapperAttrs = computed(() => (props.embedded ? {} : { wide: true, alignTop: true }));
 const cardAttrs = computed(() =>
@@ -1363,6 +1379,10 @@ async function loadElem(id: number) {
     notifyError(error, t('inventario.form.loadError'));
     void router.replace(listPath.value);
   }
+}
+
+async function onGeneratePdf() {
+  if (elemId.value !== null) await generatePdf(props.tipoId, elemId.value);
 }
 
 async function onSubmit() {
