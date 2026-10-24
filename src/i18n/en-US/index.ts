@@ -851,6 +851,15 @@ export default {
       subtitle:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     },
+    search: {
+      title: 'Search',
+      fieldLabel: 'Reference',
+      placeholder: 'Enter the item reference',
+      button: 'Search',
+      notFound: 'No item with the reference «{referencia}» exists in the inventory',
+      noPermission: 'The item exists but you do not have permission to open its record',
+      error: 'The search could not be completed. Please try again.',
+    },
     sectionTitle: 'Featured capabilities',
     features: {
       users: {

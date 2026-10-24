@@ -14,6 +14,8 @@
       </div>
     </GlassCard>
 
+    <HomeSearchCard v-if="auth.hasPermission('elementos_inventario.ver')" class="q-mt-lg" />
+
     <q-separator class="q-my-lg" />
 
     <div class="text-h6 font-outfit text-teal-10 q-mb-md">{{ t('home.sectionTitle') }}</div>
@@ -47,6 +49,8 @@
 import { useI18n } from 'vue-i18n';
 import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
 import GlassCard from '@/components/common/GlassCard.vue';
+import HomeSearchCard from '@/components/home/HomeSearchCard.vue';
+import { useAuthStore } from '@/stores/auth';
 import heroImage from '@/assets/images/home/hero-gestion-activos.jpg';
 import usersImage from '@/assets/images/home/feature-users.jpg';
 import reportsImage from '@/assets/images/home/feature-reports.jpg';
@@ -61,6 +65,7 @@ interface HomeFeatureCard {
 }
 
 const { t } = useI18n();
+const auth = useAuthStore();
 
 const features: HomeFeatureCard[] = [
   { key: 'users', icon: 'people' },

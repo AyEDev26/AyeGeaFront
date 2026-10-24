@@ -117,6 +117,12 @@ export interface VehiculoOption {
   nombre: string;
 }
 
+// Resultado de buscar un elemento por referencia exacta (ver findElemByReferencia).
+export interface ElemReferenciaMatch {
+  id: number;
+  tipoId: TipoElemInventarioId;
+}
+
 // Forma cruda del ElemInventarioResource del backend (ver GET /api/documentation).
 interface ElemInventarioResource {
   id: number;
@@ -542,6 +548,32 @@ export const useElemsInventarioStore = defineStore('elemsInventario', () => {
     );
   }
 
+  // Busca por referencia exacta (sin distinguir mayúsculas) en los 3 tipos, sin tocar byTipo.
+  // El filtro de la API puede ser parcial: la igualdad exacta se comprueba en cliente.
+  // Si alguna petición falla se propaga el error y no se devuelve ningún resultado.
+  async function findElemByReferencia(referencia: string): Promise<ElemReferenciaMatch | null> {
+    const wanted = referencia.trim().toLowerCase();
+    const tipos: TipoElemInventarioId[] = [1, 2, 3];
+    const results = await Promise.all(
+      tipos.map((tipoId) =>
+        api.get<{ data: { items: ElemInventarioResource[] } }>('/elems-inventario', {
+          params: {
+            tipo_elemento_inventario_id: tipoId,
+            per_page: 100,
+            ...buildFilterParams(tipoId, { referencia: referencia.trim() }),
+          },
+        }),
+      ),
+    );
+    for (const [i, response] of results.entries()) {
+      const match = response.data.data.items
+        .map(mapElem)
+        .find((elem) => elem.referencia?.trim().toLowerCase() === wanted);
+      if (match) return { id: match.id, tipoId: tipos[i]! };
+    }
+    return null;
+  }
+
   return {
     byTipo,
     fetchElems,
@@ -552,5 +584,6 @@ export const useElemsInventarioStore = defineStore('elemsInventario', () => {
     deleteElem,
     uploadImagen,
     fetchAllVehiculos,
+    findElemByReferencia,
   };
 });

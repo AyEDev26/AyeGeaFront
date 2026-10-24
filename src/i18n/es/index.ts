@@ -851,6 +851,15 @@ export default {
       subtitle:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     },
+    search: {
+      title: 'Buscar',
+      fieldLabel: 'Referencia',
+      placeholder: 'Introduce la referencia del elemento',
+      button: 'Buscar',
+      notFound: 'No existe ningún elemento con la referencia «{referencia}» en el inventario',
+      noPermission: 'El elemento existe pero no tienes permiso para abrir su ficha',
+      error: 'No se ha podido realizar la búsqueda. Inténtalo de nuevo.',
+    },
     sectionTitle: 'Funcionalidades destacadas',
     features: {
       users: {
