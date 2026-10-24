@@ -1,6 +1,6 @@
 # SPEC 17 — Tarjeta «Buscar» por referencia en la página Home
 
-> **Status:** Borrador
+> **Status:** Aprobado
 > **Depends on:** SPEC 13 (listados y store `elemsInventario.ts`, filtro `referencia`, `TipoElemInventarioId`), SPEC 14 (rutas `inventario/*/:id/editar`), SPEC 15 (la edición es la pantalla con carpetas). Complementa a SPEC 16 (el QR de la ficha codifica la referencia).
 > **Date:** 2026-10-24
 > **Objective:** Añadir a la página Home una tarjeta «Buscar» con un campo de referencia y un botón que busque el elemento de inventario con esa referencia (vehículo, maquinaria o EPI) y navegue a su pantalla de detalle, o muestre un mensaje si no existe.
