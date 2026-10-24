@@ -10,6 +10,12 @@ interface NamedRef {
   nombre: string;
 }
 
+// El backend devuelve el nombre del usuario responsable en `name`; en el dominio se normaliza a `nombre`.
+interface ResponsableRef {
+  id: number;
+  nombre: string;
+}
+
 export interface ElemInventario {
   id: number;
   tipoElementoInventarioId: number;
@@ -25,9 +31,19 @@ export interface ElemInventario {
     matricula: string | null;
     marca: string | null;
     modelo: string | null;
+    ultimaRevision: string | null;
     proximaRevision: string | null;
+    responsable: ResponsableRef | null;
+    critico: boolean;
   };
-  maquinaria?: { marca: string | null; modelo: string | null; proximaRevision: string | null };
+  maquinaria?: {
+    marca: string | null;
+    modelo: string | null;
+    ultimaRevision: string | null;
+    proximaRevision: string | null;
+    responsable: ResponsableRef | null;
+    critico: boolean;
+  };
   epi?: { stockMinimo: number | null };
 }
 
@@ -139,12 +155,18 @@ interface ElemInventarioResource {
     matricula?: string | null;
     marca?: string | null;
     modelo?: string | null;
+    ultima_revision?: string | null;
     proxima_revision?: string | null;
+    responsable?: { id: number; name: string } | null;
+    critico?: boolean | null;
   } | null;
   maquinaria?: {
     marca?: string | null;
     modelo?: string | null;
+    ultima_revision?: string | null;
     proxima_revision?: string | null;
+    responsable?: { id: number; name: string } | null;
+    critico?: boolean | null;
   } | null;
   epi?: { stock_minimo?: number | null } | null;
 }
@@ -209,6 +231,12 @@ function mapNamed(ref: NamedRef | null | undefined): NamedRef | null {
   return ref ? { id: ref.id, nombre: ref.nombre } : null;
 }
 
+function mapResponsable(
+  ref: { id: number; name: string } | null | undefined,
+): ResponsableRef | null {
+  return ref ? { id: ref.id, nombre: ref.name } : null;
+}
+
 function mapElem(resource: ElemInventarioResource): ElemInventario {
   const elem: ElemInventario = {
     id: resource.id,
@@ -229,14 +257,20 @@ function mapElem(resource: ElemInventarioResource): ElemInventario {
       matricula: resource.vehiculo.matricula ?? null,
       marca: resource.vehiculo.marca ?? null,
       modelo: resource.vehiculo.modelo ?? null,
+      ultimaRevision: resource.vehiculo.ultima_revision ?? null,
       proximaRevision: resource.vehiculo.proxima_revision ?? null,
+      responsable: mapResponsable(resource.vehiculo.responsable),
+      critico: resource.vehiculo.critico ?? false,
     };
   }
   if (resource.maquinaria) {
     elem.maquinaria = {
       marca: resource.maquinaria.marca ?? null,
       modelo: resource.maquinaria.modelo ?? null,
+      ultimaRevision: resource.maquinaria.ultima_revision ?? null,
       proximaRevision: resource.maquinaria.proxima_revision ?? null,
+      responsable: mapResponsable(resource.maquinaria.responsable),
+      critico: resource.maquinaria.critico ?? false,
     };
   }
   if (resource.epi) {

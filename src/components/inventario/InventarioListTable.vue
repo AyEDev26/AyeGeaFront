@@ -194,6 +194,7 @@
         bordered
         dense
         class="elegant-table"
+        :class="{ 'inventario-table--sticky': hasStickyColumns }"
         :rows="sortedItems"
         :columns="columns"
         row-key="id"
@@ -216,6 +217,20 @@
                   : t('inventario.estados.inactive')
               }}
             </q-chip>
+          </q-td>
+        </template>
+        <template #body-cell-critico="props">
+          <q-td :props="props">
+            <q-chip
+              v-if="props.row.vehiculo?.critico || props.row.maquinaria?.critico"
+              dense
+              square
+              color="red-7"
+              text-color="white"
+            >
+              {{ t('inventario.columns.critico') }}
+            </q-chip>
+            <template v-else>—</template>
           </q-td>
         </template>
         <template #body-cell-actions="props">
@@ -461,6 +476,20 @@ function marcaModelo(marca: string | null | undefined, modelo: string | null | u
   return [marca, modelo].filter(Boolean).join(' ') || null;
 }
 
+// Vehículos y maquinaria: referencia y nombre quedan ancladas a la izquierda (SPEC 20).
+const hasStickyColumns = computed(() => props.tipoId !== 3);
+
+function withStickyColumns(cols: QTableColumn<ElemInventario>[]): QTableColumn<ElemInventario>[] {
+  const sticky: Record<string, string> = {
+    referencia: 'sticky-col sticky-col--referencia',
+    nombre: 'sticky-col sticky-col--nombre',
+  };
+  return cols.map((c) => {
+    const cls = sticky[c.name];
+    return cls ? { ...c, classes: cls, headerClasses: cls } : c;
+  });
+}
+
 const dataColumns = computed<QTableColumn<ElemInventario>[]>(() => {
   const col = (
     name: string,
@@ -475,14 +504,21 @@ const dataColumns = computed<QTableColumn<ElemInventario>[]>(() => {
     format,
   });
 
-  const common = [
+  const base = [
     col('referencia', (r) => r.referencia),
     col('nombre', (r) => r.nombre),
     col('categoria', (r) => r.categoria?.nombre),
+  ];
+  const delegacion = col('delegacion', (r) => r.delegacion?.nombre);
+  const common = [
+    ...base,
     col('subcategoria', (r) => r.subcategoria?.nombre),
-    col('delegacion', (r) => r.delegacion?.nombre),
+    delegacion,
     col('ubicacion', (r) => r.ubicacion?.nombre),
   ];
+  // Vehículos y maquinaria: sin subcategoría ni ubicación (SPEC 20).
+  const commonRevisables = [...base, delegacion];
+  const critico = (r: ElemInventario) => (r.vehiculo?.critico || r.maquinaria?.critico ? 1 : 0);
   const estado: QTableColumn<ElemInventario> = {
     name: 'estado',
     label: t('inventario.columns.estado'),
@@ -492,21 +528,27 @@ const dataColumns = computed<QTableColumn<ElemInventario>[]>(() => {
   };
 
   if (props.tipoId === 1) {
-    return [
-      ...common,
+    return withStickyColumns([
+      ...commonRevisables,
       col('matricula', (r) => r.vehiculo?.matricula),
       col('marcaModelo', (r) => marcaModelo(r.vehiculo?.marca, r.vehiculo?.modelo)),
+      col('ultimaRevision', (r) => r.vehiculo?.ultimaRevision, formatDate),
       col('proximaRevision', (r) => r.vehiculo?.proximaRevision, formatDate),
+      col('responsable', (r) => r.vehiculo?.responsable?.nombre),
+      col('critico', critico),
       estado,
-    ];
+    ]);
   }
   if (props.tipoId === 2) {
-    return [
-      ...common,
+    return withStickyColumns([
+      ...commonRevisables,
       col('marcaModelo', (r) => marcaModelo(r.maquinaria?.marca, r.maquinaria?.modelo)),
+      col('ultimaRevision', (r) => r.maquinaria?.ultimaRevision, formatDate),
       col('proximaRevision', (r) => r.maquinaria?.proximaRevision, formatDate),
+      col('responsable', (r) => r.maquinaria?.responsable?.nombre),
+      col('critico', critico),
       estado,
-    ];
+    ]);
   }
   return [...common, col('stockMinimo', (r) => r.epi?.stockMinimo), estado];
 });
@@ -690,5 +732,33 @@ onMounted(() => {
     width: 12.5%;
     min-width: 150px;
   }
+}
+
+/* Columnas fijas: referencia y nombre se anclan a la izquierda al hacer scroll horizontal. */
+.inventario-table--sticky :deep(.sticky-col) {
+  position: sticky;
+  z-index: 1;
+  background-color: #ffffff;
+}
+
+.inventario-table--sticky :deep(th.sticky-col) {
+  z-index: 2;
+}
+
+.inventario-table--sticky :deep(.sticky-col--referencia) {
+  left: 0;
+  width: 130px;
+  min-width: 130px;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inventario-table--sticky :deep(.sticky-col--nombre) {
+  left: 130px;
+  min-width: 180px;
+  max-width: 240px;
+  white-space: normal;
+  box-shadow: 2px 0 4px -2px rgba(15, 23, 42, 0.25);
 }
 </style>

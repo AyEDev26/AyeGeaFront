@@ -632,7 +632,10 @@ export default {
       estado: 'Estado',
       matricula: 'Matrícula',
       marcaModelo: 'Marca / modelo',
+      ultimaRevision: 'Última revisión',
       proximaRevision: 'Próxima revisión',
+      responsable: 'Responsable',
+      critico: 'Crítico',
       stockMinimo: 'Stock mínimo',
     },
     estados: {
@@ -784,6 +787,8 @@ export default {
       footerPage: 'Página {page} de {pages}',
       success: 'Listado exportado.',
       error: 'No se pudo exportar el listado.',
+      yes: 'Sí',
+      no: 'No',
     },
     carpetas: {
       ariaLabel: 'Carpetas del elemento',

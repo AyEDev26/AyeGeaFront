@@ -44,6 +44,7 @@ export interface UseInventarioListExportOptions {
 
 const TIPO_KEYS = { 1: 'vehiculos', 2: 'maquinaria', 3: 'epis' } as const;
 const COLUMN_TYPES: Record<string, InventarioExportColumn['type']> = {
+  ultimaRevision: 'date',
   proximaRevision: 'date',
   stockMinimo: 'number',
 };
@@ -93,6 +94,9 @@ export function useInventarioListExport(options: UseInventarioListExportOptions)
         return row.estadoId === 1
           ? t('inventario.estados.active')
           : t('inventario.estados.inactive');
+      }
+      if (column.name === 'critico') {
+        return rawValue(column, row) ? t('inventario.export.yes') : t('inventario.export.no');
       }
       const value = rawValue(column, row);
       if (value === null || value === undefined || value === '') return null;

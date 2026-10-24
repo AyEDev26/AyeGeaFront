@@ -632,7 +632,10 @@ export default {
       estado: 'Status',
       matricula: 'License plate',
       marcaModelo: 'Make / model',
+      ultimaRevision: 'Last inspection',
       proximaRevision: 'Next inspection',
+      responsable: 'Responsible',
+      critico: 'Critical',
       stockMinimo: 'Minimum stock',
     },
     estados: {
@@ -784,6 +787,8 @@ export default {
       footerPage: 'Page {page} of {pages}',
       success: 'List exported.',
       error: 'Could not export the list.',
+      yes: 'Yes',
+      no: 'No',
     },
     carpetas: {
       ariaLabel: 'Item folders',
