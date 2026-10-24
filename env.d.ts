@@ -16,3 +16,7 @@ interface ImportMetaEnv {
   // Origen del backend para el proxy de dev (solo lo lee quasar.config.ts)
   readonly BACKEND_URL?: string;
 }
+
+// Build ID inyectado en compilación desde quasar.config.ts (build.define).
+// Solo lo lee src/utils/build-info.ts.
+declare const __BUILD_ID__: string;

@@ -1,7 +1,27 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
+import { execSync } from 'node:child_process';
 import { defineConfig } from '#q-app';
+
+// Build ID: YYYYMMDD-HHmm-<hash git corto>, hora local de la máquina que construye.
+// Si git no está disponible se omite el hash; el build nunca falla por esto.
+function makeBuildId(isDev: boolean): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+
+  let hash: string;
+  try {
+    hash = execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
+  } catch {
+    hash = '';
+  }
+
+  return [stamp, hash, isDev ? 'dev' : ''].filter(Boolean).join('-');
+}
 
 export default defineConfig((ctx) => {
   // Origen del backend para el proxy de desarrollo (sin /api). Se define en .env
@@ -59,7 +79,9 @@ export default defineConfig((ctx) => {
       // vueRouterBase,
 
       // publicPath: '/',
-      // define: {},
+      define: {
+        __BUILD_ID__: JSON.stringify(makeBuildId(!!ctx.dev)),
+      },
       // defineEnv: {}
       // ignorePublicFolder: true,
       // minify: false,

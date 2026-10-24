@@ -63,6 +63,8 @@
             </q-form>
           </q-card-section>
         </GlassCard>
+
+        <div class="text-center text-caption text-grey-7 q-mt-md">{{ appVersionLabel }}</div>
       </AdminPageWrapper>
     </q-page-container>
   </q-layout>
@@ -75,6 +77,7 @@ import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
 import { getApiErrorMessage } from '@/utils/api-error';
+import { appVersionLabel } from '@/utils/build-info';
 import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
 import GlassCard from '@/components/common/GlassCard.vue';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue';

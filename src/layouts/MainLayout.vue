@@ -11,7 +11,10 @@
           @click="toggleLeftDrawer"
         />
         <q-toolbar-title class="font-outfit text-weight-bold">AyeGea</q-toolbar-title>
-        <q-badge outline color="white" class="q-px-sm">v{{ appVersion }}</q-badge>
+        <q-badge outline color="white" class="q-px-sm">
+          v{{ appVersion }}<span class="gt-xs">&nbsp;· {{ buildId }}</span>
+          <q-tooltip>{{ appVersionLabel }}</q-tooltip>
+        </q-badge>
       </q-toolbar>
     </q-header>
 
@@ -152,7 +155,7 @@ import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
 import { useThemeStore, type VisualTheme } from '@/stores/theme-store';
 import { getAvatarColor, getAvatarInitials } from '@/utils/avatar';
-import { version as appVersion } from '../../package.json';
+import { appVersion, appVersionLabel, buildId } from '@/utils/build-info';
 
 const router = useRouter();
 const route = useRoute();
