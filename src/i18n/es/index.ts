@@ -621,6 +621,7 @@ export default {
       proveedorLabel: 'Proveedor',
       filterButton: 'Filtrar',
       clearButton: 'Limpiar',
+      toggleButton: 'Filtros',
     },
     columns: {
       referencia: 'Referencia',

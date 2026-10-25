@@ -5,158 +5,24 @@
         <div class="text-h5 text-weight-bolder text-teal-10 font-outfit">
           {{ title }}
         </div>
-        <q-btn
-          v-if="auth.hasPermission('elementos_inventario.crear')"
-          unelevated
-          no-caps
-          color="primary"
-          icon="add"
-          :label="t('inventario.actions.new')"
-          class="elegant-btn"
-          @click="goToNew"
-        />
-      </div>
-
-      <div class="row q-col-gutter-sm q-mb-md items-start">
-        <div class="col-6 col-md-auto inventario-filter">
-          <q-input
-            v-model="form.nombre"
-            outlined
-            dense
-            clearable
-            class="elegant-input"
-            :label="t('inventario.filters.nombreLabel')"
-            @keyup.enter="onFilterClick"
-          />
-        </div>
-        <div class="col-6 col-md-auto inventario-filter">
-          <q-input
-            v-model="form.referencia"
-            outlined
-            dense
-            clearable
-            class="elegant-input"
-            :label="t('inventario.filters.referenciaLabel')"
-            @keyup.enter="onFilterClick"
-          />
-        </div>
-        <div class="col-6 col-md-auto inventario-filter">
-          <q-input
-            v-model="form.nSerie"
-            outlined
-            dense
-            clearable
-            class="elegant-input"
-            :label="t('inventario.filters.nSerieLabel')"
-            @keyup.enter="onFilterClick"
-          />
-        </div>
-        <div v-if="tipoId === 1" class="col-6 col-md-auto inventario-filter">
-          <q-input
-            v-model="form.matricula"
-            outlined
-            dense
-            clearable
-            class="elegant-input"
-            :label="t('inventario.filters.matriculaLabel')"
-            @keyup.enter="onFilterClick"
-          />
-        </div>
-        <div class="col-6 col-md-auto inventario-filter">
-          <q-select
-            v-model="form.estadoId"
-            outlined
-            dense
-            clearable
-            emit-value
-            map-options
-            class="elegant-input"
-            :options="estadoOptions"
-            :label="t('inventario.filters.estadoLabel')"
-          />
-        </div>
-        <div class="col-6 col-md-auto inventario-filter">
-          <q-select
-            v-model="form.categoriaId"
-            outlined
-            dense
-            clearable
-            use-input
-            hide-selected
-            fill-input
-            input-debounce="0"
-            emit-value
-            map-options
-            option-value="id"
-            option-label="nombre"
-            class="elegant-input"
-            :options="categoriaSelect.shown.value"
-            :label="t('inventario.filters.categoriaLabel')"
-            @filter="categoriaSelect.onFilter"
-            @update:model-value="form.subcategoriaId = null"
-          />
-        </div>
-        <div class="col-6 col-md-auto inventario-filter">
-          <q-select
-            v-model="form.subcategoriaId"
-            outlined
-            dense
-            clearable
-            use-input
-            hide-selected
-            fill-input
-            input-debounce="0"
-            emit-value
-            map-options
-            option-value="id"
-            option-label="nombre"
-            class="elegant-input"
-            :options="subcategoriaSelect.shown.value"
-            :label="t('inventario.filters.subcategoriaLabel')"
-            @filter="subcategoriaSelect.onFilter"
-          />
-        </div>
-        <div
-          v-for="sel in simpleSelects"
-          :key="sel.key"
-          class="col-6 col-md-auto inventario-filter"
-        >
-          <q-select
-            v-model="form[sel.key]"
-            outlined
-            dense
-            clearable
-            use-input
-            hide-selected
-            fill-input
-            input-debounce="0"
-            emit-value
-            map-options
-            option-value="id"
-            option-label="nombre"
-            class="elegant-input"
-            :options="sel.select.shown.value"
-            :label="sel.label"
-            @filter="sel.select.onFilter"
-          />
-        </div>
-        <div class="col-12 col-md-auto row q-gutter-x-sm items-center">
+        <div class="row items-center q-gutter-x-sm">
           <q-btn
-            unelevated
             no-caps
             color="primary"
             icon="filter_alt"
             class="elegant-btn"
-            :label="t('inventario.filters.filterButton')"
-            @click="onFilterClick"
-          />
-          <q-btn
-            flat
-            no-caps
-            color="grey-8"
-            :label="t('inventario.filters.clearButton')"
-            @click="onClearClick"
-          />
+            :unelevated="filtersVisible"
+            :outline="!filtersVisible"
+            :label="t('inventario.filters.toggleButton')"
+            :aria-label="t('inventario.filters.toggleButton')"
+            :aria-pressed="filtersVisible"
+            @click="toggleFilters"
+          >
+            <q-badge v-if="appliedFiltersCount > 0" color="orange-8" floating rounded>
+              {{ appliedFiltersCount }}
+            </q-badge>
+            <q-tooltip>{{ t('inventario.filters.toggleButton') }}</q-tooltip>
+          </q-btn>
           <q-btn
             v-if="auth.hasPermission('elementos_inventario.ver')"
             unelevated
@@ -185,8 +51,165 @@
               </q-list>
             </q-menu>
           </q-btn>
+          <q-btn
+            v-if="auth.hasPermission('elementos_inventario.crear')"
+            unelevated
+            no-caps
+            color="primary"
+            icon="add"
+            :label="t('inventario.actions.new')"
+            class="elegant-btn"
+            @click="goToNew"
+          />
         </div>
       </div>
+
+      <q-slide-transition>
+        <div v-show="filtersVisible">
+          <div class="row q-col-gutter-sm q-mb-md items-start">
+            <div class="col-6 col-md-auto inventario-filter">
+              <q-input
+                v-model="form.nombre"
+                outlined
+                dense
+                clearable
+                class="elegant-input"
+                :label="t('inventario.filters.nombreLabel')"
+                @keyup.enter="onFilterClick"
+              />
+            </div>
+            <div class="col-6 col-md-auto inventario-filter">
+              <q-input
+                v-model="form.referencia"
+                outlined
+                dense
+                clearable
+                class="elegant-input"
+                :label="t('inventario.filters.referenciaLabel')"
+                @keyup.enter="onFilterClick"
+              />
+            </div>
+            <div class="col-6 col-md-auto inventario-filter">
+              <q-input
+                v-model="form.nSerie"
+                outlined
+                dense
+                clearable
+                class="elegant-input"
+                :label="t('inventario.filters.nSerieLabel')"
+                @keyup.enter="onFilterClick"
+              />
+            </div>
+            <div v-if="tipoId === 1" class="col-6 col-md-auto inventario-filter">
+              <q-input
+                v-model="form.matricula"
+                outlined
+                dense
+                clearable
+                class="elegant-input"
+                :label="t('inventario.filters.matriculaLabel')"
+                @keyup.enter="onFilterClick"
+              />
+            </div>
+            <div class="col-6 col-md-auto inventario-filter">
+              <q-select
+                v-model="form.estadoId"
+                outlined
+                dense
+                clearable
+                emit-value
+                map-options
+                class="elegant-input"
+                :options="estadoOptions"
+                :label="t('inventario.filters.estadoLabel')"
+              />
+            </div>
+            <div class="col-6 col-md-auto inventario-filter">
+              <q-select
+                v-model="form.categoriaId"
+                outlined
+                dense
+                clearable
+                use-input
+                hide-selected
+                fill-input
+                input-debounce="0"
+                emit-value
+                map-options
+                option-value="id"
+                option-label="nombre"
+                class="elegant-input"
+                :options="categoriaSelect.shown.value"
+                :label="t('inventario.filters.categoriaLabel')"
+                @filter="categoriaSelect.onFilter"
+                @update:model-value="form.subcategoriaId = null"
+              />
+            </div>
+            <div class="col-6 col-md-auto inventario-filter">
+              <q-select
+                v-model="form.subcategoriaId"
+                outlined
+                dense
+                clearable
+                use-input
+                hide-selected
+                fill-input
+                input-debounce="0"
+                emit-value
+                map-options
+                option-value="id"
+                option-label="nombre"
+                class="elegant-input"
+                :options="subcategoriaSelect.shown.value"
+                :label="t('inventario.filters.subcategoriaLabel')"
+                @filter="subcategoriaSelect.onFilter"
+              />
+            </div>
+            <div
+              v-for="sel in simpleSelects"
+              :key="sel.key"
+              class="col-6 col-md-auto inventario-filter"
+            >
+              <q-select
+                v-model="form[sel.key]"
+                outlined
+                dense
+                clearable
+                use-input
+                hide-selected
+                fill-input
+                input-debounce="0"
+                emit-value
+                map-options
+                option-value="id"
+                option-label="nombre"
+                class="elegant-input"
+                :options="sel.select.shown.value"
+                :label="sel.label"
+                @filter="sel.select.onFilter"
+              />
+            </div>
+            <div class="col-12 col-md-auto row q-gutter-x-sm items-center">
+              <q-btn
+                unelevated
+                no-caps
+                color="primary"
+                icon="filter_alt"
+                class="elegant-btn"
+                :label="t('inventario.filters.filterButton')"
+                @click="onFilterClick"
+              />
+              <q-btn
+                flat
+                no-caps
+                color="grey-8"
+                :label="t('inventario.filters.clearButton')"
+                @click="onClearClick"
+              />
+            </div>
+          </div>
+        </div>
+      </q-slide-transition>
 
       <q-table
         v-model:pagination="pagination"
@@ -346,6 +369,37 @@ const form = ref<FormState>(formFromFilters(state.value.filters));
 // Última combinación de filtros aplicada (vía "Filtrar" o "Limpiar"). Se reutiliza en
 // onRequest para que cambiar de página conserve el filtro activo.
 const appliedFilters = ref<ElemsInventarioFilters>({ ...state.value.filters });
+
+// Número de filtros aplicados (solo hay claves con valor, ver buildFilters).
+const appliedFiltersCount = computed(() => Object.keys(appliedFilters.value).length);
+
+// --- Visibilidad del formulario de filtros -----------------------------------
+
+// Preferencia por tipo: '1' visible, '0' oculto. Cualquier otro valor se trata como oculto.
+const filtersStorageKey = `inventario:filtros-visibles:${props.tipoId}`;
+
+function readFiltersVisible(): boolean {
+  try {
+    return localStorage.getItem(filtersStorageKey) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeFiltersVisible(visible: boolean) {
+  try {
+    localStorage.setItem(filtersStorageKey, visible ? '1' : '0');
+  } catch {
+    // Sin localStorage la preferencia solo vive en memoria durante la sesión.
+  }
+}
+
+const filtersVisible = ref<boolean>(readFiltersVisible());
+
+function toggleFilters() {
+  filtersVisible.value = !filtersVisible.value;
+  writeFiltersVisible(filtersVisible.value);
+}
 
 function buildFilters(): ElemsInventarioFilters {
   const f = form.value;
