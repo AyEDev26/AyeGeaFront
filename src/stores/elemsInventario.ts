@@ -59,6 +59,7 @@ export interface ElemsInventarioFilters {
   departamentoId?: number | null;
   proveedorId?: number | null;
   matricula?: string; // solo tipo 1
+  criticoFiltro?: 0 | 1 | null; // solo tipos 1 y 2; 1 = críticos, 0 = no críticos
 }
 
 // Estado del formulario (camelCase); se mapea a snake_case al enviar.
@@ -444,7 +445,7 @@ function buildPayload(tipoId: TipoElemInventarioId, form: ElemInventarioForm) {
   };
 }
 
-// Los filtros vacíos no se envían; estado_id = 0 sí.
+// Los filtros vacíos no se envían; estado_id = 0 y critico = 0 sí.
 function buildFilterParams(tipoId: TipoElemInventarioId, f: ElemsInventarioFilters) {
   const params: Record<string, string | number> = {};
   if (f.nombre) params.nombre = f.nombre;
@@ -458,6 +459,9 @@ function buildFilterParams(tipoId: TipoElemInventarioId, f: ElemsInventarioFilte
   if (f.departamentoId) params.departamento_id = f.departamentoId;
   if (f.proveedorId) params.proveedor_id = f.proveedorId;
   if (tipoId === 1 && f.matricula) params.matricula = f.matricula;
+  if (tipoId !== 3 && f.criticoFiltro !== undefined && f.criticoFiltro !== null) {
+    params.critico = f.criticoFiltro;
+  }
   return params;
 }
 

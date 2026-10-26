@@ -124,6 +124,19 @@
                 :label="t('inventario.filters.estadoLabel')"
               />
             </div>
+            <div v-if="tipoId !== 3" class="col-6 col-md-auto inventario-filter">
+              <q-select
+                v-model="form.criticoFiltro"
+                outlined
+                dense
+                clearable
+                emit-value
+                map-options
+                class="elegant-input"
+                :options="criticoOptions"
+                :label="t('inventario.filters.criticoLabel')"
+              />
+            </div>
             <div class="col-6 col-md-auto inventario-filter">
               <q-select
                 v-model="form.categoriaId"
@@ -338,6 +351,7 @@ interface FormState {
   nSerie: string | null;
   matricula: string | null;
   estadoId: 0 | 1 | null;
+  criticoFiltro: 0 | 1 | null;
   categoriaId: number | null;
   subcategoriaId: number | null;
   delegacionId: number | null;
@@ -355,6 +369,7 @@ function formFromFilters(f: ElemsInventarioFilters): FormState {
     nSerie: f.nSerie ?? '',
     matricula: f.matricula ?? '',
     estadoId: f.estadoId ?? null,
+    criticoFiltro: f.criticoFiltro ?? null,
     categoriaId: f.categoriaId ?? null,
     subcategoriaId: f.subcategoriaId ?? null,
     delegacionId: f.delegacionId ?? null,
@@ -409,6 +424,7 @@ function buildFilters(): ElemsInventarioFilters {
     ...(f.nSerie ? { nSerie: f.nSerie } : {}),
     ...(props.tipoId === 1 && f.matricula ? { matricula: f.matricula } : {}),
     ...(f.estadoId !== null ? { estadoId: f.estadoId } : {}),
+    ...(props.tipoId !== 3 && f.criticoFiltro !== null ? { criticoFiltro: f.criticoFiltro } : {}),
     ...(f.categoriaId ? { categoriaId: f.categoriaId } : {}),
     ...(f.subcategoriaId ? { subcategoriaId: f.subcategoriaId } : {}),
     ...(f.delegacionId ? { delegacionId: f.delegacionId } : {}),
@@ -478,6 +494,11 @@ const simpleSelects = computed<
 const estadoOptions = computed(() => [
   { label: t('inventario.estados.active'), value: 1 },
   { label: t('inventario.estados.inactive'), value: 0 },
+]);
+
+const criticoOptions = computed(() => [
+  { label: t('inventario.filters.criticoYes'), value: 1 },
+  { label: t('inventario.filters.criticoNo'), value: 0 },
 ]);
 
 // Subcategorías del tipo; sin categoría elegida se muestran todas, con categoría solo las suyas.

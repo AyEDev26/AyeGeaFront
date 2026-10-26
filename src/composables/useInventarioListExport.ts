@@ -130,6 +130,12 @@ export function useInventarioListExport(options: UseInventarioListExportOptions)
         value: f.estadoId === 1 ? t('inventario.estados.active') : t('inventario.estados.inactive'),
       });
     }
+    if (tipoId !== 3 && f.criticoFiltro !== undefined && f.criticoFiltro !== null) {
+      filters.push({
+        label: label('criticoLabel'),
+        value: f.criticoFiltro === 1 ? label('criticoYes') : label('criticoNo'),
+      });
+    }
     addSelect('categoriaLabel', f.categoriaId, filterOptions.categoriaId);
     addSelect('subcategoriaLabel', f.subcategoriaId, filterOptions.subcategoriaId);
     addSelect('delegacionLabel', f.delegacionId, filterOptions.delegacionId);
