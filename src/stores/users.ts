@@ -24,6 +24,7 @@ export interface AdminUser {
   delegacion: OrgRef | null;
   almacenId: number | null;
   almacen: OrgRef | null;
+  visibilidad: OrgRef[]; // incluye la delegación propia; [] si la API no lo devuelve
 }
 
 export interface UserSelectorOption {
@@ -72,6 +73,7 @@ interface UserResource {
   delegacion: OrgRef | null;
   almacen_id: number | null;
   almacen: OrgRef | null;
+  visibilidad?: OrgRef[];
 }
 
 interface RawPaginationMeta {
@@ -99,6 +101,7 @@ function mapUser(resource: UserResource): AdminUser {
     delegacion: resource.delegacion ?? null,
     almacenId: resource.almacen_id ?? null,
     almacen: resource.almacen ?? null,
+    visibilidad: resource.visibilidad ?? [],
   };
 }
 
@@ -121,6 +124,7 @@ export interface CreateUserPayload {
   departamento_id?: number;
   delegacion_id?: number;
   almacen_id?: number;
+  visibilidad?: number[];
 }
 
 export interface UpdateUserPayload {
@@ -134,6 +138,7 @@ export interface UpdateUserPayload {
   departamento_id?: number | null;
   delegacion_id?: number | null;
   almacen_id?: number | null;
+  visibilidad?: number[];
 }
 
 export const useUsersStore = defineStore('users', () => {

@@ -125,6 +125,8 @@ export default {
       departamentoLabel: 'Department',
       almacenLabel: 'Warehouse',
       selectDelegacionFirst: 'Select a branch first',
+      visibilidadLabel: 'Branches with access',
+      visibilidadOwnHint: "The user's own branch always has access.",
       searchPlaceholder: 'Type to search...',
       noResults: 'No results',
       nameRequired: 'Name is required.',

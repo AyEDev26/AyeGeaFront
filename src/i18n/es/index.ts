@@ -125,6 +125,8 @@ export default {
       departamentoLabel: 'Departamento',
       almacenLabel: 'Almacén',
       selectDelegacionFirst: 'Selecciona primero una delegación',
+      visibilidadLabel: 'Delegaciones con acceso',
+      visibilidadOwnHint: 'La delegación propia siempre tiene acceso.',
       searchPlaceholder: 'Escribe para buscar...',
       noResults: 'Sin resultados',
       nameRequired: 'El nombre es obligatorio.',

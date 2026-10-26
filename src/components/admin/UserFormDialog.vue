@@ -222,6 +222,26 @@
                     </q-item>
                   </template>
                 </q-select>
+
+                <div class="visibilidad-group">
+                  <div class="text-caption text-grey-7 q-mb-xs">
+                    {{ t('admin.userForm.visibilidadLabel') }}
+                  </div>
+                  <q-inner-loading :showing="loadingDelegaciones" />
+                  <q-option-group
+                    v-model="visibilidadChecked"
+                    :options="visibilidadCheckboxOptions"
+                    type="checkbox"
+                    color="teal-9"
+                    dense
+                  />
+                  <div v-if="!loadingDelegaciones && !delegacionesAcceso.length" class="text-grey">
+                    {{ t('admin.userForm.noResults') }}
+                  </div>
+                  <div v-if="delegacion" class="text-caption text-grey-7 q-mt-xs">
+                    {{ t('admin.userForm.visibilidadOwnHint') }}
+                  </div>
+                </div>
               </div>
             </q-tab-panel>
           </q-tab-panels>
@@ -366,9 +386,56 @@ const {
     : Promise.resolve([]),
 );
 
+// Delegaciones adicionales con acceso (ids, sin la propia que el backend añade siempre).
+const visibilidad = ref<number[]>([]);
+const delegacionesAcceso = ref<OrgOption[]>([]);
+const loadingDelegaciones = ref(false);
+
+// La propia se muestra marcada y deshabilitada; solo las demás se guardan en `visibilidad`.
+const visibilidadCheckboxOptions = computed(() =>
+  delegacionesAcceso.value.map((option) => ({
+    label: option.label,
+    value: option.id,
+    disable: option.id === delegacion.value?.id,
+  })),
+);
+const visibilidadChecked = computed<number[]>({
+  get: () => (delegacion.value ? [...visibilidad.value, delegacion.value.id] : visibilidad.value),
+  set: (ids) => {
+    visibilidad.value = ids.filter((id) => id !== delegacion.value?.id);
+  },
+});
+
+async function fetchDelegacionesAcceso() {
+  loadingDelegaciones.value = true;
+  try {
+    const all = await delegacionesStore.fetchAllDelegaciones();
+    delegacionesAcceso.value = all.map((item) => ({ id: item.id, label: item.nombre }));
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      color: 'red-9',
+      message: getApiErrorMessage(error, t('admin.userForm.saveError')),
+    });
+  } finally {
+    loadingDelegaciones.value = false;
+  }
+}
+
+// user.visibilidad incluye la delegación propia; el formulario solo maneja las adicionales.
+function additionalVisibilidad(user: AdminUser): OrgRef[] {
+  return user.visibilidad.filter((item) => item.id !== user.delegacionId);
+}
+
+function loadVisibilidad(current: OrgRef[]) {
+  visibilidad.value = current.map((item) => item.id);
+}
+
 // Se vacía desde el evento del select (no con un watch) para no borrar la precarga de edición.
 function onDelegacionChange() {
   loadAlmacen(null);
+  // La nueva delegación propia pasa a ser la marcada y fija: se retira de las adicionales.
+  visibilidad.value = visibilidad.value.filter((id) => id !== delegacion.value?.id);
 }
 
 const nameRules = [(val: string) => !!val || t('admin.userForm.nameRequired')];
@@ -399,6 +466,7 @@ function resetForm() {
     loadDelegacion(props.user.delegacion);
     loadDepartamento(props.user.departamento);
     loadAlmacen(props.user.almacen);
+    loadVisibilidad(additionalVisibilidad(props.user));
   } else {
     name.value = '';
     email.value = '';
@@ -407,6 +475,7 @@ function resetForm() {
     loadDelegacion(null);
     loadDepartamento(null);
     loadAlmacen(null);
+    loadVisibilidad([]);
   }
   password.value = '';
   passwordConfirmation.value = '';
@@ -418,6 +487,9 @@ function resetForm() {
 watch(visible, (isVisible) => {
   if (isVisible) {
     resetForm();
+    if (!delegacionesAcceso.value.length) {
+      void fetchDelegacionesAcceso();
+    }
   }
 });
 
@@ -448,6 +520,16 @@ function changedOrgId<K extends string>(
   return next === original ? {} : ({ [key]: next } as Record<K, number | null>);
 }
 
+// Solo en edición y si el conjunto de adicionales cambia (en PUT reemplaza el del backend).
+function changedVisibilidad(user: AdminUser): { visibilidad?: number[] } {
+  const original = additionalVisibilidad(user)
+    .map((item) => item.id)
+    .sort((a, b) => a - b);
+  const next = [...visibilidad.value].sort((a, b) => a - b);
+  const unchanged = original.length === next.length && original.every((id, i) => id === next[i]);
+  return unchanged ? {} : { visibilidad: visibilidad.value };
+}
+
 async function onSubmit() {
   const isValid = await formRef.value?.validate();
   if (!isValid) {
@@ -471,6 +553,7 @@ async function onSubmit() {
         ...changedOrgId('delegacion_id', delegacion.value, props.user.delegacionId),
         ...changedOrgId('departamento_id', departamento.value, props.user.departamentoId),
         ...changedOrgId('almacen_id', almacen.value, props.user.almacenId),
+        ...changedVisibilidad(props.user),
       });
       $q.notify({ type: 'positive', color: 'teal-9', message: t('admin.userForm.userUpdated') });
     } else {
@@ -485,6 +568,7 @@ async function onSubmit() {
         ...(delegacion.value ? { delegacion_id: delegacion.value.id } : {}),
         ...(departamento.value ? { departamento_id: departamento.value.id } : {}),
         ...(almacen.value ? { almacen_id: almacen.value.id } : {}),
+        ...(visibilidad.value.length ? { visibilidad: visibilidad.value } : {}),
       });
       $q.notify({ type: 'positive', color: 'teal-9', message: t('admin.userForm.userCreated') });
     }
@@ -505,6 +589,11 @@ async function onSubmit() {
 /* Alto fijo: el diálogo no cambia de tamaño al alternar entre pestañas. */
 .user-form-panels {
   height: 460px;
+  overflow-y: auto;
+}
+.visibilidad-group {
+  position: relative;
+  max-height: 180px;
   overflow-y: auto;
 }
 .user-form-panels--edit {
