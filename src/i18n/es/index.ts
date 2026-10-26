@@ -244,6 +244,37 @@ export default {
       updated: 'Periodicidad actualizada.',
       saveError: 'No se pudo guardar la periodicidad.',
     },
+    tiposDocumento: {
+      title: 'Tipos de documento',
+      newButton: 'Nuevo tipo de documento',
+      columns: {
+        descripcion: 'Descripción',
+        actions: 'Acciones',
+      },
+      filters: {
+        descripcionLabel: 'Descripción',
+        filterButton: 'Filtrar',
+        clearButton: 'Limpiar',
+      },
+      editTooltip: 'Editar',
+      deleteTooltip: 'Eliminar',
+      deleteDialogTitle: 'Eliminar tipo de documento',
+      deleteDialogMessage:
+        '¿Seguro que quieres eliminar el tipo de documento "{name}"? Esta acción no se puede deshacer.',
+      fetchError: 'No se pudo cargar el listado de tipos de documento.',
+      deleteSuccess: 'Tipo de documento eliminado.',
+      deleteError: 'No se pudo eliminar el tipo de documento.',
+    },
+    tipoDocumentoForm: {
+      editTitle: 'Editar tipo de documento',
+      createTitle: 'Nuevo tipo de documento',
+      descripcionLabel: 'Descripción',
+      descripcionRequired: 'La descripción es obligatoria.',
+      descripcionTooLong: 'La descripción no puede tener más de 100 caracteres.',
+      created: 'Tipo de documento creado.',
+      updated: 'Tipo de documento actualizado.',
+      saveError: 'No se pudo guardar el tipo de documento.',
+    },
     categorias: {
       title: 'Categorías',
       tabCategorias: 'Categorías',
@@ -498,6 +529,10 @@ export default {
         periodicidades: {
           title: 'Periodicidades',
           description: 'Gestiona las periodicidades de mantenimiento.',
+        },
+        tiposDocumento: {
+          title: 'Tipos de documento',
+          description: 'Gestiona los tipos de documento.',
         },
         configuracion: {
           title: 'Configuración',

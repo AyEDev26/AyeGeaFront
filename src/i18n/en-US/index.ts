@@ -244,6 +244,37 @@ export default {
       updated: 'Frequency updated.',
       saveError: 'Could not save the frequency.',
     },
+    tiposDocumento: {
+      title: 'Document types',
+      newButton: 'New document type',
+      columns: {
+        descripcion: 'Description',
+        actions: 'Actions',
+      },
+      filters: {
+        descripcionLabel: 'Description',
+        filterButton: 'Filter',
+        clearButton: 'Clear',
+      },
+      editTooltip: 'Edit',
+      deleteTooltip: 'Delete',
+      deleteDialogTitle: 'Delete document type',
+      deleteDialogMessage:
+        'Are you sure you want to delete the document type "{name}"? This action cannot be undone.',
+      fetchError: 'Could not load the document type list.',
+      deleteSuccess: 'Document type deleted.',
+      deleteError: 'Could not delete the document type.',
+    },
+    tipoDocumentoForm: {
+      editTitle: 'Edit document type',
+      createTitle: 'New document type',
+      descripcionLabel: 'Description',
+      descripcionRequired: 'Description is required.',
+      descripcionTooLong: 'Description cannot be longer than 100 characters.',
+      created: 'Document type created.',
+      updated: 'Document type updated.',
+      saveError: 'Could not save the document type.',
+    },
     categorias: {
       title: 'Categories',
       tabCategorias: 'Categories',
@@ -498,6 +529,10 @@ export default {
         periodicidades: {
           title: 'Periodicities',
           description: 'Manage maintenance periodicities.',
+        },
+        tiposDocumento: {
+          title: 'Document types',
+          description: 'Manage the document types.',
         },
         configuracion: {
           title: 'Settings',

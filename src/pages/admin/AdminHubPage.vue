@@ -173,6 +173,14 @@ const sections: AdminHubSection[] = [
         descriptionKey: 'admin.adminHub.cards.periodicidades.description',
         visible: () => auth.hasPermission('catalogos.ver'),
       },
+      {
+        key: 'tiposDocumento',
+        to: '/admin/tipos-documento',
+        icon: 'description',
+        titleKey: 'admin.adminHub.cards.tiposDocumento.title',
+        descriptionKey: 'admin.adminHub.cards.tiposDocumento.description',
+        visible: () => auth.hasPermission('catalogos.ver'),
+      },
     ],
   },
   {

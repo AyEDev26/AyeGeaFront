@@ -202,6 +202,7 @@ const adminHubPaths = [
   '/admin/proveedores',
   '/admin/categorias',
   '/admin/periodicidades',
+  '/admin/tipos-documento',
   '/admin/usuarios',
   '/admin/roles',
   '/admin/configuracion',
