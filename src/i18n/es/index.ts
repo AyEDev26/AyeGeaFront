@@ -670,6 +670,7 @@ export default {
     deleteDialogMessage:
       '¿Seguro que quieres eliminar el documento "{name}"? Esta acción no se puede deshacer.',
     fetchError: 'No se pudo cargar el listado de documentos.',
+    detailFetchError: 'No se pudo cargar el documento.',
     deleteSuccess: 'Documento eliminado.',
     deleteError: 'No se pudo eliminar el documento.',
     downloadError: 'No se pudo descargar el documento.',
@@ -677,6 +678,8 @@ export default {
   documentoForm: {
     createTitle: 'Nuevo documento',
     editTitle: 'Editar documento',
+    viewTitle: 'Detalle del documento',
+    closeButton: 'Cerrar',
     ficheroLabel: 'Fichero',
     ficheroReplaceLabel: 'Reemplazar fichero (opcional)',
     ficheroHint: 'pdf, doc, docx, xls, xlsx, jpg, jpeg, png o webp. Máximo 10 MB.',

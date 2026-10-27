@@ -183,6 +183,7 @@
       <DocumentoFormDialog
         v-model="formDialogVisible"
         :documento="editingDocumento"
+        :readonly="formReadonly"
         :tipo-options="tipoOptions"
         :categoria-options="categoriaOptions"
         :subcategoria-options="subcategoriaOptions"
@@ -194,6 +195,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useDocumentosStore, type Documento, type DocumentosFilters } from '@/stores/documentos';
@@ -209,6 +211,8 @@ import GlassCard from '@/components/common/GlassCard.vue';
 const EMPTY = '—';
 
 const $q = useQuasar();
+const route = useRoute();
+const router = useRouter();
 const { t, locale } = useI18n();
 const documentosStore = useDocumentosStore();
 const tiposDocumentoStore = useTiposDocumentoStore();
@@ -343,6 +347,8 @@ const hasLoadedOnce = ref(false);
 
 const formDialogVisible = ref(false);
 const editingDocumento = ref<Documento | null>(null);
+// Solo el modo lectura abierto desde `?editar=` lo activa; alta y edición de la tabla no.
+const formReadonly = ref(false);
 
 function notifyError(error: unknown, fallback: string) {
   $q.notify({ type: 'negative', color: 'red-9', message: getApiErrorMessage(error, fallback) });
@@ -481,13 +487,53 @@ async function onDelete(row: Documento) {
 
 function openCreateDialog() {
   editingDocumento.value = null;
+  formReadonly.value = false;
   formDialogVisible.value = true;
 }
 
 function openEditDialog(row: Documento) {
   editingDocumento.value = row;
+  formReadonly.value = false;
   formDialogVisible.value = true;
 }
+
+// Quita `editar` de la URL conservando el resto de parámetros.
+async function clearEditarQuery() {
+  if (route.query.editar === undefined) return;
+  const query = { ...route.query };
+  delete query.editar;
+  await router.replace({ query });
+}
+
+// Abre el formulario del documento indicado en `?editar=ID`, con independencia de la
+// página o los filtros del listado.
+async function openFromQuery(raw: unknown) {
+  if (raw === undefined) return;
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  const id = typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : 0;
+  if (id <= 0) {
+    await clearEditarQuery();
+    return;
+  }
+  try {
+    editingDocumento.value = await documentosStore.fetchDocumento(id);
+    formReadonly.value = !auth.hasPermission('documentos.editar');
+    formDialogVisible.value = true;
+  } catch (error) {
+    notifyError(error, t('documentos.detailFetchError'));
+    await clearEditarQuery();
+  }
+}
+
+watch(
+  () => route.query.editar,
+  (raw) => void openFromQuery(raw),
+  { immediate: true },
+);
+
+watch(formDialogVisible, (isVisible) => {
+  if (!isVisible) void clearEditarQuery();
+});
 
 function onSaved() {
   formDialogVisible.value = false;

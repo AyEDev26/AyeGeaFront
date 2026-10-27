@@ -172,6 +172,12 @@ export const useDocumentosStore = defineStore('documentos', () => {
     };
   }
 
+  // Consulta aislada: devuelve el documento sin tocar items/meta/filters/loading del listado.
+  async function fetchDocumento(id: number): Promise<Documento> {
+    const response = await api.get<{ data: DocumentoResource }>(`/documentos/${id}`);
+    return mapDocumento(response.data.data);
+  }
+
   async function refresh() {
     await fetchDocumentos(meta.value.currentPage, meta.value.perPage, filters.value);
   }
@@ -231,6 +237,7 @@ export const useDocumentosStore = defineStore('documentos', () => {
     loading,
     fetchDocumentos,
     fetchDocumentosAsociados,
+    fetchDocumento,
     createDocumento,
     updateDocumento,
     replaceFichero,

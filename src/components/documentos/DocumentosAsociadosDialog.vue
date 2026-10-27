@@ -38,6 +38,18 @@
           :hide-pagination="!loading && pagination.rowsNumber === 0"
           @request="onRequest"
         >
+          <template #body-cell-titulo="cell">
+            <q-td :props="cell">
+              <router-link
+                class="documento-link"
+                :to="{ path: '/documentos', query: { editar: String(cell.row.id) } }"
+                @click="visible = false"
+              >
+                {{ cell.row.descripcion }}
+              </router-link>
+            </q-td>
+          </template>
+
           <template #body-cell-fechaCaducidad="cell">
             <q-td :props="cell">
               <q-chip
@@ -226,3 +238,14 @@ async function onDownload(row: Documento) {
   }
 }
 </script>
+
+<style scoped>
+.documento-link {
+  color: var(--q-primary);
+  text-decoration: none;
+}
+
+.documento-link:hover {
+  text-decoration: underline;
+}
+</style>

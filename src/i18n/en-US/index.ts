@@ -670,6 +670,7 @@ export default {
     deleteDialogMessage:
       'Are you sure you want to delete the document "{name}"? This action cannot be undone.',
     fetchError: 'Could not load the document list.',
+    detailFetchError: 'Could not load the document.',
     deleteSuccess: 'Document deleted.',
     deleteError: 'Could not delete the document.',
     downloadError: 'Could not download the document.',
@@ -677,6 +678,8 @@ export default {
   documentoForm: {
     createTitle: 'New document',
     editTitle: 'Edit document',
+    viewTitle: 'Document details',
+    closeButton: 'Close',
     ficheroLabel: 'File',
     ficheroReplaceLabel: 'Replace file (optional)',
     ficheroHint: 'pdf, doc, docx, xls, xlsx, jpg, jpeg, png or webp. Maximum 10 MB.',

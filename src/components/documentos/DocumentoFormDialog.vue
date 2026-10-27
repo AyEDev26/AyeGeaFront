@@ -3,7 +3,7 @@
     <GlassCard style="width: 100%; min-width: 320px; max-width: 560px">
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6 text-teal-10 font-outfit">
-          {{ isEditMode ? t('documentoForm.editTitle') : t('documentoForm.createTitle') }}
+          {{ title }}
         </div>
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
@@ -12,6 +12,7 @@
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-y-md" @submit.prevent="onSubmit">
           <q-file
+            v-if="!readonly"
             v-model="fichero"
             outlined
             dense
@@ -35,6 +36,7 @@
             outlined
             dense
             class="elegant-input"
+            :disable="readonly"
             :label="t('documentoForm.descripcionLabel')"
             :rules="descripcionRules"
             lazy-rules
@@ -47,6 +49,7 @@
             emit-value
             map-options
             class="elegant-input"
+            :disable="readonly"
             :label="t('documentoForm.tipoLabel')"
             :options="tipoOptions"
             :rules="tipoRules"
@@ -57,10 +60,11 @@
             v-model="fechaCaducidad"
             outlined
             dense
-            clearable
+            :clearable="!readonly"
             type="date"
             stack-label
             class="elegant-input"
+            :disable="readonly"
             :label="t('documentoForm.fechaCaducidadLabel')"
           />
 
@@ -73,6 +77,7 @@
             emit-value
             map-options
             class="elegant-input documento-multi-select"
+            :disable="readonly"
             :label="t('documentoForm.categoriasLabel')"
             :options="categoriaOptions"
           />
@@ -86,6 +91,7 @@
             emit-value
             map-options
             class="elegant-input documento-multi-select"
+            :disable="readonly"
             :label="t('documentoForm.subcategoriasLabel')"
             :options="subcategoriaOptions"
           />
@@ -93,8 +99,15 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat no-caps color="grey-7" :label="t('common.cancel')" v-close-popup />
         <q-btn
+          flat
+          no-caps
+          color="grey-7"
+          :label="readonly ? t('documentoForm.closeButton') : t('common.cancel')"
+          v-close-popup
+        />
+        <q-btn
+          v-if="!readonly"
           unelevated
           no-caps
           color="primary"
@@ -121,12 +134,16 @@ interface SelectOption {
   value: number;
 }
 
-const props = defineProps<{
-  documento: Documento | null;
-  tipoOptions: SelectOption[];
-  categoriaOptions: SelectOption[];
-  subcategoriaOptions: SelectOption[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    documento: Documento | null;
+    tipoOptions: SelectOption[];
+    categoriaOptions: SelectOption[];
+    subcategoriaOptions: SelectOption[];
+    readonly?: boolean;
+  }>(),
+  { readonly: false },
+);
 
 const emit = defineEmits<{
   saved: [];
@@ -143,6 +160,11 @@ const { t } = useI18n();
 const documentosStore = useDocumentosStore();
 
 const isEditMode = computed(() => props.documento !== null);
+
+const title = computed(() => {
+  if (props.readonly) return t('documentoForm.viewTitle');
+  return isEditMode.value ? t('documentoForm.editTitle') : t('documentoForm.createTitle');
+});
 
 const formRef = ref<QForm | null>(null);
 const fichero = ref<File | null>(null);
@@ -191,6 +213,7 @@ function onHide() {
 }
 
 async function onSubmit() {
+  if (props.readonly) return;
   const isValid = await formRef.value?.validate();
   if (!isValid || tipoDocumentoId.value == null) {
     return;
