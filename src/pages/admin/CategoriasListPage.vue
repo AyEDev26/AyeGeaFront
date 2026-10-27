@@ -108,6 +108,18 @@
             <template #body-cell-actions="props">
               <q-td :props="props" class="text-center q-gutter-x-sm">
                 <q-btn
+                  v-if="auth.hasPermission('documentos.ver')"
+                  flat
+                  round
+                  dense
+                  size="sm"
+                  color="primary"
+                  icon="description"
+                  @click="openDocumentos('categoria', props.row)"
+                >
+                  <q-tooltip>{{ t('documentosAsociados.buttonTooltip') }}</q-tooltip>
+                </q-btn>
+                <q-btn
                   v-if="auth.hasPermission('catalogos.editar')"
                   flat
                   round
@@ -255,6 +267,18 @@
             <template #body-cell-actions="props">
               <q-td :props="props" class="text-center q-gutter-x-sm">
                 <q-btn
+                  v-if="auth.hasPermission('documentos.ver')"
+                  flat
+                  round
+                  dense
+                  size="sm"
+                  color="primary"
+                  icon="description"
+                  @click="openDocumentos('subcategoria', props.row)"
+                >
+                  <q-tooltip>{{ t('documentosAsociados.buttonTooltip') }}</q-tooltip>
+                </q-btn>
+                <q-btn
                   v-if="auth.hasPermission('catalogos.editar')"
                   flat
                   round
@@ -294,6 +318,12 @@
         :subcategoria="editingSubcategoria"
         @saved="onSubcategoriaSaved"
       />
+      <DocumentosAsociadosDialog
+        v-model="documentosDialogVisible"
+        :tipo="documentosTarget.tipo"
+        :id="documentosTarget.id"
+        :nombre="documentosTarget.nombre"
+      />
     </GlassCard>
   </AdminPageWrapper>
 </template>
@@ -316,6 +346,7 @@ import { useTiposElementoStore } from '@/stores/tiposElemento';
 import { getApiErrorMessage } from '@/utils/api-error';
 import CategoriaFormDialog from '@/components/admin/CategoriaFormDialog.vue';
 import SubcategoriaFormDialog from '@/components/admin/SubcategoriaFormDialog.vue';
+import DocumentosAsociadosDialog from '@/components/documentos/DocumentosAsociadosDialog.vue';
 import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
 import GlassCard from '@/components/common/GlassCard.vue';
 
@@ -700,6 +731,26 @@ async function onSubcategoriaDelete(row: Subcategoria) {
   } catch (error) {
     notifyError(error, t('admin.subcategorias.deleteError'));
   }
+}
+
+// ------------------------------------------------------------------
+// Documentos asociados
+// ------------------------------------------------------------------
+
+const documentosDialogVisible = ref(false);
+const documentosTarget = ref<{
+  tipo: 'categoria' | 'subcategoria';
+  id: number | null;
+  nombre: string;
+}>({
+  tipo: 'categoria',
+  id: null,
+  nombre: '',
+});
+
+function openDocumentos(tipo: 'categoria' | 'subcategoria', row: Categoria | Subcategoria) {
+  documentosTarget.value = { tipo, id: row.id, nombre: row.nombre };
+  documentosDialogVisible.value = true;
 }
 
 // ------------------------------------------------------------------

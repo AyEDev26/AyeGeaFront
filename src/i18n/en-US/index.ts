@@ -697,6 +697,19 @@ export default {
     saveError: 'Could not save the document.',
     replaceError: 'The data was saved, but the file could not be replaced.',
   },
+  documentosAsociados: {
+    buttonTooltip: 'Documents',
+    title: 'Documents of {name}',
+    columns: {
+      titulo: 'Title',
+      fechaCaducidad: 'Expiry date',
+      descarga: 'Download',
+    },
+    empty: 'No associated documents',
+    fetchError: 'Could not load the associated documents.',
+    retry: 'Retry',
+    manageLink: 'Manage documents',
+  },
   inventario: {
     vehiculos: { title: 'Vehicles' },
     maquinaria: { title: 'Machinery' },

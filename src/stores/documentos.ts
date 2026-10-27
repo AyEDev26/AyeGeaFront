@@ -149,6 +149,29 @@ export const useDocumentosStore = defineStore('documentos', () => {
     }
   }
 
+  // Consulta aislada: devuelve el resultado sin tocar items/meta/filters del listado principal.
+  async function fetchDocumentosAsociados(
+    relacion: { categoriaId: number } | { subcategoriaId: number },
+    page: number,
+    perPage: number,
+  ): Promise<{ items: Documento[]; meta: PaginationMeta }> {
+    const response = await api.get<{
+      data: { items: DocumentoResource[]; meta: RawPaginationMeta };
+    }>('/documentos', {
+      params: {
+        page,
+        per_page: perPage,
+        ...('categoriaId' in relacion
+          ? { categoria_id: relacion.categoriaId }
+          : { subcategoria_id: relacion.subcategoriaId }),
+      },
+    });
+    return {
+      items: response.data.data.items.map(mapDocumento),
+      meta: mapMeta(response.data.data.meta),
+    };
+  }
+
   async function refresh() {
     await fetchDocumentos(meta.value.currentPage, meta.value.perPage, filters.value);
   }
@@ -207,6 +230,7 @@ export const useDocumentosStore = defineStore('documentos', () => {
     filters,
     loading,
     fetchDocumentos,
+    fetchDocumentosAsociados,
     createDocumento,
     updateDocumento,
     replaceFichero,

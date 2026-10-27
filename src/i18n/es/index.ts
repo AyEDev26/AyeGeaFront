@@ -697,6 +697,19 @@ export default {
     saveError: 'No se pudo guardar el documento.',
     replaceError: 'Los datos se guardaron, pero no se pudo reemplazar el fichero.',
   },
+  documentosAsociados: {
+    buttonTooltip: 'Documentos',
+    title: 'Documentos de {name}',
+    columns: {
+      titulo: 'Título',
+      fechaCaducidad: 'Fecha de caducidad',
+      descarga: 'Descarga',
+    },
+    empty: 'Sin documentos asociados',
+    fetchError: 'No se pudieron cargar los documentos asociados.',
+    retry: 'Reintentar',
+    manageLink: 'Gestionar documentos',
+  },
   inventario: {
     vehiculos: { title: 'Vehículos' },
     maquinaria: { title: 'Maquinaria' },
