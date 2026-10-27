@@ -1,71 +1,79 @@
 <template>
   <q-layout>
     <q-page-container>
-      <AdminPageWrapper>
+      <q-page class="login-page flex flex-center">
         <LanguageSwitcher />
 
-        <GlassCard class="animate__fadeIn q-pa-sm login-card">
-          <q-card-section class="text-center q-pb-none">
-            <q-icon name="factory" size="48px" color="teal-9" class="animate__pulse" />
-            <div class="text-h5 text-weight-bolder text-teal-10 font-outfit q-mt-sm">AyeGea</div>
-            <div class="text-subtitle2 text-grey-7">{{ t('auth.login.subtitle') }}</div>
-          </q-card-section>
+        <div class="login-content">
+          <div class="login-card q-pa-sm">
+            <div class="login-avatar flex flex-center">
+              <q-icon name="person" size="52px" color="white" />
+            </div>
 
-          <q-card-section>
-            <q-form class="q-gutter-y-md" @submit.prevent="onSubmit">
-              <q-input
-                v-model="email"
-                outlined
-                dense
-                class="elegant-input"
-                type="email"
-                :label="t('auth.login.emailLabel')"
-                autocomplete="username"
-                :rules="emailRules"
-                lazy-rules
-              />
+            <q-card-section class="login-header text-center q-pb-none">
+              <h1 class="login-title font-outfit">AyeGea</h1>
+              <div class="login-subtitle font-outfit">{{ t('auth.login.title') }}</div>
+            </q-card-section>
 
-              <q-input
-                v-model="password"
-                outlined
-                dense
-                class="elegant-input"
-                :type="showPassword ? 'text' : 'password'"
-                :label="t('auth.login.passwordLabel')"
-                autocomplete="current-password"
-                :rules="passwordRules"
-                lazy-rules
-              >
-                <template #append>
-                  <q-icon
-                    :name="showPassword ? 'visibility_off' : 'visibility'"
-                    class="cursor-pointer"
-                    @click="showPassword = !showPassword"
-                  />
-                </template>
-              </q-input>
+            <q-card-section>
+              <q-form class="q-gutter-y-md" @submit.prevent="onSubmit">
+                <q-input
+                  v-model="email"
+                  outlined
+                  dense
+                  class="elegant-input"
+                  type="email"
+                  :label="t('auth.login.emailLabel')"
+                  autocomplete="username"
+                  :rules="emailRules"
+                  lazy-rules
+                />
 
-              <div class="text-right">
-                <router-link class="text-caption text-teal-8" to="/forgot-password">
-                  {{ t('auth.login.forgotPasswordLink') }}
-                </router-link>
-              </div>
+                <q-input
+                  v-model="password"
+                  outlined
+                  dense
+                  class="elegant-input"
+                  :type="showPassword ? 'text' : 'password'"
+                  :label="t('auth.login.passwordLabel')"
+                  autocomplete="current-password"
+                  :rules="passwordRules"
+                  lazy-rules
+                >
+                  <template #append>
+                    <q-icon
+                      :name="showPassword ? 'visibility_off' : 'visibility'"
+                      class="cursor-pointer"
+                      @click="showPassword = !showPassword"
+                    />
+                  </template>
+                </q-input>
 
-              <q-btn
-                type="submit"
-                unelevated
-                color="primary"
-                class="elegant-btn full-width"
-                no-caps
-                :label="t('auth.login.submitButton')"
-                :loading="loading"
-              />
-            </q-form>
-          </q-card-section>
-        </GlassCard>
+                <div class="text-right">
+                  <router-link class="login-link text-caption" to="/forgot-password">
+                    {{ t('auth.login.forgotPasswordLink') }}
+                  </router-link>
+                </div>
 
-        <div class="text-center text-caption text-grey-7 q-mt-md">{{ appVersionLabel }}</div>
-      </AdminPageWrapper>
+                <q-btn
+                  type="submit"
+                  unelevated
+                  color="primary"
+                  class="elegant-btn full-width"
+                  no-caps
+                  :label="t('auth.login.submitButton')"
+                  :loading="loading"
+                />
+              </q-form>
+            </q-card-section>
+          </div>
+
+          <div class="login-powered text-center text-caption q-mt-md">
+            {{ t('auth.login.poweredBy') }}
+          </div>
+          <div class="login-build text-center text-caption q-mt-md">{{ appVersionLabel }}</div>
+        </div>
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>
@@ -78,8 +86,6 @@ import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
 import { getApiErrorMessage } from '@/utils/api-error';
 import { appVersionLabel } from '@/utils/build-info';
-import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
-import GlassCard from '@/components/common/GlassCard.vue';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue';
 
 const route = useRoute();
@@ -125,14 +131,80 @@ async function onSubmit() {
 </script>
 
 <style scoped>
-.login-card {
-  width: 100%;
-  margin: 0 auto;
+.login-page {
+  --login-accent: #44809f;
+  --login-card-bg: rgb(255 255 255 / 0.35);
+  --login-card-border: rgb(255 255 255 / 0.55);
+  --login-text: #ffffff;
+  --login-build-text: #ffffff;
+
+  min-height: 100vh;
+  padding: 16px;
+  background:
+    radial-gradient(circle at 8% 6%, #b8a62a 0%, transparent 38%),
+    radial-gradient(circle at 6% 62%, #1b6f7a 0%, transparent 45%),
+    radial-gradient(circle at 94% 8%, #6a6d80 0%, transparent 42%),
+    radial-gradient(circle at 92% 94%, #7a4a69 0%, transparent 45%), #1f3a4a;
 }
 
-@media (min-width: 768px) {
-  .login-card {
-    width: min(60vw, 400px);
-  }
+.login-content {
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  z-index: 10;
+}
+
+.login-card {
+  position: relative;
+  margin-top: 44px;
+  width: 100%;
+  background: var(--login-card-bg);
+  border: 1px solid var(--login-card-border);
+  border-radius: 24px;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.15);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.login-avatar {
+  position: absolute;
+  top: -44px;
+  left: 50%;
+  width: 88px;
+  height: 88px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--login-accent);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.2);
+}
+
+.login-header {
+  padding-top: 56px;
+}
+
+.login-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--login-text);
+}
+
+.login-subtitle {
+  margin-top: 4px;
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: var(--login-text);
+}
+
+.login-link {
+  color: var(--login-text);
+  text-decoration: underline;
+}
+
+.login-powered,
+.login-build {
+  color: var(--login-build-text);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.45);
 }
 </style>

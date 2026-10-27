@@ -12,6 +12,8 @@ export default {
   },
   auth: {
     login: {
+      poweredBy: 'Desarrollado por Agricultura y Ensayo S.L.',
+      title: 'Iniciar sesión',
       subtitle: 'Inicia sesión para continuar',
       emailLabel: 'Email',
       passwordLabel: 'Password',
