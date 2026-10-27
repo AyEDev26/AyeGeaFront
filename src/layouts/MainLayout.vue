@@ -116,6 +116,19 @@
         </q-item>
 
         <q-item
+          v-if="auth.hasPermission('documentos.ver')"
+          clickable
+          to="/documentos"
+          class="drawer-item"
+          active-class="drawer-item--active"
+        >
+          <q-item-section avatar>
+            <q-icon name="folder_open" />
+          </q-item-section>
+          <q-item-section>{{ t('layout.nav.documentos') }}</q-item-section>
+        </q-item>
+
+        <q-item
           v-if="hasAdminHubAccess"
           clickable
           to="/admin/administracion"

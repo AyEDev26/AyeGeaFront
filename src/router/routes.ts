@@ -86,6 +86,11 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true, requiresPermission: 'elementos_inventario.editar' },
       },
       {
+        path: 'documentos',
+        component: () => import('@/pages/DocumentosListPage.vue'),
+        meta: { requiresAuth: true, requiresPermission: 'documentos.ver' },
+      },
+      {
         // Sin requiresPermission: el guard solo admite un permiso y el hub se abre con cualquiera
         // de varios; la propia página oculta las tarjetas sin permiso.
         path: 'admin/administracion',
