@@ -121,7 +121,7 @@
         :columns="columns"
         row-key="id"
         :rows-per-page-options="[10, 15, 25, 50]"
-        :loading="activityLogStore.loading"
+        v-bind="activityLogStoreLoadingAttrs"
         @request="onRequest"
         @row-click="onRowClick"
       >
@@ -239,6 +239,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDelayedLoading } from '@/composables/useDelayedLoading';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
@@ -442,6 +443,8 @@ onMounted(() => {
     pagination: { page: pagination.value.page, rowsPerPage: pagination.value.rowsPerPage },
   });
 });
+
+const activityLogStoreLoadingAttrs = useDelayedLoading(() => activityLogStore.loading);
 </script>
 
 <style scoped>

@@ -11,12 +11,15 @@
       class="admin-page-content"
       :class="wide ? 'col-12 col-md-11' : 'col-12 col-md-10 col-lg-8'"
     >
+      <PageBreadcrumbs />
       <slot />
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
+import PageBreadcrumbs from '@/components/common/PageBreadcrumbs.vue';
+
 withDefaults(
   defineProps<{
     wide?: boolean;

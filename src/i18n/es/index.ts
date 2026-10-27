@@ -982,6 +982,17 @@ export default {
       epis: 'EPIs',
       documentos: 'Documentos',
     },
+    breadcrumb: {
+      ariaLabel: 'Ruta de navegación',
+      inventory: 'Inventario',
+      profile: 'Perfil',
+      new: 'Nuevo',
+      edit: 'Editar',
+    },
+    back: {
+      tooltip: 'Volver',
+      ariaLabel: 'Volver a {destino}',
+    },
     logout: 'Cerrar sesión',
     theme: {
       classic: 'Clásico',

@@ -98,13 +98,18 @@
         :columns="columns"
         row-key="id"
         :rows-per-page-options="[10, 15, 25, 50]"
-        :loading="documentosStore.loading"
+        v-bind="documentosStoreLoadingAttrs"
         @request="onRequest"
       >
         <template #body-cell-categorias="props">
           <q-td :props="props">
             <template v-if="props.row.categorias.length">
-              <q-chip v-for="c in props.row.categorias" :key="c.id" dense size="sm">
+              <q-chip
+                v-for="c in props.row.categorias"
+                :key="c.id"
+                square
+                class="q-ma-xs text-weight-medium"
+              >
                 {{ c.nombre }}
               </q-chip>
             </template>
@@ -115,7 +120,12 @@
         <template #body-cell-subcategorias="props">
           <q-td :props="props">
             <template v-if="props.row.subcategorias.length">
-              <q-chip v-for="s in props.row.subcategorias" :key="s.id" dense size="sm">
+              <q-chip
+                v-for="s in props.row.subcategorias"
+                :key="s.id"
+                square
+                class="q-ma-xs text-weight-medium"
+              >
                 {{ s.nombre }}
               </q-chip>
             </template>
@@ -126,12 +136,12 @@
         <template #body-cell-fechaCaducidad="props">
           <q-td :props="props">
             <q-chip
-              v-if="props.row.fechaCaducidad && props.row.caducado"
-              dense
-              size="sm"
-              color="red-9"
+              v-if="props.row.fechaCaducidad"
+              square
+              class="q-ma-none text-weight-medium"
+              :color="props.row.caducado ? 'red-9' : 'green-8'"
               text-color="white"
-              :title="t('documentos.expired')"
+              :title="props.row.caducado ? t('documentos.expired') : undefined"
             >
               {{ formatDate(props.row.fechaCaducidad) }}
             </q-chip>
@@ -194,6 +204,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDelayedLoading } from '@/composables/useDelayedLoading';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuasar, type QTableColumn } from 'quasar';
@@ -538,4 +549,6 @@ watch(formDialogVisible, (isVisible) => {
 function onSaved() {
   formDialogVisible.value = false;
 }
+
+const documentosStoreLoadingAttrs = useDelayedLoading(() => documentosStore.loading);
 </script>

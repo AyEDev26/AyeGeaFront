@@ -102,7 +102,7 @@
             :columns="categoriaColumns"
             row-key="id"
             :rows-per-page-options="ROWS_PER_PAGE_OPTIONS"
-            :loading="categoriasStore.loading"
+            v-bind="categoriasStoreLoadingAttrs"
             @request="cat.onRequest"
           >
             <template #body-cell-actions="props">
@@ -261,7 +261,7 @@
             :columns="subcategoriaColumns"
             row-key="id"
             :rows-per-page-options="ROWS_PER_PAGE_OPTIONS"
-            :loading="subcategoriasStore.loading"
+            v-bind="subcategoriasStoreLoadingAttrs"
             @request="sub.onRequest"
           >
             <template #body-cell-actions="props">
@@ -329,6 +329,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDelayedLoading } from '@/composables/useDelayedLoading';
 import { computed, onMounted, ref, watch, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuasar, type QTableColumn } from 'quasar';
@@ -779,4 +780,7 @@ watch(
 onMounted(() => {
   void loadTipos();
 });
+
+const categoriasStoreLoadingAttrs = useDelayedLoading(() => categoriasStore.loading);
+const subcategoriasStoreLoadingAttrs = useDelayedLoading(() => subcategoriasStore.loading);
 </script>

@@ -33,9 +33,10 @@
           :columns="columns"
           row-key="id"
           :rows-per-page-options="[5, 10, 15]"
-          :loading="loading"
           :no-data-label="t('documentosAsociados.empty')"
-          :hide-pagination="!loading && pagination.rowsNumber === 0"
+          :hide-no-data="!loaded"
+          v-bind="loadingAttrs"
+          :hide-pagination="!loaded || (!loading && pagination.rowsNumber === 0)"
           @request="onRequest"
         >
           <template #body-cell-titulo="cell">
@@ -53,12 +54,12 @@
           <template #body-cell-fechaCaducidad="cell">
             <q-td :props="cell">
               <q-chip
-                v-if="cell.row.fechaCaducidad && cell.row.caducado"
-                dense
-                size="sm"
-                color="red-9"
+                v-if="cell.row.fechaCaducidad"
+                square
+                class="q-ma-none text-weight-medium"
+                :color="cell.row.caducado ? 'red-9' : 'green-8'"
                 text-color="white"
-                :title="t('documentos.expired')"
+                :title="cell.row.caducado ? t('documentos.expired') : undefined"
               >
                 {{ formatDate(cell.row.fechaCaducidad) }}
               </q-chip>
@@ -100,6 +101,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDelayedLoading } from '@/composables/useDelayedLoading';
 import { computed, ref, watch } from 'vue';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
@@ -126,6 +128,8 @@ const auth = useAuthStore();
 
 const rows = ref<Documento[]>([]);
 const loading = ref(false);
+// Hasta que termina la primera carga no se muestra "sin datos" (evita el parpadeo al abrir).
+const loaded = ref(false);
 const errorMessage = ref<string | null>(null);
 const pagination = ref({
   page: 1,
@@ -188,7 +192,10 @@ async function load() {
     if (seq !== requestSeq) return;
     errorMessage.value = getApiErrorMessage(error, t('documentosAsociados.fetchError'));
   } finally {
-    if (seq === requestSeq) loading.value = false;
+    if (seq === requestSeq) {
+      loading.value = false;
+      loaded.value = true;
+    }
   }
 }
 
@@ -197,15 +204,24 @@ function reset() {
   rows.value = [];
   errorMessage.value = null;
   loading.value = false;
+  loaded.value = false;
   pagination.value = { page: 1, rowsPerPage: DEFAULT_PER_PAGE, rowsNumber: 0 };
 }
 
+// Clave de lo que ya se cargó/está cargándose: el watch de abajo y el @show del diálogo
+// disparan ambos al abrir, y la segunda carga vaciaba las filas ya mostradas (parpadeo).
+let loadedKey: string | null = null;
+
 function onShow() {
+  const key = `${props.tipo}:${props.id}`;
+  if (key === loadedKey) return;
+  loadedKey = key;
   reset();
   void load();
 }
 
 function onHide() {
+  loadedKey = null;
   reset();
 }
 
@@ -237,6 +253,8 @@ async function onDownload(row: Documento) {
     });
   }
 }
+
+const loadingAttrs = useDelayedLoading(() => loading.value);
 </script>
 
 <style scoped>

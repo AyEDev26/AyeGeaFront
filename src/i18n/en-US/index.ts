@@ -982,6 +982,17 @@ export default {
       epis: 'PPE',
       documentos: 'Documents',
     },
+    breadcrumb: {
+      ariaLabel: 'Breadcrumb',
+      inventory: 'Inventory',
+      profile: 'Profile',
+      new: 'New',
+      edit: 'Edit',
+    },
+    back: {
+      tooltip: 'Back',
+      ariaLabel: 'Back to {destino}',
+    },
     logout: 'Sign out',
     theme: {
       classic: 'Classic',

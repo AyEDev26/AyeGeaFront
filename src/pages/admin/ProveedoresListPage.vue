@@ -70,7 +70,7 @@
         :columns="columns"
         row-key="id"
         :rows-per-page-options="[10, 15, 25, 50]"
-        :loading="proveedoresStore.loading"
+        v-bind="proveedoresStoreLoadingAttrs"
         @request="onRequest"
       >
         <template #body-cell-actions="props">
@@ -113,6 +113,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDelayedLoading } from '@/composables/useDelayedLoading';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
@@ -322,4 +323,6 @@ function openEditDialog(row: Proveedor) {
 function onSaved() {
   formDialogVisible.value = false;
 }
+
+const proveedoresStoreLoadingAttrs = useDelayedLoading(() => proveedoresStore.loading);
 </script>

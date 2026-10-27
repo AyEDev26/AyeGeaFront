@@ -235,8 +235,8 @@
         :columns="columns"
         row-key="id"
         :rows-per-page-options="[10, 15, 25, 50]"
-        :loading="state.loading"
         :no-data-label="t('inventario.empty')"
+        v-bind="stateLoadingAttrs"
         @request="onRequest"
       >
         <template #body-cell-estado="props">
@@ -303,6 +303,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDelayedLoading } from '@/composables/useDelayedLoading';
 import { computed, onMounted, ref, watch, type Ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar, type QTableColumn } from 'quasar';
@@ -798,6 +799,8 @@ onMounted(() => {
     pagination: { page: pagination.value.page, rowsPerPage: pagination.value.rowsPerPage },
   });
 });
+
+const stateLoadingAttrs = useDelayedLoading(() => state.value.loading);
 </script>
 
 <style scoped>
