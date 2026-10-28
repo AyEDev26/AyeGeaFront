@@ -197,6 +197,12 @@ async function onSubmit() {
   color: var(--login-text);
 }
 
+.login-card :deep(.q-field__native),
+.login-card :deep(.q-field__input) {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
 .login-link {
   color: var(--login-text);
   text-decoration: underline;
