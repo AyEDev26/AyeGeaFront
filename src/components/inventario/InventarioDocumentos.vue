@@ -31,6 +31,19 @@
           class="q-ml-sm"
           :label="section.rows.length"
         />
+        <q-space />
+        <q-btn
+          v-if="section.origen === 'elemento' && canCreate"
+          unelevated
+          no-caps
+          dense
+          color="primary"
+          icon="add"
+          class="elegant-btn px-md"
+          :label="t('inventarioDocumentos.addButton')"
+          :loading="openingDialog"
+          @click="openCreate"
+        />
       </div>
 
       <q-table
@@ -39,7 +52,7 @@
         dense
         class="elegant-table"
         :rows="section.rows"
-        :columns="columns"
+        :columns="section.origen === 'elemento' ? elementoColumns : columns"
         row-key="id"
         hide-pagination
         :rows-per-page-options="[0]"
@@ -78,19 +91,67 @@
             </q-btn>
           </q-td>
         </template>
+
+        <template #body-cell-acciones="cell">
+          <q-td :props="cell" class="text-center q-gutter-x-sm">
+            <q-btn
+              v-if="canEdit"
+              flat
+              round
+              dense
+              size="sm"
+              color="primary"
+              icon="edit"
+              @click="openEdit(cell.row)"
+            >
+              <q-tooltip>{{ t('inventarioDocumentos.editTooltip') }}</q-tooltip>
+            </q-btn>
+            <q-btn
+              v-if="canDelete"
+              flat
+              round
+              dense
+              size="sm"
+              color="negative"
+              icon="delete"
+              @click="onDeleteConfirm(cell.row)"
+            >
+              <q-tooltip>{{ t('inventarioDocumentos.deleteTooltip') }}</q-tooltip>
+            </q-btn>
+          </q-td>
+        </template>
       </q-table>
     </section>
+
+    <DocumentoFormDialog
+      v-if="elementoContext"
+      v-model="dialogVisible"
+      :documento="editingDocumento"
+      :tipo-options="tipoOptions"
+      :categoria-options="[]"
+      :subcategoria-options="[]"
+      :elemento="elementoContext"
+      @saved="onSaved"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useDelayedLoading } from '@/composables/useDelayedLoading';
 import { useAuthStore } from '@/stores/auth';
-import { useDocumentosStore, type Documento, type DocumentoOrigen } from '@/stores/documentos';
+import {
+  useDocumentosStore,
+  type Documento,
+  type DocumentoOrigen,
+  type ElementoContext,
+} from '@/stores/documentos';
+import { useElemsInventarioStore } from '@/stores/elemsInventario';
+import { useTiposDocumentoStore } from '@/stores/tiposDocumento';
 import { getApiErrorMessage } from '@/utils/api-error';
+import DocumentoFormDialog from '@/components/documentos/DocumentoFormDialog.vue';
 
 const EMPTY = '—';
 
@@ -109,8 +170,20 @@ const $q = useQuasar();
 const { t, locale } = useI18n();
 const documentosStore = useDocumentosStore();
 const auth = useAuthStore();
+const elemsStore = useElemsInventarioStore();
+const tiposDocumentoStore = useTiposDocumentoStore();
 
 const canView = computed(() => auth.hasPermission('documentos.ver'));
+const canCreate = computed(() => auth.hasPermission('documentos.crear'));
+
+const canEdit = computed(() => auth.hasPermission('documentos.editar'));
+const canDelete = computed(() => auth.hasPermission('documentos.eliminar'));
+
+const editingDocumento = ref<Documento | null>(null);
+const dialogVisible = ref(false);
+const openingDialog = ref(false);
+const elementoContext = ref<ElementoContext | null>(null);
+const tipoOptions = ref<{ label: string; value: number }[]>([]);
 
 const rows = ref<Documento[]>([]);
 const loading = ref(false);
@@ -158,6 +231,21 @@ const columns = computed<QTableColumn<Documento>[]>(() => [
   },
 ]);
 
+// Solo la tabla de la sección Elemento lleva columna de acciones.
+const elementoColumns = computed<QTableColumn<Documento>[]>(() =>
+  canEdit.value || canDelete.value
+    ? [
+        ...columns.value,
+        {
+          name: 'acciones',
+          label: t('inventarioDocumentos.columns.actions'),
+          field: 'id',
+          align: 'center',
+        },
+      ]
+    : columns.value,
+);
+
 async function load() {
   const seq = ++requestSeq;
   loading.value = true;
@@ -200,6 +288,77 @@ async function onDownload(row: Documento) {
       type: 'negative',
       color: 'red-9',
       message: getApiErrorMessage(error, t('documentos.downloadError')),
+    });
+  }
+}
+
+// Categoría/subcategoría del elemento y tipos de documento se cargan al abrir el diálogo.
+function openCreate() {
+  return openDialog(null);
+}
+
+function openEdit(row: Documento) {
+  return openDialog(row);
+}
+
+async function openDialog(documento: Documento | null) {
+  openingDialog.value = true;
+  try {
+    const [elem, tipos] = await Promise.all([
+      elemsStore.fetchElem(props.id),
+      tiposDocumentoStore.fetchAllTiposDocumento(),
+    ]);
+    elementoContext.value = {
+      id: elem.id,
+      categoria: elem.categoria,
+      subcategoria: elem.subcategoria,
+    };
+    tipoOptions.value = tipos.map((tipo) => ({ label: tipo.descripcion, value: tipo.id }));
+    editingDocumento.value = documento;
+    // Si el diálogo se monta ahora, debe nacer cerrado para que su watch de apertura reinicie el formulario.
+    await nextTick();
+    dialogVisible.value = true;
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      color: 'red-9',
+      message: getApiErrorMessage(error, t('inventarioDocumentos.elementoFetchError')),
+    });
+  } finally {
+    openingDialog.value = false;
+  }
+}
+
+async function onSaved() {
+  dialogVisible.value = false;
+  await load();
+}
+
+function onDeleteConfirm(row: Documento) {
+  $q.dialog({
+    title: t('inventarioDocumentos.deleteDialogTitle'),
+    message: t('inventarioDocumentos.deleteDialogMessage', { name: row.descripcion }),
+    cancel: true,
+    persistent: true,
+  }).onOk(() => {
+    void onDelete(row);
+  });
+}
+
+async function onDelete(row: Documento) {
+  try {
+    await documentosStore.deleteDocumento(row.id, { refresh: false });
+    $q.notify({
+      type: 'positive',
+      color: 'teal-9',
+      message: t('inventarioDocumentos.deleteSuccess'),
+    });
+    await load();
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      color: 'red-9',
+      message: getApiErrorMessage(error, t('inventarioDocumentos.deleteError')),
     });
   }
 }

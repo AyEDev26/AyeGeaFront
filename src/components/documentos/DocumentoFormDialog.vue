@@ -68,7 +68,38 @@
             :label="t('documentoForm.fechaCaducidadLabel')"
           />
 
+          <template v-if="elemento">
+            <div>
+              <q-toggle
+                v-model="flagCategoria"
+                :disable="readonly || !elemento.categoria"
+                :label="
+                  t('documentoForm.flagCategoriaLabel', { name: elemento.categoria?.nombre ?? '—' })
+                "
+              />
+              <div v-if="!elemento.categoria" class="text-caption text-grey-7 q-pl-sm">
+                {{ t('documentoForm.flagCategoriaHint') }}
+              </div>
+            </div>
+
+            <div>
+              <q-toggle
+                v-model="flagSubcategoria"
+                :disable="readonly || !elemento.subcategoria"
+                :label="
+                  t('documentoForm.flagSubcategoriaLabel', {
+                    name: elemento.subcategoria?.nombre ?? '—',
+                  })
+                "
+              />
+              <div v-if="!elemento.subcategoria" class="text-caption text-grey-7 q-pl-sm">
+                {{ t('documentoForm.flagSubcategoriaHint') }}
+              </div>
+            </div>
+          </template>
+
           <q-select
+            v-if="!elemento"
             v-model="categorias"
             outlined
             dense
@@ -83,6 +114,7 @@
           />
 
           <q-select
+            v-if="!elemento"
             v-model="subcategorias"
             outlined
             dense
@@ -125,7 +157,7 @@
 import { computed, ref, watch } from 'vue';
 import { useQuasar, type QForm } from 'quasar';
 import { useI18n } from 'vue-i18n';
-import { useDocumentosStore, type Documento } from '@/stores/documentos';
+import { useDocumentosStore, type Documento, type ElementoContext } from '@/stores/documentos';
 import { getApiErrorMessage } from '@/utils/api-error';
 import GlassCard from '@/components/common/GlassCard.vue';
 
@@ -141,8 +173,9 @@ const props = withDefaults(
     categoriaOptions: SelectOption[];
     subcategoriaOptions: SelectOption[];
     readonly?: boolean;
+    elemento?: ElementoContext | null;
   }>(),
-  { readonly: false },
+  { readonly: false, elemento: null },
 );
 
 const emit = defineEmits<{
@@ -173,6 +206,8 @@ const tipoDocumentoId = ref<number | null>(null);
 const fechaCaducidad = ref<string | null>(null);
 const categorias = ref<number[]>([]);
 const subcategorias = ref<number[]>([]);
+const flagCategoria = ref(false);
+const flagSubcategoria = ref(false);
 const saving = ref(false);
 
 const ficheroRules = [
@@ -199,6 +234,10 @@ function resetForm() {
   fechaCaducidad.value = props.documento?.fechaCaducidad ?? null;
   categorias.value = props.documento?.categorias.map((c) => c.id) ?? [];
   subcategorias.value = props.documento?.subcategorias.map((s) => s.id) ?? [];
+  flagCategoria.value =
+    !!props.elemento?.categoria && categorias.value.includes(props.elemento.categoria.id);
+  flagSubcategoria.value =
+    !!props.elemento?.subcategoria && subcategorias.value.includes(props.elemento.subcategoria.id);
   formRef.value?.resetValidation();
 }
 
@@ -207,6 +246,13 @@ watch(visible, (isVisible) => {
     resetForm();
   }
 });
+
+// En modo elemento, los flags añaden o quitan solo el id del elemento y se conserva el resto.
+function composeIds(current: number[], elementId: number | undefined, flag: boolean): number[] {
+  if (!props.elemento || elementId == null) return current;
+  const rest = current.filter((id) => id !== elementId);
+  return flag ? [...rest, elementId] : rest;
+}
 
 function onHide() {
   saving.value = false;
@@ -219,19 +265,36 @@ async function onSubmit() {
     return;
   }
 
+  const categoriaIds = composeIds(
+    categorias.value,
+    props.elemento?.categoria?.id,
+    flagCategoria.value,
+  );
+  const subcategoriaIds = composeIds(
+    subcategorias.value,
+    props.elemento?.subcategoria?.id,
+    flagSubcategoria.value,
+  );
+  // Desde la ficha no se recarga el listado /documentos.
+  const writeOptions = props.elemento ? { refresh: false } : {};
+
   saving.value = true;
   try {
     if (isEditMode.value && props.documento) {
-      await documentosStore.updateDocumento(props.documento.id, {
-        descripcion: descripcion.value,
-        tipoDocumentoId: tipoDocumentoId.value,
-        fechaCaducidad: fechaCaducidad.value,
-        categorias: categorias.value,
-        subcategorias: subcategorias.value,
-      });
+      await documentosStore.updateDocumento(
+        props.documento.id,
+        {
+          descripcion: descripcion.value,
+          tipoDocumentoId: tipoDocumentoId.value,
+          fechaCaducidad: fechaCaducidad.value,
+          categorias: categoriaIds,
+          subcategorias: subcategoriaIds,
+        },
+        writeOptions,
+      );
       if (fichero.value) {
         try {
-          await documentosStore.replaceFichero(props.documento.id, fichero.value);
+          await documentosStore.replaceFichero(props.documento.id, fichero.value, writeOptions);
         } catch (error) {
           // Los datos ya están guardados: se mantiene el diálogo abierto con el aviso.
           $q.notify({
@@ -244,14 +307,18 @@ async function onSubmit() {
       }
       $q.notify({ type: 'positive', color: 'teal-9', message: t('documentoForm.updated') });
     } else if (fichero.value) {
-      await documentosStore.createDocumento({
-        fichero: fichero.value,
-        descripcion: descripcion.value,
-        tipoDocumentoId: tipoDocumentoId.value,
-        fechaCaducidad: fechaCaducidad.value,
-        categorias: categorias.value,
-        subcategorias: subcategorias.value,
-      });
+      await documentosStore.createDocumento(
+        {
+          fichero: fichero.value,
+          descripcion: descripcion.value,
+          tipoDocumentoId: tipoDocumentoId.value,
+          fechaCaducidad: fechaCaducidad.value,
+          categorias: categoriaIds,
+          subcategorias: subcategoriaIds,
+          ...(props.elemento ? { elemsInventario: [props.elemento.id] } : {}),
+        },
+        writeOptions,
+      );
       $q.notify({ type: 'positive', color: 'teal-9', message: t('documentoForm.created') });
     }
     emit('saved');

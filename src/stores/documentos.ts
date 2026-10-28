@@ -96,6 +96,8 @@ export interface DocumentoCreatePayload {
   fechaCaducidad: string | null;
   categorias: number[];
   subcategorias: number[];
+  // Elementos de inventario a asociar (solo los que ve el usuario).
+  elemsInventario?: number[];
 }
 
 export interface DocumentoUpdatePayload {
@@ -104,6 +106,18 @@ export interface DocumentoUpdatePayload {
   fechaCaducidad: string | null;
   categorias: number[];
   subcategorias: number[];
+}
+
+// Contexto del elemento de inventario cuando DocumentoFormDialog se abre desde su ficha.
+export interface ElementoContext {
+  id: number;
+  categoria: { id: number; nombre: string } | null;
+  subcategoria: { id: number; nombre: string } | null;
+}
+
+// refresh=false evita recargar el listado /documentos (no altera items/meta/filters).
+export interface WriteOptions {
+  refresh?: boolean;
 }
 
 function triggerDownload(blob: Blob, fileName: string) {
@@ -197,7 +211,7 @@ export const useDocumentosStore = defineStore('documentos', () => {
   }
 
   // Multipart: los opcionales vacíos se omiten y los arrays vacíos no se envían.
-  async function createDocumento(payload: DocumentoCreatePayload) {
+  async function createDocumento(payload: DocumentoCreatePayload, options: WriteOptions = {}) {
     const formData = new FormData();
     formData.append('fichero', payload.fichero);
     formData.append('descripcion', payload.descripcion.trim());
@@ -205,14 +219,21 @@ export const useDocumentosStore = defineStore('documentos', () => {
     if (payload.fechaCaducidad) formData.append('fecha_caducidad', payload.fechaCaducidad);
     payload.categorias.forEach((id) => formData.append('categorias[]', String(id)));
     payload.subcategorias.forEach((id) => formData.append('subcategorias[]', String(id)));
+    (payload.elemsInventario ?? []).forEach((id) =>
+      formData.append('elems_inventario[]', String(id)),
+    );
     await api.post('/documentos', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    await refresh();
+    if (options.refresh !== false) await refresh();
   }
 
   // JSON: fecha vaciada = null; categorias/subcategorias siempre se envían. Sin `elems_inventario`.
-  async function updateDocumento(id: number, payload: DocumentoUpdatePayload) {
+  async function updateDocumento(
+    id: number,
+    payload: DocumentoUpdatePayload,
+    options: WriteOptions = {},
+  ) {
     await api.put(`/documentos/${id}`, {
       descripcion: payload.descripcion.trim(),
       tipo_documento_id: payload.tipoDocumentoId,
@@ -220,16 +241,16 @@ export const useDocumentosStore = defineStore('documentos', () => {
       categorias: payload.categorias,
       subcategorias: payload.subcategorias,
     });
-    await refresh();
+    if (options.refresh !== false) await refresh();
   }
 
-  async function replaceFichero(id: number, fichero: File) {
+  async function replaceFichero(id: number, fichero: File, options: WriteOptions = {}) {
     const formData = new FormData();
     formData.append('fichero', fichero);
     await api.post(`/documentos/${id}/fichero`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    await refresh();
+    if (options.refresh !== false) await refresh();
   }
 
   async function downloadDocumento(documento: Pick<Documento, 'id' | 'nombreOriginal'>) {
@@ -239,9 +260,9 @@ export const useDocumentosStore = defineStore('documentos', () => {
     triggerDownload(response.data, documento.nombreOriginal);
   }
 
-  async function deleteDocumento(id: number) {
+  async function deleteDocumento(id: number, options: WriteOptions = {}) {
     await api.delete(`/documentos/${id}`);
-    await refresh();
+    if (options.refresh !== false) await refresh();
   }
 
   return {

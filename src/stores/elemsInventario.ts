@@ -123,6 +123,9 @@ export interface ElemInventarioDetail {
   id: number;
   tipoElementoInventarioId: number;
   imagenUrl: string | null;
+  // Nombres de categoría y subcategoría (el formulario solo guarda sus ids).
+  categoria: NamedRef | null;
+  subcategoria: NamedRef | null;
   form: ElemInventarioForm;
 }
 
@@ -364,6 +367,8 @@ function mapDetail(resource: ElemInventarioDetailResource): ElemInventarioDetail
     id: resource.id,
     tipoElementoInventarioId: resource.tipo_elemento_inventario_id,
     imagenUrl: resource.imagenUrl ?? null,
+    categoria: mapNamed(resource.categoria),
+    subcategoria: mapNamed(resource.subcategoria),
     form,
   };
 }
