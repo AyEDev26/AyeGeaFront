@@ -8,6 +8,8 @@ export interface DocumentoRelacion {
   nombre: string;
 }
 
+export type DocumentoOrigen = 'elemento' | 'subcategoria' | 'categoria';
+
 export interface Documento {
   id: number;
   descripcion: string;
@@ -22,6 +24,8 @@ export interface Documento {
   categorias: DocumentoRelacion[];
   subcategorias: DocumentoRelacion[];
   createdAt: string;
+  // Solo presente en GET /elems-inventario/{id}/documentos
+  origen?: DocumentoOrigen;
 }
 
 export interface DocumentosFilters {
@@ -47,6 +51,7 @@ interface DocumentoResource {
   categorias: DocumentoRelacion[];
   subcategorias: DocumentoRelacion[];
   created_at: string;
+  origen?: DocumentoOrigen;
 }
 
 interface RawPaginationMeta {
@@ -71,6 +76,7 @@ function mapDocumento(resource: DocumentoResource): Documento {
     categorias: resource.categorias ?? [],
     subcategorias: resource.subcategorias ?? [],
     createdAt: resource.created_at,
+    ...(resource.origen ? { origen: resource.origen } : {}),
   };
 }
 
@@ -172,6 +178,14 @@ export const useDocumentosStore = defineStore('documentos', () => {
     };
   }
 
+  // Consulta aislada: documentos de la ficha (elemento + subcategoría + categoría) con `origen`.
+  async function fetchDocumentosDeElemento(elemId: number): Promise<Documento[]> {
+    const response = await api.get<{ data: DocumentoResource[] }>(
+      `/elems-inventario/${elemId}/documentos`,
+    );
+    return response.data.data.map(mapDocumento);
+  }
+
   // Consulta aislada: devuelve el documento sin tocar items/meta/filters/loading del listado.
   async function fetchDocumento(id: number): Promise<Documento> {
     const response = await api.get<{ data: DocumentoResource }>(`/documentos/${id}`);
@@ -237,6 +251,7 @@ export const useDocumentosStore = defineStore('documentos', () => {
     loading,
     fetchDocumentos,
     fetchDocumentosAsociados,
+    fetchDocumentosDeElemento,
     fetchDocumento,
     createDocumento,
     updateDocumento,

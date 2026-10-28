@@ -713,6 +713,16 @@ export default {
     retry: 'Reintentar',
     manageLink: 'Gestionar documentos',
   },
+  inventarioDocumentos: {
+    sections: {
+      elemento: 'Elemento',
+      subcategoria: 'Subcategoría',
+      categoria: 'Categoría',
+    },
+    empty: 'Sin documentos',
+    noAccess: 'Sin acceso a los documentos',
+    fetchError: 'No se pudieron cargar los documentos del elemento.',
+  },
   inventario: {
     vehiculos: { title: 'Vehículos' },
     maquinaria: { title: 'Maquinaria' },

@@ -50,6 +50,7 @@
             v-else-if="carpeta.kind === 'costes'"
             :labels="carpeta.labels ?? []"
           />
+          <InventarioDocumentos v-else-if="carpeta.kind === 'documentos'" :id="id" />
           <SkeletonTablePlaceholder v-else :columns="carpeta.columns ?? []" />
         </q-tab-panel>
       </q-tab-panels>
@@ -66,6 +67,7 @@ import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
 import GlassCard from '@/components/common/GlassCard.vue';
 import SkeletonTablePlaceholder from '@/components/inventario/SkeletonTablePlaceholder.vue';
 import SkeletonCostesCard from '@/components/inventario/SkeletonCostesCard.vue';
+import InventarioDocumentos from '@/components/inventario/InventarioDocumentos.vue';
 
 type CarpetaKey =
   | 'informacion'
@@ -83,7 +85,7 @@ type CarpetaKey =
   | 'manuales'
   | 'plantillas';
 
-type CarpetaKind = 'form' | 'table' | 'costes';
+type CarpetaKind = 'form' | 'table' | 'costes' | 'documentos';
 
 interface CarpetaConfig {
   key: CarpetaKey;
@@ -149,9 +151,8 @@ const COSTES: CarpetaConfig = {
 };
 const DOCUMENTOS: CarpetaConfig = {
   key: 'documentos',
-  kind: 'table',
+  kind: 'documentos',
   icon: 'description',
-  columns: col('nombre', 'tipo', 'fecha', 'vencimiento'),
 };
 const POLIZAS: CarpetaConfig = {
   key: 'polizas',
