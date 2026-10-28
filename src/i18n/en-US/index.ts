@@ -281,8 +281,6 @@ export default {
     },
     categorias: {
       title: 'Categories',
-      tabCategorias: 'Categories',
-      tabSubcategorias: 'Subcategories',
       newButton: 'New category',
       columns: {
         nombre: 'Name',
@@ -297,6 +295,7 @@ export default {
         filterButton: 'Filter',
         clearButton: 'Clear',
       },
+      subcategoriasTooltip: 'Subcategories',
       editTooltip: 'Edit',
       deleteTooltip: 'Delete',
       deleteDialogTitle: 'Delete category',
@@ -321,22 +320,15 @@ export default {
       saveError: 'Could not save the category.',
     },
     subcategorias: {
+      dialogTitle: 'Subcategories of {name}',
+      emptyMessage: 'This category has no subcategories',
+      retryButton: 'Retry',
       newButton: 'New subcategory',
       columns: {
         nombre: 'Name',
-        categoria: 'Category',
         periodicidad: 'Frequency',
         prefijo: 'Prefix',
         actions: 'Actions',
-      },
-      filters: {
-        nombreLabel: 'Name',
-        prefijoLabel: 'Prefix',
-        categoriaLabel: 'Category',
-        tipoLabel: 'Item type',
-        periodicidadLabel: 'Frequency',
-        filterButton: 'Filter',
-        clearButton: 'Clear',
       },
       editTooltip: 'Edit',
       deleteTooltip: 'Delete',

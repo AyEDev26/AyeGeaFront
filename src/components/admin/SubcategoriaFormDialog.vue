@@ -16,6 +16,7 @@
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-y-md" @submit.prevent="onSubmit">
           <q-select
+            v-if="!categoria"
             v-model="categoriaId"
             outlined
             dense
@@ -97,6 +98,8 @@ import GlassCard from '@/components/common/GlassCard.vue';
 
 const props = defineProps<{
   subcategoria: Subcategoria | null;
+  // Categoría fija: oculta el select de categoría y fuerza categoria_id en el payload.
+  categoria?: { id: number; nombre: string };
 }>();
 
 const emit = defineEmits<{
@@ -135,7 +138,7 @@ const prefijoRules = [
 ];
 
 function resetForm() {
-  categoriaId.value = props.subcategoria?.categoriaId ?? null;
+  categoriaId.value = props.categoria?.id ?? props.subcategoria?.categoriaId ?? null;
   nombre.value = props.subcategoria?.nombre ?? '';
   periodicidadId.value = props.subcategoria?.periodicidadId ?? null;
   prefijo.value = props.subcategoria?.prefijo ?? '';
@@ -148,7 +151,7 @@ async function loadOptions() {
   loadingOptions.value = true;
   try {
     const [categorias, periodicidades] = await Promise.allSettled([
-      categoriasStore.fetchAllCategorias(),
+      props.categoria ? Promise.resolve<Categoria[]>([]) : categoriasStore.fetchAllCategorias(),
       subcategoriasStore.fetchPeriodicidadOptions(),
     ]);
     if (categorias.status === 'fulfilled') {
@@ -193,7 +196,7 @@ function onHide() {
 // en alta se omiten.
 function buildPayload(): SubcategoriaPayload {
   const payload: SubcategoriaPayload = {
-    categoria_id: categoriaId.value as number,
+    categoria_id: props.categoria?.id ?? (categoriaId.value as number),
     nombre: nombre.value.trim(),
   };
   const prefijoValue = (prefijo.value ?? '').trim();
