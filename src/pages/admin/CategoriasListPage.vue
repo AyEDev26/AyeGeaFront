@@ -14,7 +14,7 @@
           icon="add"
           :label="t('admin.categorias.newButton')"
           class="elegant-btn"
-          @click="openCategoriaCreate"
+          @click="goToCategoriaCreate"
         />
       </div>
 
@@ -104,17 +104,6 @@
               <q-tooltip>{{ t('documentosAsociados.buttonTooltip') }}</q-tooltip>
             </q-btn>
             <q-btn
-              flat
-              round
-              dense
-              size="sm"
-              color="primary"
-              icon="account_tree"
-              @click="openSubcategorias(props.row)"
-            >
-              <q-tooltip>{{ t('admin.categorias.subcategoriasTooltip') }}</q-tooltip>
-            </q-btn>
-            <q-btn
               v-if="auth.hasPermission('catalogos.editar')"
               flat
               round
@@ -122,7 +111,7 @@
               size="sm"
               color="primary"
               icon="edit"
-              @click="openCategoriaEdit(props.row)"
+              @click="goToCategoriaEdit(props.row)"
             >
               <q-tooltip>{{ t('admin.categorias.editTooltip') }}</q-tooltip>
             </q-btn>
@@ -142,16 +131,6 @@
         </template>
       </q-table>
 
-      <CategoriaFormDialog
-        v-model="categoriaDialogVisible"
-        :categoria="editingCategoria"
-        @saved="onCategoriaSaved"
-      />
-      <SubcategoriasDeCategoriaDialog
-        v-model="subcategoriasDialogVisible"
-        :categoria-id="subcategoriasTarget.id"
-        :categoria-nombre="subcategoriasTarget.nombre"
-      />
       <DocumentosAsociadosDialog
         v-model="documentosDialogVisible"
         tipo="categoria"
@@ -165,6 +144,7 @@
 <script setup lang="ts">
 import { useDelayedLoading } from '@/composables/useDelayedLoading';
 import { computed, onMounted, ref, watch, type Ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth';
@@ -172,8 +152,6 @@ import type { PaginationMeta } from '@/stores/users';
 import { useCategoriasStore, type Categoria, type CategoriasFilters } from '@/stores/categorias';
 import { useTiposElementoStore } from '@/stores/tiposElemento';
 import { getApiErrorMessage } from '@/utils/api-error';
-import CategoriaFormDialog from '@/components/admin/CategoriaFormDialog.vue';
-import SubcategoriasDeCategoriaDialog from '@/components/admin/SubcategoriasDeCategoriaDialog.vue';
 import DocumentosAsociadosDialog from '@/components/documentos/DocumentosAsociadosDialog.vue';
 import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
 import GlassCard from '@/components/common/GlassCard.vue';
@@ -181,6 +159,7 @@ import GlassCard from '@/components/common/GlassCard.vue';
 const ROWS_PER_PAGE_OPTIONS = [10, 15, 25, 50];
 
 const $q = useQuasar();
+const router = useRouter();
 const { t } = useI18n();
 const auth = useAuthStore();
 const categoriasStore = useCategoriasStore();
@@ -362,21 +341,12 @@ function onCatClear() {
   void cat.applyFilters({});
 }
 
-const categoriaDialogVisible = ref(false);
-const editingCategoria = ref<Categoria | null>(null);
-
-function openCategoriaCreate() {
-  editingCategoria.value = null;
-  categoriaDialogVisible.value = true;
+function goToCategoriaCreate() {
+  void router.push('/admin/categorias/nuevo');
 }
 
-function openCategoriaEdit(row: Categoria) {
-  editingCategoria.value = row;
-  categoriaDialogVisible.value = true;
-}
-
-function onCategoriaSaved() {
-  categoriaDialogVisible.value = false;
+function goToCategoriaEdit(row: Categoria) {
+  void router.push(`/admin/categorias/${row.id}`);
 }
 
 function onCategoriaDeleteConfirm(row: Categoria) {
@@ -397,18 +367,6 @@ async function onCategoriaDelete(row: Categoria) {
   } catch (error) {
     notifyError(error, t('admin.categorias.deleteError'));
   }
-}
-
-// ------------------------------------------------------------------
-// Subcategorías de una categoría
-// ------------------------------------------------------------------
-
-const subcategoriasDialogVisible = ref(false);
-const subcategoriasTarget = ref<{ id: number; nombre: string }>({ id: 0, nombre: '' });
-
-function openSubcategorias(row: Categoria) {
-  subcategoriasTarget.value = { id: row.id, nombre: row.nombre };
-  subcategoriasDialogVisible.value = true;
 }
 
 // ------------------------------------------------------------------

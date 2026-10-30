@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="visible" @show="onShow" @hide="onHide">
+  <q-dialog :model-value="shown" @update:model-value="onDialogModel" @hide="onHide">
     <GlassCard style="width: 100%; min-width: 320px; max-width: 720px">
       <q-card-section class="row items-center q-pb-none no-wrap">
         <div class="text-h6 text-teal-10 font-outfit ellipsis">
@@ -208,28 +208,48 @@ function reset() {
   pagination.value = { page: 1, rowsPerPage: DEFAULT_PER_PAGE, rowsNumber: 0 };
 }
 
-// Clave de lo que ya se cargó/está cargándose: el watch de abajo y el @show del diálogo
-// disparan ambos al abrir, y la segunda carga vaciaba las filas ya mostradas (parpadeo).
-let loadedKey: string | null = null;
+// El diálogo se muestra solo cuando la primera carga ha terminado: así se abre ya con las filas
+// y sin el salto de contenido vacío → relleno. `visible` es lo que pide el padre; `shown`, lo que
+// pinta el q-dialog.
+const shown = ref(false);
+let openToken = 0;
 
-function onShow() {
-  const key = `${props.tipo}:${props.id}`;
-  if (key === loadedKey) return;
-  loadedKey = key;
+async function openWhenLoaded() {
+  const token = ++openToken;
   reset();
-  void load();
+  await load();
+  if (token === openToken && visible.value) shown.value = true;
+}
+
+function onDialogModel(value: boolean) {
+  if (!value) visible.value = false;
 }
 
 function onHide() {
-  loadedKey = null;
   reset();
 }
+
+watch(
+  visible,
+  (isVisible) => {
+    if (isVisible) {
+      void openWhenLoaded();
+    } else {
+      openToken++;
+      shown.value = false;
+    }
+  },
+  { immediate: true },
+);
 
 // Si el diálogo sigue abierto y cambia la fila, se descarta lo anterior y se recarga.
 watch(
   () => [props.tipo, props.id],
   () => {
-    if (visible.value) onShow();
+    if (visible.value) {
+      reset();
+      void load();
+    }
   },
 );
 

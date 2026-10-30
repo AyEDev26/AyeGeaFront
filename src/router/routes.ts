@@ -229,6 +229,32 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'admin/categorias/nuevo',
+        component: () => import('@/pages/admin/CategoriaFormPage.vue'),
+        meta: {
+          requiresAuth: true,
+          requiresPermission: 'catalogos.crear',
+          breadcrumb: [
+            { label: 'layout.nav.administration', to: '/admin/administracion' },
+            { label: 'admin.adminHub.cards.categorias.title', to: '/admin/categorias' },
+            { label: 'layout.breadcrumb.new' },
+          ],
+        },
+      },
+      {
+        path: 'admin/categorias/:id',
+        component: () => import('@/pages/admin/CategoriaFormPage.vue'),
+        meta: {
+          requiresAuth: true,
+          requiresPermission: 'catalogos.ver',
+          breadcrumb: [
+            { label: 'layout.nav.administration', to: '/admin/administracion' },
+            { label: 'admin.adminHub.cards.categorias.title', to: '/admin/categorias' },
+            { label: 'layout.breadcrumb.edit' },
+          ],
+        },
+      },
+      {
         path: 'admin/periodicidades',
         component: () => import('@/pages/admin/PeriodicidadesListPage.vue'),
         meta: {

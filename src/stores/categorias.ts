@@ -99,9 +99,16 @@ export const useCategoriasStore = defineStore('categorias', () => {
     }
   }
 
-  async function createCategoria(payload: CategoriaPayload) {
-    await api.post('/categorias', payload);
+  // Lectura individual; no altera items/meta/filters.
+  async function fetchCategoria(id: number): Promise<Categoria> {
+    const response = await api.get<{ data: CategoriaResource }>(`/categorias/${id}`);
+    return mapCategoria(response.data.data);
+  }
+
+  async function createCategoria(payload: CategoriaPayload): Promise<Categoria> {
+    const response = await api.post<{ data: CategoriaResource }>('/categorias', payload);
     await fetchCategorias(meta.value.currentPage, meta.value.perPage, filters.value);
+    return mapCategoria(response.data.data);
   }
 
   async function updateCategoria(id: number, payload: CategoriaPayload) {
@@ -144,6 +151,7 @@ export const useCategoriasStore = defineStore('categorias', () => {
     filters,
     loading,
     fetchCategorias,
+    fetchCategoria,
     createCategoria,
     updateCategoria,
     deleteCategoria,
