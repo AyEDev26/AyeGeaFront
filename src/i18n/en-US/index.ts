@@ -129,6 +129,7 @@ export default {
       selectDelegacionFirst: 'Select a branch first',
       visibilidadLabel: 'Branches with access',
       visibilidadOwnHint: "The user's own branch always has access.",
+      delegacionesLoadError: 'Could not load the branches.',
       searchPlaceholder: 'Type to search...',
       noResults: 'No results',
       nameRequired: 'Name is required.',
@@ -437,6 +438,7 @@ export default {
       created: 'Warehouse created.',
       updated: 'Warehouse updated.',
       saveError: 'Could not save the warehouse.',
+      responsablesLoadError: 'Could not load the users.',
     },
     ubicaciones: {
       title: 'Locations',
@@ -623,6 +625,7 @@ export default {
         causerLabel: 'Causer',
         causerPlaceholder: 'Search user by name...',
         causerNoResults: 'No results',
+        causersLoadError: 'Could not load the users.',
         createdFromLabel: 'From',
         createdToLabel: 'To',
         filterButton: 'Filter',

@@ -91,13 +91,12 @@
             clearable
             use-input
             hide-dropdown-icon
-            input-debounce="300"
             class="elegant-input"
             option-value="id"
             :label="t('admin.almacenForm.responsableLabel')"
             :placeholder="t('admin.almacenForm.searchPlaceholder')"
             :options="responsableOptions"
-            :loading="usersStore.searchingUsers"
+            :loading="loadingResponsables"
             @filter="onFilterResponsables"
           >
             <template #no-option>
@@ -172,6 +171,9 @@ const responsable = ref<RelationOption | null>(null);
 const delegacionOptions = ref<RelationOption[]>([]);
 const ubicacionOptions = ref<RelationOption[]>([]);
 const responsableOptions = ref<RelationOption[]>([]);
+// Usuarios activos de GET /users/selector, cargados al abrir el diálogo (filtrado local).
+const responsablesAll = ref<RelationOption[]>([]);
+const loadingResponsables = ref(false);
 const searchingDelegaciones = ref(false);
 const searchingUbicaciones = ref(false);
 const saving = ref(false);
@@ -199,9 +201,28 @@ function resetForm() {
   formRef.value?.resetValidation();
 }
 
+async function loadResponsables() {
+  loadingResponsables.value = true;
+  try {
+    const users = await usersStore.fetchUsersSelector();
+    responsablesAll.value = users.map((u) => ({ id: u.id, label: u.name }));
+  } catch (error) {
+    responsablesAll.value = [];
+    $q.notify({
+      type: 'negative',
+      color: 'red-9',
+      message: getApiErrorMessage(error, t('admin.almacenForm.responsablesLoadError')),
+    });
+  } finally {
+    loadingResponsables.value = false;
+  }
+}
+
 watch(visible, (isVisible) => {
   if (isVisible) {
     resetForm();
+    responsablesAll.value = [];
+    void loadResponsables();
   }
 });
 
@@ -257,21 +278,13 @@ function onFilterUbicaciones(
     });
 }
 
-function onFilterResponsables(
-  value: string,
-  update: (callback: () => void) => void,
-  abort: () => void,
-) {
-  usersStore
-    .searchUsersByName(value)
-    .then((results) => {
-      update(() => {
-        responsableOptions.value = results.map((item) => ({ id: item.id, label: item.name }));
-      });
-    })
-    .catch(() => {
-      abort();
-    });
+function onFilterResponsables(value: string, update: (callback: () => void) => void) {
+  update(() => {
+    const needle = value.trim().toLowerCase();
+    responsableOptions.value = needle
+      ? responsablesAll.value.filter((item) => item.label.toLowerCase().includes(needle))
+      : responsablesAll.value;
+  });
 }
 
 function onHide() {

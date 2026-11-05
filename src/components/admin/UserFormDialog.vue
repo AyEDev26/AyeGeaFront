@@ -152,13 +152,12 @@
                   clearable
                   use-input
                   hide-dropdown-icon
-                  input-debounce="300"
                   class="elegant-input"
                   option-value="id"
                   :label="t('admin.userForm.delegacionLabel')"
                   :placeholder="t('admin.userForm.searchPlaceholder')"
                   :options="delegacionOptions"
-                  :loading="searchingDelegacion"
+                  :loading="loadingDelegaciones"
                   @filter="onFilterDelegacion"
                   @update:model-value="onDelegacionChange"
                 >
@@ -360,13 +359,26 @@ function useOrgSelect(search: (nombre: string) => Promise<OrgRef[]>) {
   return { model, options, searching, onFilter, load };
 }
 
-const {
-  model: delegacion,
-  options: delegacionOptions,
-  searching: searchingDelegacion,
-  onFilter: onFilterDelegacion,
-  load: loadDelegacion,
-} = useOrgSelect((nombre) => delegacionesStore.searchDelegacionesByNombre(nombre));
+// Delegaciones del selector (GET /delegaciones/selector): una sola carga compartida por el
+// select «Delegación» (filtrado local) y los checkboxes de acceso.
+const delegacion = ref<OrgOption | null>(null);
+const delegacionOptions = ref<OrgOption[]>([]);
+const delegacionesAcceso = ref<OrgOption[]>([]);
+const loadingDelegaciones = ref(false);
+
+function onFilterDelegacion(value: string, update: (callback: () => void) => void) {
+  update(() => {
+    const needle = value.trim().toLowerCase();
+    delegacionOptions.value = needle
+      ? delegacionesAcceso.value.filter((item) => item.label.toLowerCase().includes(needle))
+      : delegacionesAcceso.value;
+  });
+}
+
+function loadDelegacion(current: OrgRef | null | undefined) {
+  delegacion.value = current ? { id: current.id, label: current.nombre } : null;
+}
+
 const {
   model: departamento,
   options: departamentoOptions,
@@ -388,9 +400,6 @@ const {
 
 // Delegaciones adicionales con acceso (ids, sin la propia que el backend añade siempre).
 const visibilidad = ref<number[]>([]);
-const delegacionesAcceso = ref<OrgOption[]>([]);
-const loadingDelegaciones = ref(false);
-
 // La propia se muestra marcada y deshabilitada; solo las demás se guardan en `visibilidad`.
 const visibilidadCheckboxOptions = computed(() =>
   delegacionesAcceso.value.map((option) => ({
@@ -409,13 +418,13 @@ const visibilidadChecked = computed<number[]>({
 async function fetchDelegacionesAcceso() {
   loadingDelegaciones.value = true;
   try {
-    const all = await delegacionesStore.fetchAllDelegaciones();
+    const all = await delegacionesStore.fetchDelegacionesSelector();
     delegacionesAcceso.value = all.map((item) => ({ id: item.id, label: item.nombre }));
   } catch (error) {
     $q.notify({
       type: 'negative',
       color: 'red-9',
-      message: getApiErrorMessage(error, t('admin.userForm.saveError')),
+      message: getApiErrorMessage(error, t('admin.userForm.delegacionesLoadError')),
     });
   } finally {
     loadingDelegaciones.value = false;

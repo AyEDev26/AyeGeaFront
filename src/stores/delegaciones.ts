@@ -9,6 +9,11 @@ export interface Delegacion {
   prefijo: string | null;
 }
 
+export interface DelegacionSelectorOption {
+  id: number;
+  nombre: string;
+}
+
 export interface DelegacionesFilters {
   nombre?: string;
 }
@@ -117,12 +122,20 @@ export const useDelegacionesStore = defineStore('delegaciones', () => {
     return [first, ...rest].flatMap((page) => page.items.map(mapDelegacion));
   }
 
+  // Delegaciones sin paginar, ordenadas por nombre, para selects (GET /delegaciones/selector).
+  // No filtra por visibilidad y no toca items/meta/filters.
+  async function fetchDelegacionesSelector(): Promise<DelegacionSelectorOption[]> {
+    const response = await api.get<{ data: DelegacionSelectorOption[] }>('/delegaciones/selector');
+    return response.data.data.map((d) => ({ id: d.id, nombre: d.nombre }));
+  }
+
   return {
     items,
     meta,
     filters,
     loading,
     fetchAllDelegaciones,
+    fetchDelegacionesSelector,
     searchDelegacionesByNombre,
     fetchDelegaciones,
     createDelegacion,

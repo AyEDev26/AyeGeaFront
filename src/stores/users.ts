@@ -150,7 +150,6 @@ export const useUsersStore = defineStore('users', () => {
     total: 0,
   });
   const loading = ref(false);
-  const searchingUsers = ref(false);
   const filters = ref<UsersFilters>({});
 
   function buildFilterParams(value: UsersFilters) {
@@ -211,20 +210,6 @@ export const useUsersStore = defineStore('users', () => {
     await fetchUsers(meta.value.currentPage, meta.value.perPage, filters.value);
   }
 
-  async function searchUsersByName(name: string): Promise<AdminUser[]> {
-    searchingUsers.value = true;
-    try {
-      const response = await api.get<{
-        data: { items: UserResource[]; meta: RawPaginationMeta };
-      }>('/users', {
-        params: { name, per_page: 10 },
-      });
-      return response.data.data.items.map(mapUser);
-    } finally {
-      searchingUsers.value = false;
-    }
-  }
-
   // Recorre todas las páginas (per_page=100) sin tocar items/meta/filters.
   async function fetchAllUsers(): Promise<AdminUser[]> {
     const fetchPage = async (page: number) => {
@@ -251,7 +236,6 @@ export const useUsersStore = defineStore('users', () => {
     meta,
     filters,
     loading,
-    searchingUsers,
     fetchUsers,
     fetchAllUsers,
     fetchUsersSelector,
@@ -260,6 +244,5 @@ export const useUsersStore = defineStore('users', () => {
     deleteUser,
     unlockUser,
     uploadAvatar,
-    searchUsersByName,
   };
 });

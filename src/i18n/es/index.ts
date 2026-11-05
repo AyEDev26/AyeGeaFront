@@ -129,6 +129,7 @@ export default {
       selectDelegacionFirst: 'Selecciona primero una delegación',
       visibilidadLabel: 'Delegaciones con acceso',
       visibilidadOwnHint: 'La delegación propia siempre tiene acceso.',
+      delegacionesLoadError: 'No se pudieron cargar las delegaciones.',
       searchPlaceholder: 'Escribe para buscar...',
       noResults: 'Sin resultados',
       nameRequired: 'El nombre es obligatorio.',
@@ -437,6 +438,7 @@ export default {
       created: 'Almacén creado.',
       updated: 'Almacén actualizado.',
       saveError: 'No se pudo guardar el almacén.',
+      responsablesLoadError: 'No se pudieron cargar los usuarios.',
     },
     ubicaciones: {
       title: 'Ubicaciones',
@@ -623,6 +625,7 @@ export default {
         causerLabel: 'Causante',
         causerPlaceholder: 'Buscar usuario por nombre...',
         causerNoResults: 'Sin resultados',
+        causersLoadError: 'No se pudieron cargar los usuarios.',
         createdFromLabel: 'Desde',
         createdToLabel: 'Hasta',
         filterButton: 'Filtrar',

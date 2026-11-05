@@ -54,7 +54,7 @@
             :label="t('admin.activityLog.filters.causerLabel')"
             :placeholder="t('admin.activityLog.filters.causerPlaceholder')"
             :options="causerOptions"
-            :loading="usersStore.searchingUsers"
+            :loading="loadingCausers"
             option-label="name"
             option-value="id"
             @filter="onCauserFilter"
@@ -249,7 +249,7 @@ import {
   type ActivityLogEntry,
   type ActivityLogFilters,
 } from '@/stores/activityLog';
-import { useUsersStore, type AdminUser } from '@/stores/users';
+import { useUsersStore, type UserSelectorOption } from '@/stores/users';
 import { useLocaleStore } from '@/stores/locale';
 import { getApiErrorMessage } from '@/utils/api-error';
 import AdminPageWrapper from '@/components/common/AdminPageWrapper.vue';
@@ -313,9 +313,11 @@ const filters = ref({
 // lo que haya escrito el usuario en los inputs sin haber pulsado "Filtrar" todavía.
 const appliedFilters = ref<ActivityLogFilters>({});
 
-const selectedCauser = ref<AdminUser | null>(null);
-const causerOptions = ref<AdminUser[]>([]);
-let causerSearchTimeout: ReturnType<typeof setTimeout> | undefined;
+const selectedCauser = ref<UserSelectorOption | null>(null);
+const causerOptions = ref<UserSelectorOption[]>([]);
+// Usuarios activos de GET /users/selector, cargados al montar (filtrado local).
+const causersAll = ref<UserSelectorOption[]>([]);
+const loadingCausers = ref(false);
 
 const detailDialog = ref(false);
 const selectedEntry = ref<ActivityLogEntry | null>(null);
@@ -408,30 +410,28 @@ async function onClearClick() {
 }
 
 function onCauserFilter(val: string, update: (callback: () => void) => void) {
-  if (causerSearchTimeout) {
-    clearTimeout(causerSearchTimeout);
+  update(() => {
+    const needle = val.trim().toLowerCase();
+    causerOptions.value = needle
+      ? causersAll.value.filter((user) => user.name.toLowerCase().includes(needle))
+      : causersAll.value;
+  });
+}
+
+async function loadCausers() {
+  loadingCausers.value = true;
+  try {
+    causersAll.value = await usersStore.fetchUsersSelector();
+  } catch (error) {
+    causersAll.value = [];
+    $q.notify({
+      type: 'negative',
+      color: 'red-9',
+      message: getApiErrorMessage(error, t('admin.activityLog.filters.causersLoadError')),
+    });
+  } finally {
+    loadingCausers.value = false;
   }
-  causerSearchTimeout = setTimeout(() => {
-    void (async () => {
-      if (!val) {
-        update(() => {
-          causerOptions.value = [];
-        });
-        return;
-      }
-      try {
-        const results = await usersStore.searchUsersByName(val);
-        update(() => {
-          causerOptions.value = results;
-        });
-      } catch (error) {
-        notifyFetchError(error);
-        update(() => {
-          causerOptions.value = [];
-        });
-      }
-    })();
-  }, 300);
 }
 
 async function onCauserSelected() {
@@ -439,6 +439,7 @@ async function onCauserSelected() {
 }
 
 onMounted(() => {
+  void loadCausers();
   void onRequest({
     pagination: { page: pagination.value.page, rowsPerPage: pagination.value.rowsPerPage },
   });
