@@ -51,7 +51,20 @@ export default defineRouter(({ store }) => {
       }
     }
 
-    if (to.meta.requiresPermission && !auth.hasPermission(to.meta.requiresPermission)) {
+    // Sesiones guardadas antes de SPEC 36 no traen `delegacion`: se completa con un único /me.
+    if (to.meta.requiresAuth && auth.user && auth.user.delegacion === undefined) {
+      try {
+        await auth.fetchMe();
+      } catch {
+        // fetchMe() ya limpió la sesión al fallar.
+      }
+
+      if (!auth.isAuthenticated) {
+        return { path: '/login', query: { redirect: to.fullPath } };
+      }
+    }
+
+    if (to.meta.requiresPermission &&!auth.hasPermission(to.meta.requiresPermission)) {
       Notify.create({ type: 'negative', message: 'No tienes permiso para acceder a esta sección' });
       return { path: '/' };
     }

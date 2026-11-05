@@ -13,6 +13,7 @@ export interface AuthUser {
   lastLoginAt: string | null;
   roles: string[];
   permissions: string[];
+  delegacion: { id: number; nombre: string } | null;
 }
 
 // Forma cruda del UserResource del backend (ver GET /api/documentation, schema UserResource).
@@ -27,6 +28,7 @@ interface UserResource {
   last_login_at: string | null;
   roles: string[];
   permissions: string[];
+  delegacion?: { id: number; nombre: string } | null;
 }
 
 interface LoginResponseData {
@@ -74,6 +76,7 @@ function mapUser(resource: UserResource): AuthUser {
     lastLoginAt: resource.last_login_at,
     roles: resource.roles,
     permissions: resource.permissions,
+    delegacion: resource.delegacion ?? null,
   };
   console.log('[auth] usuario obtenido:', user);
   return user;
@@ -196,6 +199,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await api.get<{ data: UserResource }>('/me');
       user.value = mapUser(response.data.data);
+      persist();
     } catch (error) {
       clearSession();
       throw error;

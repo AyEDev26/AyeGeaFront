@@ -998,6 +998,7 @@ export default {
   },
   layout: {
     menuAriaLabel: 'Menu',
+    defaultBranch: 'Default branch',
     nav: {
       menuSection: 'Menu',
       home: 'Home',

@@ -998,6 +998,7 @@ export default {
   },
   layout: {
     menuAriaLabel: 'Menú',
+    defaultBranch: 'Delegación por defecto',
     nav: {
       menuSection: 'Menu',
       home: 'Inicio',

@@ -42,6 +42,15 @@
           <div class="col overflow-hidden">
             <div class="text-subtitle1 text-weight-medium ellipsis">{{ user?.name }}</div>
             <div class="text-body2 text-blue-grey-2 ellipsis">{{ user?.email }}</div>
+            <div
+              v-if="user?.delegacion"
+              class="row items-center no-wrap q-gutter-x-xs text-body2 text-blue-grey-2"
+            >
+              <q-icon name="business" size="xs" :aria-label="t('layout.defaultBranch')">
+                <q-tooltip>{{ t('layout.defaultBranch') }}</q-tooltip>
+              </q-icon>
+              <span class="ellipsis">{{ user.delegacion.nombre }}</span>
+            </div>
           </div>
         </div>
 
