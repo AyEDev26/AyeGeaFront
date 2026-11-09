@@ -61,6 +61,11 @@
             :id="id"
             @changed="refreshKey++"
           />
+          <InventarioMantenimientos
+            v-else-if="carpeta.kind === 'mantenimientos'"
+            :id="id"
+            @changed="refreshKey++"
+          />
           <SkeletonTablePlaceholder v-else :columns="carpeta.columns ?? []" />
         </q-tab-panel>
       </q-tab-panels>
@@ -79,6 +84,7 @@ import SkeletonTablePlaceholder from '@/components/inventario/SkeletonTablePlace
 import SkeletonCostesCard from '@/components/inventario/SkeletonCostesCard.vue';
 import InventarioDocumentos from '@/components/inventario/InventarioDocumentos.vue';
 import InventarioRevisiones from '@/components/inventario/InventarioRevisiones.vue';
+import InventarioMantenimientos from '@/components/inventario/InventarioMantenimientos.vue';
 
 type CarpetaKey =
   | 'informacion'
@@ -96,7 +102,7 @@ type CarpetaKey =
   | 'manuales'
   | 'plantillas';
 
-type CarpetaKind = 'form' | 'table' | 'costes' | 'documentos' | 'revisiones';
+type CarpetaKind = 'form' | 'table' | 'costes' | 'documentos' | 'revisiones' | 'mantenimientos';
 
 interface CarpetaConfig {
   key: CarpetaKey;
@@ -141,9 +147,8 @@ const TAREAS: CarpetaConfig = {
 };
 const MANTENIMIENTOS: CarpetaConfig = {
   key: 'mantenimientos',
-  kind: 'table',
+  kind: 'mantenimientos',
   icon: 'build',
-  columns: col('fecha', 'tipo', 'descripcion', 'importe', 'estado'),
 };
 const ITVS: CarpetaConfig = {
   key: 'itvs',
@@ -222,7 +227,7 @@ const VEHICULO_MAQUINARIA: CarpetaConfig[] = [
 const CARPETAS: Record<TipoElemInventarioId, CarpetaConfig[]> = {
   1: VEHICULO_MAQUINARIA,
   2: VEHICULO_MAQUINARIA,
-  3: [INFORMACION, TAREAS, MANTENIMIENTOS, COSTES, DOCUMENTOS, MANUALES, PLANTILLAS],
+  3: [INFORMACION, TAREAS, COSTES, DOCUMENTOS, MANUALES, PLANTILLAS],
 };
 
 const carpetas = computed(() => CARPETAS[props.tipoId]);
