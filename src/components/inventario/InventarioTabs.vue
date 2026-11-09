@@ -66,6 +66,7 @@
             :id="id"
             @changed="refreshKey++"
           />
+          <InventarioItvs v-else-if="carpeta.kind === 'itvs'" :id="id" @changed="refreshKey++" />
           <SkeletonTablePlaceholder v-else :columns="carpeta.columns ?? []" />
         </q-tab-panel>
       </q-tab-panels>
@@ -85,6 +86,7 @@ import SkeletonCostesCard from '@/components/inventario/SkeletonCostesCard.vue';
 import InventarioDocumentos from '@/components/inventario/InventarioDocumentos.vue';
 import InventarioRevisiones from '@/components/inventario/InventarioRevisiones.vue';
 import InventarioMantenimientos from '@/components/inventario/InventarioMantenimientos.vue';
+import InventarioItvs from '@/components/inventario/InventarioItvs.vue';
 
 type CarpetaKey =
   | 'informacion'
@@ -102,7 +104,14 @@ type CarpetaKey =
   | 'manuales'
   | 'plantillas';
 
-type CarpetaKind = 'form' | 'table' | 'costes' | 'documentos' | 'revisiones' | 'mantenimientos';
+type CarpetaKind =
+  | 'form'
+  | 'table'
+  | 'costes'
+  | 'documentos'
+  | 'revisiones'
+  | 'mantenimientos'
+  | 'itvs';
 
 interface CarpetaConfig {
   key: CarpetaKey;
@@ -152,9 +161,8 @@ const MANTENIMIENTOS: CarpetaConfig = {
 };
 const ITVS: CarpetaConfig = {
   key: 'itvs',
-  kind: 'table',
+  kind: 'itvs',
   icon: 'fact_check',
-  columns: col('fecha', 'resultado', 'proximaFecha', 'importe'),
 };
 const REVISIONES: CarpetaConfig = {
   key: 'revisiones',
@@ -209,7 +217,8 @@ const PLANTILLAS: CarpetaConfig = {
   columns: col('nombre', 'tipo', 'descripcion', 'fecha'),
 };
 
-const VEHICULO_MAQUINARIA: CarpetaConfig[] = [
+// Las ITVs solo existen para vehículos: la API rechaza otros tipos en POST /itvs.
+const VEHICULOS: CarpetaConfig[] = [
   INFORMACION,
   ALERTAS,
   TAREAS,
@@ -224,9 +233,11 @@ const VEHICULO_MAQUINARIA: CarpetaConfig[] = [
   EQUIPOS,
 ];
 
+const MAQUINARIA: CarpetaConfig[] = VEHICULOS.filter((c) => c.key !== 'itvs');
+
 const CARPETAS: Record<TipoElemInventarioId, CarpetaConfig[]> = {
-  1: VEHICULO_MAQUINARIA,
-  2: VEHICULO_MAQUINARIA,
+  1: VEHICULOS,
+  2: MAQUINARIA,
   3: [INFORMACION, TAREAS, COSTES, DOCUMENTOS, MANUALES, PLANTILLAS],
 };
 
