@@ -1,7 +1,7 @@
 <template>
   <InventarioTabs v-if="elemId !== null" :key="route.path" :tipo-id="2" :id="elemId">
-    <template #informacion>
-      <InventarioForm embedded :tipo-id="2" />
+    <template #informacion="{ refreshKey }">
+      <InventarioForm embedded :tipo-id="2" :refresh-key="refreshKey" />
     </template>
   </InventarioTabs>
   <InventarioForm v-else :key="route.path" :tipo-id="2" />

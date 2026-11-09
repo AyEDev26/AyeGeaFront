@@ -976,7 +976,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuasar, type QForm } from 'quasar';
 import { AxiosError } from 'axios';
@@ -1006,6 +1006,8 @@ const props = defineProps<{
   tipoId: TipoElemInventarioId;
   /** Se renderiza dentro de la carpeta «Información»: sin título, wrapper ni card propios. */
   embedded?: boolean;
+  /** Al cambiar, el detalle se vuelve a cargar (campos de solo lectura calculados por el backend). */
+  refreshKey?: number;
 }>();
 
 const $q = useQuasar();
@@ -1454,6 +1456,15 @@ async function onSubmit() {
     saving.value = false;
   }
 }
+
+watch(
+  () => props.refreshKey,
+  (value, previous) => {
+    if (value !== undefined && value !== previous && elemId.value !== null) {
+      void loadElem(elemId.value);
+    }
+  },
+);
 
 onMounted(async () => {
   loading.value = true;

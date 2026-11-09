@@ -45,12 +45,22 @@
           :name="carpeta.key"
           class="q-pa-none"
         >
-          <slot v-if="carpeta.kind === 'form'" name="informacion" :id="id" />
+          <slot
+            v-if="carpeta.kind === 'form'"
+            name="informacion"
+            :id="id"
+            :refresh-key="refreshKey"
+          />
           <SkeletonCostesCard
             v-else-if="carpeta.kind === 'costes'"
             :labels="carpeta.labels ?? []"
           />
           <InventarioDocumentos v-else-if="carpeta.kind === 'documentos'" :id="id" />
+          <InventarioRevisiones
+            v-else-if="carpeta.kind === 'revisiones'"
+            :id="id"
+            @changed="refreshKey++"
+          />
           <SkeletonTablePlaceholder v-else :columns="carpeta.columns ?? []" />
         </q-tab-panel>
       </q-tab-panels>
@@ -59,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import type { TipoElemInventarioId } from '@/stores/elemsInventario';
@@ -68,6 +78,7 @@ import GlassCard from '@/components/common/GlassCard.vue';
 import SkeletonTablePlaceholder from '@/components/inventario/SkeletonTablePlaceholder.vue';
 import SkeletonCostesCard from '@/components/inventario/SkeletonCostesCard.vue';
 import InventarioDocumentos from '@/components/inventario/InventarioDocumentos.vue';
+import InventarioRevisiones from '@/components/inventario/InventarioRevisiones.vue';
 
 type CarpetaKey =
   | 'informacion'
@@ -85,7 +96,7 @@ type CarpetaKey =
   | 'manuales'
   | 'plantillas';
 
-type CarpetaKind = 'form' | 'table' | 'costes' | 'documentos';
+type CarpetaKind = 'form' | 'table' | 'costes' | 'documentos' | 'revisiones';
 
 interface CarpetaConfig {
   key: CarpetaKey;
@@ -103,6 +114,9 @@ const props = defineProps<{
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
+
+// Sube cuando una carpeta cambia datos que se reflejan en «Información» (p. ej. revisiones).
+const refreshKey = ref(0);
 
 const TIPO_KEYS = { 1: 'vehiculos', 2: 'maquinaria', 3: 'epis' } as const;
 const tipoKey = computed(() => TIPO_KEYS[props.tipoId]);
@@ -139,9 +153,8 @@ const ITVS: CarpetaConfig = {
 };
 const REVISIONES: CarpetaConfig = {
   key: 'revisiones',
-  kind: 'table',
+  kind: 'revisiones',
   icon: 'rule',
-  columns: col('fecha', 'tipo', 'responsable', 'resultado', 'proximaFecha'),
 };
 const COSTES: CarpetaConfig = {
   key: 'costes',
@@ -209,7 +222,7 @@ const VEHICULO_MAQUINARIA: CarpetaConfig[] = [
 const CARPETAS: Record<TipoElemInventarioId, CarpetaConfig[]> = {
   1: VEHICULO_MAQUINARIA,
   2: VEHICULO_MAQUINARIA,
-  3: [INFORMACION, TAREAS, REVISIONES, MANTENIMIENTOS, COSTES, DOCUMENTOS, MANUALES, PLANTILLAS],
+  3: [INFORMACION, TAREAS, MANTENIMIENTOS, COSTES, DOCUMENTOS, MANUALES, PLANTILLAS],
 };
 
 const carpetas = computed(() => CARPETAS[props.tipoId]);

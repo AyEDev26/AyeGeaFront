@@ -16,6 +16,15 @@ export const useAuxiliaresInventarioStore = defineStore('auxiliaresInventario', 
   const fetchEstados = () => fetchDescripciones('/estados');
   const fetchEstadosRevision = () => fetchDescripciones('/estados-revision');
   const fetchTiposFuncionamiento = () => fetchDescripciones('/tipos-funcionamiento');
+  // Catálogos de la revisión como tarea (no confundir con /estados-revision, estado del elemento).
+  const fetchPrioridadesRevisionMant = () => fetchDescripciones('/revision-mant-prioridades');
+  const fetchEstadosRevisionMant = () => fetchDescripciones('/revision-mant-estados');
 
-  return { fetchEstados, fetchEstadosRevision, fetchTiposFuncionamiento };
+  return {
+    fetchEstados,
+    fetchEstadosRevision,
+    fetchTiposFuncionamiento,
+    fetchPrioridadesRevisionMant,
+    fetchEstadosRevisionMant,
+  };
 });
