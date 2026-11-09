@@ -73,6 +73,9 @@ export interface ElemInventarioVehiculoForm {
   estadoRevisionId: number | null;
   renting: boolean;
   precio: number | null;
+  kmsIniciales: number | null;
+  horasIniciales: number | null;
+  // Solo lectura (vienen del Resource, no se envían).
   kmsActuales: number | null;
   horasActuales: number | null;
   responsableId: number | null;
@@ -85,6 +88,7 @@ export interface ElemInventarioMaquinariaForm {
   marca: string | null;
   modelo: string | null;
   fechaCompra: string | null;
+  // Solo lectura (vienen del Resource, no se envían).
   ultimaRevision: string | null;
   proximaRevision: string | null;
   estadoRevisionId: number | null;
@@ -201,6 +205,8 @@ interface ElemInventarioDetailResource extends ElemInventarioResource {
     estado_revision_id?: number | null;
     renting?: boolean | null;
     precio?: string | number | null;
+    kms_iniciales?: number | null;
+    horas_iniciales?: number | null;
     kms_actuales?: number | null;
     horas_actuales?: number | null;
     responsable_id?: number | null;
@@ -335,6 +341,8 @@ function mapDetail(resource: ElemInventarioDetailResource): ElemInventarioDetail
       estadoRevisionId: v.estado_revision_id ?? null,
       renting: v.renting ?? false,
       precio: toNumber(v.precio),
+      kmsIniciales: v.kms_iniciales ?? null,
+      horasIniciales: v.horas_iniciales ?? null,
       kmsActuales: v.kms_actuales ?? null,
       horasActuales: v.horas_actuales ?? null,
       responsableId: v.responsable_id ?? null,
@@ -388,13 +396,10 @@ function buildBlockPayload(tipoId: TipoElemInventarioId, form: ElemInventarioFor
         marca: nullIfBlank(v.marca),
         modelo: nullIfBlank(v.modelo),
         fecha_compra: v.fechaCompra || null,
-        ultima_revision: v.ultimaRevision || null,
-        proxima_revision: v.proximaRevision || null,
-        estado_revision_id: v.estadoRevisionId,
         renting: v.renting,
         precio: v.precio,
-        kms_actuales: v.kmsActuales,
-        horas_actuales: v.horasActuales,
+        kms_iniciales: v.kmsIniciales,
+        horas_iniciales: v.horasIniciales,
         responsable_id: v.responsableId,
         vehiculo_especial: v.vehiculoEspecial,
         tipo_funcionamiento_id: v.tipoFuncionamientoId,
@@ -409,9 +414,6 @@ function buildBlockPayload(tipoId: TipoElemInventarioId, form: ElemInventarioFor
         marca: nullIfBlank(m.marca),
         modelo: nullIfBlank(m.modelo),
         fecha_compra: m.fechaCompra || null,
-        ultima_revision: m.ultimaRevision || null,
-        proxima_revision: m.proximaRevision || null,
-        estado_revision_id: m.estadoRevisionId,
         cod_inversion: nullIfBlank(m.codInversion),
         precio: m.precio,
         responsable_id: m.responsableId,

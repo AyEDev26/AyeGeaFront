@@ -845,6 +845,8 @@ export default {
         estadoRevision: 'Estado de revisión',
         renting: 'Renting',
         precio: 'Precio',
+        kmsIniciales: 'Kilómetros iniciales',
+        horasIniciales: 'Horas iniciales',
         kmsActuales: 'Kilómetros actuales',
         horasActuales: 'Horas actuales',
         responsable: 'Responsable',

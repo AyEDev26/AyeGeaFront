@@ -452,47 +452,39 @@
                 @update:model-value="clearServerError('fechaCompra')"
               />
             </div>
-            <div class="col-12 col-sm-6 col-md-3">
+            <div v-if="isEditMode" class="col-12 col-sm-6 col-md-3">
               <q-input
-                v-model="form.vehiculo.ultimaRevision"
+                :model-value="form.vehiculo.ultimaRevision"
                 outlined
                 dense
                 hide-bottom-space
+                disable
                 class="elegant-input"
                 :label="t('inventario.form.labels.ultimaRevision')"
                 type="date"
                 stack-label
-                :error="!!serverErrors.ultimaRevision"
-                :error-message="serverErrors.ultimaRevision"
-                @update:model-value="clearServerError('ultimaRevision')"
               />
             </div>
-            <div class="col-12 col-sm-6 col-md-3">
+            <div v-if="isEditMode" class="col-12 col-sm-6 col-md-3">
               <q-input
-                v-model="form.vehiculo.proximaRevision"
+                :model-value="form.vehiculo.proximaRevision"
                 outlined
                 dense
                 hide-bottom-space
+                disable
                 class="elegant-input"
                 :label="t('inventario.form.labels.proximaRevision')"
                 type="date"
                 stack-label
-                :error="!!serverErrors.proximaRevision"
-                :error-message="serverErrors.proximaRevision"
-                @update:model-value="clearServerError('proximaRevision')"
               />
             </div>
-            <div class="col-12 col-sm-6 col-md-3">
+            <div v-if="isEditMode" class="col-12 col-sm-6 col-md-3">
               <q-select
-                v-model="form.vehiculo.estadoRevisionId"
+                :model-value="form.vehiculo.estadoRevisionId"
                 outlined
                 dense
                 hide-bottom-space
-                clearable
-                use-input
-                hide-selected
-                fill-input
-                input-debounce="0"
+                disable
                 emit-value
                 map-options
                 option-value="id"
@@ -500,10 +492,6 @@
                 class="elegant-input"
                 :options="estadoRevisionSelect.shown.value"
                 :label="t('inventario.form.labels.estadoRevision')"
-                :error="!!serverErrors.estadoRevisionId"
-                :error-message="serverErrors.estadoRevisionId"
-                @filter="estadoRevisionSelect.onFilter"
-                @update:model-value="clearServerError('estadoRevisionId')"
               />
             </div>
             <div class="col-12 col-sm-6 col-md-3">
@@ -579,7 +567,7 @@
             </div>
             <div class="col-12 col-sm-6 col-md-3">
               <q-input
-                :model-value="form.vehiculo.kmsActuales"
+                :model-value="form.vehiculo.kmsIniciales"
                 outlined
                 dense
                 hide-bottom-space
@@ -587,22 +575,22 @@
                 min="0"
                 step="1"
                 class="elegant-input"
-                :label="t('inventario.form.labels.kmsActuales')"
+                :label="t('inventario.form.labels.kmsIniciales')"
                 :rules="[nonNegativeRule]"
                 lazy-rules
-                :error="!!serverErrors.kmsActuales"
-                :error-message="serverErrors.kmsActuales"
+                :error="!!serverErrors.kmsIniciales"
+                :error-message="serverErrors.kmsIniciales"
                 @update:model-value="
                   (val) => {
-                    setBlockNumber('vehiculo', 'kmsActuales', val);
-                    clearServerError('kmsActuales');
+                    setBlockNumber('vehiculo', 'kmsIniciales', val);
+                    clearServerError('kmsIniciales');
                   }
                 "
               />
             </div>
             <div class="col-12 col-sm-6 col-md-3">
               <q-input
-                :model-value="form.vehiculo.horasActuales"
+                :model-value="form.vehiculo.horasIniciales"
                 outlined
                 dense
                 hide-bottom-space
@@ -610,17 +598,41 @@
                 min="0"
                 step="1"
                 class="elegant-input"
-                :label="t('inventario.form.labels.horasActuales')"
+                :label="t('inventario.form.labels.horasIniciales')"
                 :rules="[nonNegativeRule]"
                 lazy-rules
-                :error="!!serverErrors.horasActuales"
-                :error-message="serverErrors.horasActuales"
+                :error="!!serverErrors.horasIniciales"
+                :error-message="serverErrors.horasIniciales"
                 @update:model-value="
                   (val) => {
-                    setBlockNumber('vehiculo', 'horasActuales', val);
-                    clearServerError('horasActuales');
+                    setBlockNumber('vehiculo', 'horasIniciales', val);
+                    clearServerError('horasIniciales');
                   }
                 "
+              />
+            </div>
+            <div v-if="isEditMode" class="col-12 col-sm-6 col-md-3">
+              <q-input
+                :model-value="form.vehiculo.kmsActuales"
+                outlined
+                dense
+                hide-bottom-space
+                disable
+                type="number"
+                class="elegant-input"
+                :label="t('inventario.form.labels.kmsActuales')"
+              />
+            </div>
+            <div v-if="isEditMode" class="col-12 col-sm-6 col-md-3">
+              <q-input
+                :model-value="form.vehiculo.horasActuales"
+                outlined
+                dense
+                hide-bottom-space
+                disable
+                type="number"
+                class="elegant-input"
+                :label="t('inventario.form.labels.horasActuales')"
               />
             </div>
             <div class="col-12 col-sm-6 col-md-3">
@@ -713,47 +725,39 @@
                 @update:model-value="clearServerError('fechaCompra')"
               />
             </div>
-            <div class="col-12 col-sm-6 col-md-3">
+            <div v-if="isEditMode" class="col-12 col-sm-6 col-md-3">
               <q-input
-                v-model="form.maquinaria.ultimaRevision"
+                :model-value="form.maquinaria.ultimaRevision"
                 outlined
                 dense
                 hide-bottom-space
+                disable
                 class="elegant-input"
                 :label="t('inventario.form.labels.ultimaRevision')"
                 type="date"
                 stack-label
-                :error="!!serverErrors.ultimaRevision"
-                :error-message="serverErrors.ultimaRevision"
-                @update:model-value="clearServerError('ultimaRevision')"
               />
             </div>
-            <div class="col-12 col-sm-6 col-md-3">
+            <div v-if="isEditMode" class="col-12 col-sm-6 col-md-3">
               <q-input
-                v-model="form.maquinaria.proximaRevision"
+                :model-value="form.maquinaria.proximaRevision"
                 outlined
                 dense
                 hide-bottom-space
+                disable
                 class="elegant-input"
                 :label="t('inventario.form.labels.proximaRevision')"
                 type="date"
                 stack-label
-                :error="!!serverErrors.proximaRevision"
-                :error-message="serverErrors.proximaRevision"
-                @update:model-value="clearServerError('proximaRevision')"
               />
             </div>
-            <div class="col-12 col-sm-6 col-md-3">
+            <div v-if="isEditMode" class="col-12 col-sm-6 col-md-3">
               <q-select
-                v-model="form.maquinaria.estadoRevisionId"
+                :model-value="form.maquinaria.estadoRevisionId"
                 outlined
                 dense
                 hide-bottom-space
-                clearable
-                use-input
-                hide-selected
-                fill-input
-                input-debounce="0"
+                disable
                 emit-value
                 map-options
                 option-value="id"
@@ -761,10 +765,6 @@
                 class="elegant-input"
                 :options="estadoRevisionSelect.shown.value"
                 :label="t('inventario.form.labels.estadoRevision')"
-                :error="!!serverErrors.estadoRevisionId"
-                :error-message="serverErrors.estadoRevisionId"
-                @filter="estadoRevisionSelect.onFilter"
-                @update:model-value="clearServerError('estadoRevisionId')"
               />
             </div>
             <div class="col-12 col-sm-6 col-md-3">
@@ -1067,6 +1067,8 @@ function withBlock(base: ElemInventarioForm, tipoId: TipoElemInventarioId): Elem
       estadoRevisionId: null,
       renting: false,
       precio: null,
+      kmsIniciales: null,
+      horasIniciales: null,
       kmsActuales: null,
       horasActuales: null,
       responsableId: null,

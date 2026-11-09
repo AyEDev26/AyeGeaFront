@@ -284,6 +284,8 @@ export function useInventarioPdf() {
           field('tipoFuncionamiento', formatSelect(l.tiposFuncionamiento, v.tipoFuncionamientoId)),
           field('responsable', formatSelect(l.responsables, v.responsableId)),
           field('precio', formatPrice(v.precio)),
+          field('kmsIniciales', formatNumber(v.kmsIniciales)),
+          field('horasIniciales', formatNumber(v.horasIniciales)),
           field('kmsActuales', formatNumber(v.kmsActuales)),
           field('horasActuales', formatNumber(v.horasActuales)),
           field('renting', formatBool(v.renting)),

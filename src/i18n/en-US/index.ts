@@ -845,6 +845,8 @@ export default {
         estadoRevision: 'Inspection status',
         renting: 'Leased',
         precio: 'Price',
+        kmsIniciales: 'Initial kilometers',
+        horasIniciales: 'Initial hours',
         kmsActuales: 'Current kilometers',
         horasActuales: 'Current hours',
         responsable: 'Responsible user',
