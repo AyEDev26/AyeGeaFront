@@ -96,6 +96,25 @@
         </q-td>
       </template>
 
+      <template #body-cell-documento="cell">
+        <q-td :props="cell">
+          <q-btn
+            v-if="cell.row.documento"
+            flat
+            dense
+            no-caps
+            size="sm"
+            color="primary"
+            icon="attach_file"
+            class="text-left"
+            :label="cell.row.documento.descripcion"
+            :loading="downloadingId === cell.row.documento.id"
+            @click="onDownload(cell.row.documento.id)"
+          />
+          <span v-else>{{ EMPTY }}</span>
+        </q-td>
+      </template>
+
       <template #body-cell-acciones="cell">
         <q-td :props="cell" class="text-center q-gutter-x-sm">
           <q-btn
@@ -135,6 +154,37 @@
             </q-btn>
           </template>
           <q-btn
+            v-if="canAttach"
+            flat
+            round
+            dense
+            size="sm"
+            color="primary"
+            :icon="cell.row.documento ? 'swap_horiz' : 'attach_file'"
+            :loading="openingDocumento && documentoTarea?.id === cell.row.id"
+            @click="openDocumento(cell.row)"
+          >
+            <q-tooltip>
+              {{
+                cell.row.documento
+                  ? t('tareaDocumento.replaceTooltip')
+                  : t('tareaDocumento.attachTooltip')
+              }}
+            </q-tooltip>
+          </q-btn>
+          <q-btn
+            v-if="canEdit && cell.row.documento"
+            flat
+            round
+            dense
+            size="sm"
+            color="warning"
+            icon="link_off"
+            @click="onUnlinkConfirm(cell.row)"
+          >
+            <q-tooltip>{{ t('tareaDocumento.unlinkTooltip') }}</q-tooltip>
+          </q-btn>
+          <q-btn
             v-if="canDelete"
             flat
             round
@@ -167,6 +217,16 @@
       :mantenimiento="actionMantenimiento"
       @saved="onSaved"
     />
+    <DocumentoFormDialog
+      v-if="elementoContext"
+      v-model="documentoDialogVisible"
+      :documento="null"
+      :tipo-options="tipoOptions"
+      :categoria-options="[]"
+      :subcategoria-options="[]"
+      :elemento="elementoContext"
+      @saved="onDocumentoSaved"
+    />
   </div>
 </template>
 
@@ -175,6 +235,7 @@ import { computed, ref, watch } from 'vue';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useDelayedLoading } from '@/composables/useDelayedLoading';
+import { useTareaDocumento } from '@/composables/useTareaDocumento';
 import { useAuthStore } from '@/stores/auth';
 import { useAuxiliaresInventarioStore } from '@/stores/auxiliaresInventario';
 import {
@@ -183,6 +244,7 @@ import {
   type Mantenimiento,
 } from '@/stores/mantenimientos';
 import { getApiErrorMessage } from '@/utils/api-error';
+import DocumentoFormDialog from '@/components/documentos/DocumentoFormDialog.vue';
 import MantenimientoFormDialog from '@/components/inventario/MantenimientoFormDialog.vue';
 import MantenimientoRealizarDialog from '@/components/inventario/MantenimientoRealizarDialog.vue';
 import MantenimientoCancelarDialog from '@/components/inventario/MantenimientoCancelarDialog.vue';
@@ -194,8 +256,10 @@ const props = defineProps<{
 }>();
 
 // `changed` avisa de que un mantenimiento se creó, cambió o eliminó: la ficha debe recargarse.
+// `documentoChanged` avisa de que un documento se asoció o eliminó: la carpeta «Documentos» debe recargarse.
 const emit = defineEmits<{
   changed: [];
+  documentoChanged: [];
 }>();
 
 const $q = useQuasar();
@@ -294,6 +358,14 @@ const columns = computed<QTableColumn<Mantenimiento>[]>(() => {
       align: 'right',
     },
   ];
+  if (canViewDocumento.value) {
+    base.push({
+      name: 'documento',
+      label: t('inventarioMantenimientos.columns.documento'),
+      field: (row) => row.documento?.descripcion ?? EMPTY,
+      align: 'left',
+    });
+  }
   return canEdit.value || canDelete.value
     ? [
         ...base,
@@ -334,6 +406,28 @@ async function load(page: number, perPage: number) {
 function reload() {
   return load(pagination.value.page, pagination.value.rowsPerPage);
 }
+
+const {
+  canViewDocumento,
+  canAttach,
+  downloadingId,
+  openingDocumento,
+  documentoTarea,
+  documentoDialogVisible,
+  elementoContext,
+  tipoOptions,
+  onDownload,
+  openDocumento,
+  onDocumentoSaved,
+  onUnlinkConfirm,
+} = useTareaDocumento({
+  elementoId: computed(() => props.id),
+  canEdit,
+  setDocumento: (id, documentoId) => mantenimientosStore.setDocumentoMantenimiento(id, documentoId),
+  reload,
+  onChanged: () => emit('changed'),
+  onDocumentoChanged: () => emit('documentoChanged'),
+});
 
 function onRequest(requestProps: { pagination: { page: number; rowsPerPage: number } }) {
   const { page, rowsPerPage } = requestProps.pagination;

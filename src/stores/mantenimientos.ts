@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { api } from '@/boot/axios';
 import type { PaginationMeta } from '@/stores/users';
-import type { ElemInventarioRef } from '@/stores/revisiones';
+import type { ElemInventarioRef, TareaDocumento } from '@/stores/revisiones';
 
 interface IdDescripcion {
   id: number;
@@ -34,6 +34,8 @@ export interface Mantenimiento {
   usuarioCancelacion: IdName | null;
   motivoCancelacion: string | null;
   usuarioCreacion: IdName | null;
+  documentoId: number | null;
+  documento: TareaDocumento | null;
 }
 
 export interface MantenimientoForm {
@@ -62,7 +64,7 @@ export interface MantenimientosFilters {
 
 export const MANTENIMIENTO_ESTADO = { PENDIENTE: 1, REALIZADA: 2, CANCELADA: 3 } as const;
 
-// Forma cruda del MantenimientoResource del backend. `documento_id` y `documento` no se mapean.
+// Forma cruda del MantenimientoResource del backend.
 interface MantenimientoResource {
   id: number;
   elem_inventario_id: number;
@@ -83,6 +85,8 @@ interface MantenimientoResource {
   usuario_cancelacion: IdName | null;
   motivo_cancelacion: string | null;
   usuario_creacion: IdName | null;
+  documento_id?: number | null;
+  documento?: { id: number; descripcion: string; url_descarga: string } | null;
 }
 
 interface RawPaginationMeta {
@@ -117,6 +121,14 @@ function mapMantenimiento(m: MantenimientoResource): Mantenimiento {
     usuarioCancelacion: m.usuario_cancelacion ?? null,
     motivoCancelacion: m.motivo_cancelacion ?? null,
     usuarioCreacion: m.usuario_creacion ?? null,
+    documentoId: m.documento_id ?? null,
+    documento: m.documento
+      ? {
+          id: m.documento.id,
+          descripcion: m.documento.descripcion,
+          urlDescarga: m.documento.url_descarga,
+        }
+      : null,
   };
 }
 
@@ -188,6 +200,11 @@ export const useMantenimientosStore = defineStore('mantenimientos', () => {
     });
   }
 
+  // Envía solo `documento_id` (null desasocia); no toca el resto de campos.
+  async function setDocumentoMantenimiento(id: number, documentoId: number | null) {
+    await api.put(`/mantenimientos/${id}`, { documento_id: documentoId });
+  }
+
   async function deleteMantenimiento(id: number) {
     await api.delete(`/mantenimientos/${id}`);
   }
@@ -215,6 +232,7 @@ export const useMantenimientosStore = defineStore('mantenimientos', () => {
     fetchMantenimientos,
     createMantenimiento,
     updateMantenimiento,
+    setDocumentoMantenimiento,
     deleteMantenimiento,
     realizarMantenimiento,
     cancelarMantenimiento,

@@ -18,11 +18,14 @@ interface IdName {
   name: string;
 }
 
-export interface RevisionDocumento {
+// Documento asociado a una tarea del elemento (revisión, mantenimiento o ITV).
+export interface TareaDocumento {
   id: number;
   descripcion: string;
   urlDescarga: string;
 }
+
+export type RevisionDocumento = TareaDocumento;
 
 export interface Revision {
   id: number;

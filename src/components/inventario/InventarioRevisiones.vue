@@ -150,14 +150,14 @@
             size="sm"
             color="primary"
             :icon="cell.row.documento ? 'swap_horiz' : 'attach_file'"
-            :loading="openingDocumento && documentoRevision?.id === cell.row.id"
+            :loading="openingDocumento && documentoTarea?.id === cell.row.id"
             @click="openDocumento(cell.row)"
           >
             <q-tooltip>
               {{
                 cell.row.documento
-                  ? t('inventarioRevisiones.replaceDocumentoTooltip')
-                  : t('inventarioRevisiones.attachDocumentoTooltip')
+                  ? t('tareaDocumento.replaceTooltip')
+                  : t('tareaDocumento.attachTooltip')
               }}
             </q-tooltip>
           </q-btn>
@@ -171,7 +171,7 @@
             icon="link_off"
             @click="onUnlinkConfirm(cell.row)"
           >
-            <q-tooltip>{{ t('inventarioRevisiones.unlinkDocumentoTooltip') }}</q-tooltip>
+            <q-tooltip>{{ t('tareaDocumento.unlinkTooltip') }}</q-tooltip>
           </q-btn>
           <q-btn
             v-if="canDelete"
@@ -212,14 +212,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useDelayedLoading } from '@/composables/useDelayedLoading';
+import { useTareaDocumento } from '@/composables/useTareaDocumento';
 import { useAuthStore } from '@/stores/auth';
-import { useDocumentosStore, type Documento, type ElementoContext } from '@/stores/documentos';
-import { useElemsInventarioStore } from '@/stores/elemsInventario';
-import { useTiposDocumentoStore } from '@/stores/tiposDocumento';
 import { useAuxiliaresInventarioStore } from '@/stores/auxiliaresInventario';
 import { REVISION_ESTADO, useRevisionesStore, type Revision } from '@/stores/revisiones';
 import { getApiErrorMessage } from '@/utils/api-error';
@@ -246,29 +244,18 @@ const { t, locale } = useI18n();
 const auth = useAuthStore();
 const revisionesStore = useRevisionesStore();
 const auxiliares = useAuxiliaresInventarioStore();
-const documentosStore = useDocumentosStore();
-const elemsStore = useElemsInventarioStore();
-const tiposDocumentoStore = useTiposDocumentoStore();
 
 const canView = computed(() => auth.hasPermission('mantenimiento_revisiones.ver'));
 
 const canCreate = computed(() => auth.hasPermission('mantenimiento_revisiones.crear'));
 const canEdit = computed(() => auth.hasPermission('mantenimiento_revisiones.editar'));
 const canDelete = computed(() => auth.hasPermission('mantenimiento_revisiones.eliminar'));
-const canViewDocumento = computed(() => auth.hasPermission('documentos.ver'));
-const canDeleteDocumento = computed(() => auth.hasPermission('documentos.eliminar'));
-const canAttach = computed(() => canEdit.value && auth.hasPermission('documentos.crear'));
 
 const dialogVisible = ref(false);
 const editingRevision = ref<Revision | null>(null);
 const realizarVisible = ref(false);
 const cancelarVisible = ref(false);
 const actionRevision = ref<Revision | null>(null);
-const documentoDialogVisible = ref(false);
-const openingDocumento = ref(false);
-const documentoRevision = ref<Revision | null>(null);
-const elementoContext = ref<ElementoContext | null>(null);
-const tipoOptions = ref<{ label: string; value: number }[]>([]);
 
 const estadoId = ref<number | null>(null);
 const prioridadId = ref<number | null>(null);
@@ -388,6 +375,28 @@ function reload() {
   return load(pagination.value.page, pagination.value.rowsPerPage);
 }
 
+const {
+  canViewDocumento,
+  canAttach,
+  downloadingId,
+  openingDocumento,
+  documentoTarea,
+  documentoDialogVisible,
+  elementoContext,
+  tipoOptions,
+  onDownload,
+  openDocumento,
+  onDocumentoSaved,
+  onUnlinkConfirm,
+} = useTareaDocumento({
+  elementoId: computed(() => props.id),
+  canEdit,
+  setDocumento: (id, documentoId) => revisionesStore.setDocumentoRevision(id, documentoId),
+  reload,
+  onChanged: () => emit('changed'),
+  onDocumentoChanged: () => emit('documentoChanged'),
+});
+
 function onRequest(requestProps: { pagination: { page: number; rowsPerPage: number } }) {
   const { page, rowsPerPage } = requestProps.pagination;
   return load(page, rowsPerPage);
@@ -450,147 +459,6 @@ async function onDelete(row: Revision) {
       type: 'negative',
       color: 'red-9',
       message: getApiErrorMessage(error, t('inventarioRevisiones.deleteError')),
-    });
-  }
-}
-
-const downloadingId = ref<number | null>(null);
-
-// `documento` de la revisión no trae el nombre original: se consulta antes de descargar.
-async function onDownload(documentoId: number) {
-  downloadingId.value = documentoId;
-  try {
-    const documento = await documentosStore.fetchDocumento(documentoId);
-    await documentosStore.downloadDocumento(documento);
-  } catch (error) {
-    $q.notify({
-      type: 'negative',
-      color: 'red-9',
-      message: getApiErrorMessage(error, t('documentos.downloadError')),
-    });
-  } finally {
-    downloadingId.value = null;
-  }
-}
-
-// Elemento (categoría/subcategoría) y tipos de documento se cargan al abrir el diálogo.
-async function openDocumento(row: Revision) {
-  openingDocumento.value = true;
-  documentoRevision.value = row;
-  try {
-    const [elem, tipos] = await Promise.all([
-      elemsStore.fetchElem(props.id),
-      tiposDocumentoStore.fetchAllTiposDocumento(),
-    ]);
-    elementoContext.value = {
-      id: elem.id,
-      categoria: elem.categoria,
-      subcategoria: elem.subcategoria,
-    };
-    tipoOptions.value = tipos.map((tipo) => ({ label: tipo.descripcion, value: tipo.id }));
-    // Si el diálogo se monta ahora, debe nacer cerrado para que su watch reinicie el formulario.
-    await nextTick();
-    documentoDialogVisible.value = true;
-  } catch (error) {
-    $q.notify({
-      type: 'negative',
-      color: 'red-9',
-      message: getApiErrorMessage(error, t('inventarioRevisiones.documentoElementoFetchError')),
-    });
-  } finally {
-    openingDocumento.value = false;
-  }
-}
-
-// El documento ya está subido: si falla la asociación, se avisa y el documento queda en «Documentos».
-async function onDocumentoSaved(documento?: Documento) {
-  documentoDialogVisible.value = false;
-  const revision = documentoRevision.value;
-  if (!documento || !revision) return;
-  const previous = revision.documento;
-  try {
-    await revisionesStore.setDocumentoRevision(revision.id, documento.id);
-    $q.notify({
-      type: 'positive',
-      color: 'teal-9',
-      message: t('inventarioRevisiones.documentoAttachSuccess'),
-    });
-    emit('changed');
-    emit('documentoChanged');
-    await reload();
-    if (previous) offerDeletePrevious(previous.id);
-  } catch (error) {
-    $q.notify({
-      type: 'negative',
-      color: 'red-9',
-      message: getApiErrorMessage(error, t('inventarioRevisiones.documentoAttachError')),
-    });
-  }
-}
-
-function onUnlinkConfirm(row: Revision) {
-  $q.dialog({
-    title: t('inventarioRevisiones.unlinkDialogTitle'),
-    message: t('inventarioRevisiones.unlinkDialogMessage', {
-      name: row.documento?.descripcion ?? '',
-    }),
-    cancel: true,
-    persistent: true,
-  }).onOk(() => {
-    void onUnlink(row);
-  });
-}
-
-async function onUnlink(row: Revision) {
-  const previous = row.documento;
-  try {
-    await revisionesStore.setDocumentoRevision(row.id, null);
-    $q.notify({
-      type: 'positive',
-      color: 'teal-9',
-      message: t('inventarioRevisiones.unlinkSuccess'),
-    });
-    emit('changed');
-    emit('documentoChanged');
-    await reload();
-    if (previous) offerDeletePrevious(previous.id);
-  } catch (error) {
-    $q.notify({
-      type: 'negative',
-      color: 'red-9',
-      message: getApiErrorMessage(error, t('inventarioRevisiones.unlinkError')),
-    });
-  }
-}
-
-// El documento anterior se conserva por defecto; solo se ofrece borrarlo con `documentos.eliminar`.
-function offerDeletePrevious(documentoId: number) {
-  if (!canDeleteDocumento.value) return;
-  $q.dialog({
-    title: t('inventarioRevisiones.deletePreviousTitle'),
-    message: t('inventarioRevisiones.deletePreviousMessage'),
-    cancel: { label: t('inventarioRevisiones.deletePreviousKeep'), flat: true },
-    ok: { label: t('inventarioRevisiones.deletePreviousConfirm'), color: 'negative' },
-    persistent: true,
-  }).onOk(() => {
-    void deletePrevious(documentoId);
-  });
-}
-
-async function deletePrevious(documentoId: number) {
-  try {
-    await documentosStore.deleteDocumento(documentoId, { refresh: false });
-    $q.notify({
-      type: 'positive',
-      color: 'teal-9',
-      message: t('inventarioRevisiones.deletePreviousSuccess'),
-    });
-    emit('documentoChanged');
-  } catch (error) {
-    $q.notify({
-      type: 'negative',
-      color: 'red-9',
-      message: getApiErrorMessage(error, t('inventarioRevisiones.deletePreviousError')),
     });
   }
 }

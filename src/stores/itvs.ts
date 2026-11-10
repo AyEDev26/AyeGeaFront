@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { api } from '@/boot/axios';
 import type { PaginationMeta } from '@/stores/users';
-import type { ElemInventarioRef } from '@/stores/revisiones';
+import type { ElemInventarioRef, TareaDocumento } from '@/stores/revisiones';
 
 interface IdDescripcion {
   id: number;
@@ -34,6 +34,8 @@ export interface Itv {
   usuarioCancelacion: IdName | null;
   motivoCancelacion: string | null;
   usuarioCreacion: IdName | null;
+  documentoId: number | null;
+  documento: TareaDocumento | null;
 }
 
 export interface ItvForm {
@@ -64,7 +66,7 @@ export interface ItvsFilters {
 
 export const ITV_ESTADO = { PENDIENTE: 1, REALIZADA: 2, CANCELADA: 3 } as const;
 
-// Forma cruda del ItvResource del backend. `documento_id` y `documento` no se mapean.
+// Forma cruda del ItvResource del backend.
 interface ItvResource {
   id: number;
   elem_inventario_id: number;
@@ -85,6 +87,8 @@ interface ItvResource {
   usuario_cancelacion: IdName | null;
   motivo_cancelacion: string | null;
   usuario_creacion: IdName | null;
+  documento_id?: number | null;
+  documento?: { id: number; descripcion: string; url_descarga: string } | null;
 }
 
 interface RawPaginationMeta {
@@ -119,6 +123,14 @@ function mapItv(i: ItvResource): Itv {
     usuarioCancelacion: i.usuario_cancelacion ?? null,
     motivoCancelacion: i.motivo_cancelacion ?? null,
     usuarioCreacion: i.usuario_creacion ?? null,
+    documentoId: i.documento_id ?? null,
+    documento: i.documento
+      ? {
+          id: i.documento.id,
+          descripcion: i.documento.descripcion,
+          urlDescarga: i.documento.url_descarga,
+        }
+      : null,
   };
 }
 
@@ -186,6 +198,11 @@ export const useItvsStore = defineStore('itvs', () => {
     });
   }
 
+  // Envía solo `documento_id` (null desasocia); no toca el resto de campos.
+  async function setDocumentoItv(id: number, documentoId: number | null) {
+    await api.put(`/itvs/${id}`, { documento_id: documentoId });
+  }
+
   async function deleteItv(id: number) {
     await api.delete(`/itvs/${id}`);
   }
@@ -216,6 +233,7 @@ export const useItvsStore = defineStore('itvs', () => {
     fetchItvs,
     createItv,
     updateItv,
+    setDocumentoItv,
     deleteItv,
     realizarItv,
     cancelarItv,

@@ -70,8 +70,14 @@
             v-else-if="carpeta.kind === 'mantenimientos'"
             :id="id"
             @changed="refreshKey++"
+            @documento-changed="documentosRefreshKey++"
           />
-          <InventarioItvs v-else-if="carpeta.kind === 'itvs'" :id="id" @changed="refreshKey++" />
+          <InventarioItvs
+            v-else-if="carpeta.kind === 'itvs'"
+            :id="id"
+            @changed="refreshKey++"
+            @documento-changed="documentosRefreshKey++"
+          />
           <SkeletonTablePlaceholder v-else :columns="carpeta.columns ?? []" />
         </q-tab-panel>
       </q-tab-panels>
