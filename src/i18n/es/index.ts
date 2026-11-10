@@ -766,6 +766,7 @@ export default {
       prev: 'Mes anterior',
       next: 'Mes siguiente',
       today: 'Hoy',
+      legend: 'Leyenda',
       selectDay: 'Selecciona un día para ver sus vencimientos.',
       noTasks: 'No hay vencimientos este día.',
       dayCount: '{n} vencimiento | {n} vencimientos',

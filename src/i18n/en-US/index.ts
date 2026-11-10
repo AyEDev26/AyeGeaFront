@@ -766,6 +766,7 @@ export default {
       prev: 'Previous month',
       next: 'Next month',
       today: 'Today',
+      legend: 'Legend',
       selectDay: 'Select a day to see its due dates.',
       noTasks: 'No due dates on this day.',
       dayCount: '{n} due date | {n} due dates',

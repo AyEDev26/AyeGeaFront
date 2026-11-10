@@ -60,12 +60,38 @@
           >
             <q-icon :name="URGENCIA_META[v.urgencia].icon" size="20px" />
             <q-icon :name="TIPO_ICON[v.tipo]" size="20px" class="text-blue-grey-8" />
+            <q-tooltip anchor="top middle" self="bottom middle" :delay="200">
+              <div class="text-weight-bold">{{ v.elemNombre }}</div>
+              <div v-if="v.titulo">{{ v.titulo }}</div>
+            </q-tooltip>
           </span>
           <span v-if="cell.items.length > MAX_MARKS" class="text-caption text-blue-grey-8">
             +{{ cell.items.length - MAX_MARKS }}
           </span>
         </span>
       </button>
+    </div>
+
+    <div
+      class="cal-legend q-mt-sm text-caption text-blue-grey-8"
+      role="group"
+      :aria-label="t('vencimientos.calendar.legend')"
+    >
+      <span class="text-weight-bold">{{ t('vencimientos.calendar.legend') }}:</span>
+      <span
+        v-for="u in URGENCIAS"
+        :key="u"
+        class="cal-legend__item"
+        :class="`text-${URGENCIA_META[u].color}`"
+      >
+        <q-icon :name="URGENCIA_META[u].icon" size="20px" />
+        <span class="text-blue-grey-9">{{ t(`vencimientos.status.${u}`) }}</span>
+      </span>
+      <span class="cal-legend__sep" aria-hidden="true" />
+      <span v-for="(icon, tipo) in TIPO_ICON" :key="tipo" class="cal-legend__item">
+        <q-icon :name="icon" size="20px" class="text-blue-grey-8" />
+        <span class="text-blue-grey-9">{{ t(`vencimientos.tipo.${tipo}`) }}</span>
+      </span>
     </div>
 
     <div class="q-mt-md">
@@ -102,7 +128,7 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { toYmd, type Vencimiento } from '@/stores/vencimientos';
 import VencimientoItem from './VencimientoItem.vue';
-import { rowKey, TIPO_ICON, URGENCIA_META, ymdOf } from './vencimientos-ui';
+import { rowKey, TIPO_ICON, URGENCIAS, URGENCIA_META, ymdOf } from './vencimientos-ui';
 
 const props = defineProps<{
   items: Vencimiento[];
@@ -285,5 +311,21 @@ const selectedLabel = computed(() =>
     min-height: 64px;
     padding: 2px;
   }
+}
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+.cal-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.cal-legend__sep {
+  width: 1px;
+  height: 18px;
+  background: rgb(0 0 0 / 20%);
 }
 </style>
