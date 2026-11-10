@@ -20,21 +20,6 @@
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-y-md" @submit.prevent="onSubmit">
           <q-input
-            v-model="descripcion"
-            outlined
-            dense
-            type="textarea"
-            autogrow
-            class="elegant-input"
-            :label="t('mantenimientoForm.descripcionLabel')"
-            :rules="descripcionRules"
-            :error="!!serverErrors.descripcion"
-            :error-message="serverErrors.descripcion"
-            lazy-rules
-            @update:model-value="clearServerError('descripcion')"
-          />
-
-          <q-input
             v-model="fechaMantenimiento"
             outlined
             dense
@@ -47,6 +32,21 @@
             :error-message="serverErrors.fechaMantenimiento"
             lazy-rules
             @update:model-value="clearServerError('fechaMantenimiento')"
+          />
+
+          <q-input
+            v-model="descripcion"
+            outlined
+            dense
+            type="textarea"
+            autogrow
+            class="elegant-input"
+            :label="t('mantenimientoForm.descripcionLabel')"
+            :rules="descripcionRules"
+            :error="!!serverErrors.descripcion"
+            :error-message="serverErrors.descripcion"
+            lazy-rules
+            @update:model-value="clearServerError('descripcion')"
           />
 
           <q-select

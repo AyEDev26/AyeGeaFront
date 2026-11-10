@@ -19,39 +19,20 @@
 
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-y-md" @submit.prevent="onSubmit">
-          <div class="row q-col-gutter-sm">
-            <div class="col-12 col-sm-6">
-              <q-input
-                v-model="fechaItv"
-                outlined
-                dense
-                type="date"
-                stack-label
-                class="elegant-input"
-                :label="t('itvForm.fechaItvLabel')"
-                :rules="fechaRules"
-                :error="!!serverErrors.fechaItv"
-                :error-message="serverErrors.fechaItv"
-                lazy-rules
-                @update:model-value="clearServerError('fechaItv')"
-              />
-            </div>
-            <div class="col-12 col-sm-6">
-              <q-input
-                v-model="fechaProximaItv"
-                outlined
-                dense
-                clearable
-                type="date"
-                stack-label
-                class="elegant-input"
-                :label="t('itvForm.fechaProximaItvLabel')"
-                :error="!!serverErrors.fechaProximaItv"
-                :error-message="serverErrors.fechaProximaItv"
-                @update:model-value="clearServerError('fechaProximaItv')"
-              />
-            </div>
-          </div>
+          <q-input
+            v-model="fechaItv"
+            outlined
+            dense
+            type="date"
+            stack-label
+            class="elegant-input"
+            :label="t('itvForm.fechaItvLabel')"
+            :rules="fechaRules"
+            :error="!!serverErrors.fechaItv"
+            :error-message="serverErrors.fechaItv"
+            lazy-rules
+            @update:model-value="clearServerError('fechaItv')"
+          />
 
           <q-input
             v-model="resultado"
@@ -134,6 +115,20 @@
             :error-message="serverErrors.coste"
             lazy-rules
             @update:model-value="clearServerError('coste')"
+          />
+
+          <q-input
+            v-model="fechaProximaItv"
+            outlined
+            dense
+            clearable
+            type="date"
+            stack-label
+            class="elegant-input"
+            :label="t('itvForm.fechaProximaItvLabel')"
+            :error="!!serverErrors.fechaProximaItv"
+            :error-message="serverErrors.fechaProximaItv"
+            @update:model-value="clearServerError('fechaProximaItv')"
           />
         </q-form>
       </q-card-section>

@@ -20,19 +20,6 @@
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-y-md" @submit.prevent="onSubmit">
           <q-input
-            v-model="nombre"
-            outlined
-            dense
-            class="elegant-input"
-            :label="t('revisionForm.nombreLabel')"
-            :rules="nombreRules"
-            :error="!!serverErrors.nombre"
-            :error-message="serverErrors.nombre"
-            lazy-rules
-            @update:model-value="clearServerError('nombre')"
-          />
-
-          <q-input
             v-model="fechaRevision"
             outlined
             dense
@@ -48,17 +35,16 @@
           />
 
           <q-input
-            v-model="fechaProximaRevision"
+            v-model="nombre"
             outlined
             dense
-            clearable
-            type="date"
-            stack-label
             class="elegant-input"
-            :label="t('revisionForm.fechaProximaRevisionLabel')"
-            :error="!!serverErrors.fechaProximaRevision"
-            :error-message="serverErrors.fechaProximaRevision"
-            @update:model-value="clearServerError('fechaProximaRevision')"
+            :label="t('revisionForm.nombreLabel')"
+            :rules="nombreRules"
+            :error="!!serverErrors.nombre"
+            :error-message="serverErrors.nombre"
+            lazy-rules
+            @update:model-value="clearServerError('nombre')"
           />
 
           <q-select
@@ -92,6 +78,20 @@
             :error-message="serverErrors.coste"
             lazy-rules
             @update:model-value="clearServerError('coste')"
+          />
+
+          <q-input
+            v-model="fechaProximaRevision"
+            outlined
+            dense
+            clearable
+            type="date"
+            stack-label
+            class="elegant-input"
+            :label="t('revisionForm.fechaProximaRevisionLabel')"
+            :error="!!serverErrors.fechaProximaRevision"
+            :error-message="serverErrors.fechaProximaRevision"
+            @update:model-value="clearServerError('fechaProximaRevision')"
           />
         </q-form>
       </q-card-section>
