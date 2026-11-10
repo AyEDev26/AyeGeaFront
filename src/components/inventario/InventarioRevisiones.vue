@@ -325,6 +325,12 @@ const columns = computed<QTableColumn<Revision>[]>(() => {
       field: (row) => formatCoste(row.coste),
       align: 'right',
     },
+    {
+      name: 'creadoPor',
+      label: t('inventarioRevisiones.columns.creadoPor'),
+      field: (row) => row.usuarioCreacion?.name ?? EMPTY,
+      align: 'left',
+    },
   ];
   if (canViewDocumento.value) {
     base.push({

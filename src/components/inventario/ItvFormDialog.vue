@@ -9,6 +9,14 @@
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
+      <q-card-section v-if="isEditMode && itv?.usuarioCreacion" class="q-pb-none">
+        <q-chip dense outline color="teal-10" icon="person" style="max-width: 100%">
+          <span class="ellipsis">{{
+            t('itvForm.createdBy', { name: itv.usuarioCreacion.name })
+          }}</span>
+        </q-chip>
+      </q-card-section>
+
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-y-md" @submit.prevent="onSubmit">
           <div class="row q-col-gutter-sm">

@@ -9,6 +9,14 @@
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
+      <q-card-section v-if="isEditMode && mantenimiento?.usuarioCreacion" class="q-pb-none">
+        <q-chip dense outline color="teal-10" icon="person" style="max-width: 100%">
+          <span class="ellipsis">{{
+            t('mantenimientoForm.createdBy', { name: mantenimiento.usuarioCreacion.name })
+          }}</span>
+        </q-chip>
+      </q-card-section>
+
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-y-md" @submit.prevent="onSubmit">
           <q-input

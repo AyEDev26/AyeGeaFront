@@ -326,6 +326,12 @@ const columns = computed<QTableColumn<Itv>[]>(() => {
       field: (row) => formatCoste(row.coste),
       align: 'right',
     },
+    {
+      name: 'creadoPor',
+      label: t('inventarioItvs.columns.creadoPor'),
+      field: (row) => row.usuarioCreacion?.name ?? EMPTY,
+      align: 'left',
+    },
   ];
   if (canViewDocumento.value) {
     base.push({

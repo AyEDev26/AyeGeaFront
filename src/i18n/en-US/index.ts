@@ -850,6 +850,7 @@ export default {
       prioridad: 'Priority',
       estado: 'Status',
       coste: 'Cost',
+      creadoPor: 'Created by',
       documento: 'Document',
       actions: 'Actions',
     },
@@ -881,6 +882,7 @@ export default {
       prioridad: 'Priority',
       estado: 'Status',
       coste: 'Cost',
+      creadoPor: 'Created by',
       documento: 'Document',
       actions: 'Actions',
     },
@@ -911,6 +913,7 @@ export default {
       horasItv: 'Hours',
       estado: 'Status',
       coste: 'Cost',
+      creadoPor: 'Created by',
       documento: 'Document',
       actions: 'Actions',
     },
@@ -918,6 +921,7 @@ export default {
   itvForm: {
     createTitle: 'Add ITV',
     editTitle: 'Edit ITV',
+    createdBy: 'Created by: {name}',
     fechaItvLabel: 'Scheduled date',
     fechaProximaItvLabel: 'Next ITV',
     resultadoLabel: 'Result',
@@ -960,6 +964,7 @@ export default {
   mantenimientoForm: {
     createTitle: 'Add maintenance',
     editTitle: 'Edit maintenance',
+    createdBy: 'Created by: {name}',
     descripcionLabel: 'Description',
     fechaMantenimientoLabel: 'Scheduled date',
     prioridadLabel: 'Priority',
@@ -997,6 +1002,7 @@ export default {
   revisionForm: {
     createTitle: 'Add revision',
     editTitle: 'Edit revision',
+    createdBy: 'Created by: {name}',
     nombreLabel: 'Name',
     fechaRevisionLabel: 'Scheduled date',
     fechaProximaRevisionLabel: 'Next revision',

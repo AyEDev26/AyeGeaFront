@@ -357,6 +357,12 @@ const columns = computed<QTableColumn<Mantenimiento>[]>(() => {
       field: (row) => formatCoste(row.coste),
       align: 'right',
     },
+    {
+      name: 'creadoPor',
+      label: t('inventarioMantenimientos.columns.creadoPor'),
+      field: (row) => row.usuarioCreacion?.name ?? EMPTY,
+      align: 'left',
+    },
   ];
   if (canViewDocumento.value) {
     base.push({
