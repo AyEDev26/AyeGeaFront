@@ -87,16 +87,6 @@
                 </q-item>
               </template>
             </q-select>
-            <div v-if="hasActiveFilters">
-              <q-btn
-                flat
-                no-caps
-                color="grey-8"
-                icon="filter_alt_off"
-                :label="t('vencimientos.filters.clear')"
-                @click="clearFilters"
-              />
-            </div>
           </div>
         </div>
       </div>
@@ -122,19 +112,38 @@
         </div>
       </q-banner>
 
-      <q-tabs
-        v-model="tab"
-        dense
-        align="left"
-        class="text-teal-10 q-mb-md"
-        active-color="teal-9"
-        indicator-color="teal-9"
-        no-caps
-      >
-        <q-tab name="lista" icon="format_list_bulleted" :label="t('vencimientos.tabs.lista')" />
-        <q-tab name="activo" icon="directions_car" :label="t('vencimientos.tabs.activo')" />
-        <q-tab name="calendario" icon="calendar_month" :label="t('vencimientos.tabs.calendario')" />
-      </q-tabs>
+      <div class="row items-center no-wrap q-mb-md">
+        <q-tabs
+          v-model="tab"
+          dense
+          align="left"
+          class="col text-teal-10"
+          active-color="teal-9"
+          indicator-color="teal-9"
+          no-caps
+        >
+          <q-tab name="lista" icon="format_list_bulleted" :label="t('vencimientos.tabs.lista')" />
+          <q-tab name="activo" icon="directions_car" :label="t('vencimientos.tabs.activo')" />
+          <q-tab
+            name="calendario"
+            icon="calendar_month"
+            :label="t('vencimientos.tabs.calendario')"
+          />
+        </q-tabs>
+        <q-btn
+          v-if="hasActiveFilters"
+          flat
+          no-caps
+          dense
+          color="grey-8"
+          icon="filter_alt_off"
+          class="q-ml-sm"
+          :aria-label="t('vencimientos.filters.clear')"
+          @click="clearFilters"
+        >
+          <span class="gt-xs q-ml-xs">{{ t('vencimientos.filters.clear') }}</span>
+        </q-btn>
+      </div>
 
       <div v-if="store.loading && !store.loaded" class="row justify-center q-pa-xl">
         <q-spinner color="primary" size="40px" :aria-label="t('vencimientos.loading')" />
