@@ -18,6 +18,12 @@ interface IdName {
   name: string;
 }
 
+export interface RevisionDocumento {
+  id: number;
+  descripcion: string;
+  urlDescarga: string;
+}
+
 export interface Revision {
   id: number;
   elemInventarioId: number;
@@ -37,6 +43,8 @@ export interface Revision {
   usuarioCancelacion: IdName | null;
   motivoCancelacion: string | null;
   usuarioCreacion: IdName | null;
+  documentoId: number | null;
+  documento: RevisionDocumento | null;
 }
 
 export interface RevisionForm {
@@ -63,7 +71,7 @@ export interface RevisionRealizarPayload {
 
 export const REVISION_ESTADO = { PENDIENTE: 1, REALIZADA: 2, CANCELADA: 3 } as const;
 
-// Forma cruda del RevisionResource del backend. `documento_id` y `documento` no se mapean.
+// Forma cruda del RevisionResource del backend.
 interface RevisionResource {
   id: number;
   elem_inventario_id: number;
@@ -83,6 +91,8 @@ interface RevisionResource {
   usuario_cancelacion: IdName | null;
   motivo_cancelacion: string | null;
   usuario_creacion: IdName | null;
+  documento_id?: number | null;
+  documento?: { id: number; descripcion: string; url_descarga: string } | null;
 }
 
 interface RawPaginationMeta {
@@ -112,6 +122,14 @@ function mapRevision(r: RevisionResource): Revision {
     usuarioCancelacion: r.usuario_cancelacion ?? null,
     motivoCancelacion: r.motivo_cancelacion ?? null,
     usuarioCreacion: r.usuario_creacion ?? null,
+    documentoId: r.documento_id ?? null,
+    documento: r.documento
+      ? {
+          id: r.documento.id,
+          descripcion: r.documento.descripcion,
+          urlDescarga: r.documento.url_descarga,
+        }
+      : null,
   };
 }
 
@@ -178,6 +196,11 @@ export const useRevisionesStore = defineStore('revisiones', () => {
     });
   }
 
+  // Envía solo `documento_id` (null desasocia); no toca el resto de campos.
+  async function setDocumentoRevision(id: number, documentoId: number | null) {
+    await api.put(`/revisiones/${id}`, { documento_id: documentoId });
+  }
+
   async function deleteRevision(id: number) {
     await api.delete(`/revisiones/${id}`);
   }
@@ -206,6 +229,7 @@ export const useRevisionesStore = defineStore('revisiones', () => {
     fetchRevisiones,
     createRevision,
     updateRevision,
+    setDocumentoRevision,
     deleteRevision,
     realizarRevision,
     cancelarRevision,

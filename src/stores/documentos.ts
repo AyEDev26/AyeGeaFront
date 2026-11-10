@@ -211,7 +211,10 @@ export const useDocumentosStore = defineStore('documentos', () => {
   }
 
   // Multipart: los opcionales vacíos se omiten y los arrays vacíos no se envían.
-  async function createDocumento(payload: DocumentoCreatePayload, options: WriteOptions = {}) {
+  async function createDocumento(
+    payload: DocumentoCreatePayload,
+    options: WriteOptions = {},
+  ): Promise<Documento> {
     const formData = new FormData();
     formData.append('fichero', payload.fichero);
     formData.append('descripcion', payload.descripcion.trim());
@@ -222,10 +225,11 @@ export const useDocumentosStore = defineStore('documentos', () => {
     (payload.elemsInventario ?? []).forEach((id) =>
       formData.append('elems_inventario[]', String(id)),
     );
-    await api.post('/documentos', formData, {
+    const response = await api.post<{ data: DocumentoResource }>('/documentos', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     if (options.refresh !== false) await refresh();
+    return mapDocumento(response.data.data);
   }
 
   // JSON: fecha vaciada = null; categorias/subcategorias siempre se envían. Sin `elems_inventario`.

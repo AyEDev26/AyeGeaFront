@@ -164,6 +164,7 @@ const ORIGENES: { origen: DocumentoOrigen; icon: string }[] = [
 
 const props = defineProps<{
   id: number;
+  refreshKey?: number;
 }>();
 
 const $q = useQuasar();
@@ -278,6 +279,14 @@ watch(
     if (allowed) void load();
   },
   { immediate: true },
+);
+
+// Otra carpeta cambió documentos del elemento: se recarga solo si ya se había cargado.
+watch(
+  () => props.refreshKey,
+  () => {
+    if (loaded.value && canView.value) void load();
+  },
 );
 
 async function onDownload(row: Documento) {

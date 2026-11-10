@@ -816,6 +816,25 @@ export default {
       '¿Seguro que quieres eliminar la revisión "{name}"? Esta acción no se puede deshacer.',
     deleteSuccess: 'Revisión eliminada.',
     deleteError: 'No se pudo eliminar la revisión.',
+    attachDocumentoTooltip: 'Adjuntar documento',
+    replaceDocumentoTooltip: 'Reemplazar documento',
+    documentoAttachSuccess: 'Documento asociado a la revisión.',
+    documentoAttachError:
+      'La revisión no se pudo asociar al documento. El documento se ha subido y está en la carpeta «Documentos».',
+    documentoElementoFetchError: 'No se pudieron cargar los datos del elemento.',
+    unlinkDocumentoTooltip: 'Desasociar documento',
+    unlinkDialogTitle: 'Desasociar documento',
+    unlinkDialogMessage:
+      '¿Seguro que quieres desasociar el documento "{name}" de esta revisión? El documento se conserva en «Documentos».',
+    unlinkSuccess: 'Documento desasociado de la revisión.',
+    unlinkError: 'No se pudo desasociar el documento.',
+    deletePreviousTitle: '¿Eliminar también el documento anterior?',
+    deletePreviousMessage:
+      'El documento anterior se ha desasociado de la revisión y se conserva en «Documentos». Si lo eliminas, también desaparecerá de cualquier otro elemento, categoría o subcategoría al que esté asociado.',
+    deletePreviousKeep: 'Conservar',
+    deletePreviousConfirm: 'Eliminar',
+    deletePreviousSuccess: 'Documento anterior eliminado.',
+    deletePreviousError: 'No se pudo eliminar el documento anterior.',
     retry: 'Reintentar',
     fetchError: 'No se pudieron cargar las revisiones del elemento.',
     filters: {
@@ -829,6 +848,7 @@ export default {
       prioridad: 'Prioridad',
       estado: 'Estado',
       coste: 'Coste',
+      documento: 'Documento',
       actions: 'Acciones',
     },
   },

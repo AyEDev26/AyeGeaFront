@@ -94,6 +94,25 @@
         </q-td>
       </template>
 
+      <template #body-cell-documento="cell">
+        <q-td :props="cell">
+          <q-btn
+            v-if="cell.row.documento"
+            flat
+            dense
+            no-caps
+            size="sm"
+            color="primary"
+            icon="attach_file"
+            class="text-left"
+            :label="cell.row.documento.descripcion"
+            :loading="downloadingId === cell.row.documento.id"
+            @click="onDownload(cell.row.documento.id)"
+          />
+          <span v-else>{{ EMPTY }}</span>
+        </q-td>
+      </template>
+
       <template #body-cell-acciones="cell">
         <q-td :props="cell" class="text-center q-gutter-x-sm">
           <q-btn flat round dense size="sm" color="primary" icon="edit" @click="openEdit(cell.row)">
@@ -124,6 +143,37 @@
             </q-btn>
           </template>
           <q-btn
+            v-if="canAttach"
+            flat
+            round
+            dense
+            size="sm"
+            color="primary"
+            :icon="cell.row.documento ? 'swap_horiz' : 'attach_file'"
+            :loading="openingDocumento && documentoRevision?.id === cell.row.id"
+            @click="openDocumento(cell.row)"
+          >
+            <q-tooltip>
+              {{
+                cell.row.documento
+                  ? t('inventarioRevisiones.replaceDocumentoTooltip')
+                  : t('inventarioRevisiones.attachDocumentoTooltip')
+              }}
+            </q-tooltip>
+          </q-btn>
+          <q-btn
+            v-if="canEdit && cell.row.documento"
+            flat
+            round
+            dense
+            size="sm"
+            color="warning"
+            icon="link_off"
+            @click="onUnlinkConfirm(cell.row)"
+          >
+            <q-tooltip>{{ t('inventarioRevisiones.unlinkDocumentoTooltip') }}</q-tooltip>
+          </q-btn>
+          <q-btn
             v-if="canDelete"
             flat
             round
@@ -148,18 +198,32 @@
     />
     <RevisionRealizarDialog v-model="realizarVisible" :revision="actionRevision" @saved="onSaved" />
     <RevisionCancelarDialog v-model="cancelarVisible" :revision="actionRevision" @saved="onSaved" />
+    <DocumentoFormDialog
+      v-if="elementoContext"
+      v-model="documentoDialogVisible"
+      :documento="null"
+      :tipo-options="tipoOptions"
+      :categoria-options="[]"
+      :subcategoria-options="[]"
+      :elemento="elementoContext"
+      @saved="onDocumentoSaved"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useQuasar, type QTableColumn } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useDelayedLoading } from '@/composables/useDelayedLoading';
 import { useAuthStore } from '@/stores/auth';
+import { useDocumentosStore, type Documento, type ElementoContext } from '@/stores/documentos';
+import { useElemsInventarioStore } from '@/stores/elemsInventario';
+import { useTiposDocumentoStore } from '@/stores/tiposDocumento';
 import { useAuxiliaresInventarioStore } from '@/stores/auxiliaresInventario';
 import { REVISION_ESTADO, useRevisionesStore, type Revision } from '@/stores/revisiones';
 import { getApiErrorMessage } from '@/utils/api-error';
+import DocumentoFormDialog from '@/components/documentos/DocumentoFormDialog.vue';
 import RevisionFormDialog from '@/components/inventario/RevisionFormDialog.vue';
 import RevisionRealizarDialog from '@/components/inventario/RevisionRealizarDialog.vue';
 import RevisionCancelarDialog from '@/components/inventario/RevisionCancelarDialog.vue';
@@ -171,8 +235,10 @@ const props = defineProps<{
 }>();
 
 // `changed` avisa de que una revisión se creó, cambió o eliminó: la ficha debe recargarse.
+// `documentoChanged` avisa de que un documento se asoció o eliminó: la carpeta «Documentos» debe recargarse.
 const emit = defineEmits<{
   changed: [];
+  documentoChanged: [];
 }>();
 
 const $q = useQuasar();
@@ -180,18 +246,29 @@ const { t, locale } = useI18n();
 const auth = useAuthStore();
 const revisionesStore = useRevisionesStore();
 const auxiliares = useAuxiliaresInventarioStore();
+const documentosStore = useDocumentosStore();
+const elemsStore = useElemsInventarioStore();
+const tiposDocumentoStore = useTiposDocumentoStore();
 
 const canView = computed(() => auth.hasPermission('mantenimiento_revisiones.ver'));
 
 const canCreate = computed(() => auth.hasPermission('mantenimiento_revisiones.crear'));
 const canEdit = computed(() => auth.hasPermission('mantenimiento_revisiones.editar'));
 const canDelete = computed(() => auth.hasPermission('mantenimiento_revisiones.eliminar'));
+const canViewDocumento = computed(() => auth.hasPermission('documentos.ver'));
+const canDeleteDocumento = computed(() => auth.hasPermission('documentos.eliminar'));
+const canAttach = computed(() => canEdit.value && auth.hasPermission('documentos.crear'));
 
 const dialogVisible = ref(false);
 const editingRevision = ref<Revision | null>(null);
 const realizarVisible = ref(false);
 const cancelarVisible = ref(false);
 const actionRevision = ref<Revision | null>(null);
+const documentoDialogVisible = ref(false);
+const openingDocumento = ref(false);
+const documentoRevision = ref<Revision | null>(null);
+const elementoContext = ref<ElementoContext | null>(null);
+const tipoOptions = ref<{ label: string; value: number }[]>([]);
 
 const estadoId = ref<number | null>(null);
 const prioridadId = ref<number | null>(null);
@@ -262,6 +339,14 @@ const columns = computed<QTableColumn<Revision>[]>(() => {
       align: 'right',
     },
   ];
+  if (canViewDocumento.value) {
+    base.push({
+      name: 'documento',
+      label: t('inventarioRevisiones.columns.documento'),
+      field: (row) => row.documento?.descripcion ?? EMPTY,
+      align: 'left',
+    });
+  }
   return canEdit.value || canDelete.value
     ? [
         ...base,
@@ -365,6 +450,147 @@ async function onDelete(row: Revision) {
       type: 'negative',
       color: 'red-9',
       message: getApiErrorMessage(error, t('inventarioRevisiones.deleteError')),
+    });
+  }
+}
+
+const downloadingId = ref<number | null>(null);
+
+// `documento` de la revisión no trae el nombre original: se consulta antes de descargar.
+async function onDownload(documentoId: number) {
+  downloadingId.value = documentoId;
+  try {
+    const documento = await documentosStore.fetchDocumento(documentoId);
+    await documentosStore.downloadDocumento(documento);
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      color: 'red-9',
+      message: getApiErrorMessage(error, t('documentos.downloadError')),
+    });
+  } finally {
+    downloadingId.value = null;
+  }
+}
+
+// Elemento (categoría/subcategoría) y tipos de documento se cargan al abrir el diálogo.
+async function openDocumento(row: Revision) {
+  openingDocumento.value = true;
+  documentoRevision.value = row;
+  try {
+    const [elem, tipos] = await Promise.all([
+      elemsStore.fetchElem(props.id),
+      tiposDocumentoStore.fetchAllTiposDocumento(),
+    ]);
+    elementoContext.value = {
+      id: elem.id,
+      categoria: elem.categoria,
+      subcategoria: elem.subcategoria,
+    };
+    tipoOptions.value = tipos.map((tipo) => ({ label: tipo.descripcion, value: tipo.id }));
+    // Si el diálogo se monta ahora, debe nacer cerrado para que su watch reinicie el formulario.
+    await nextTick();
+    documentoDialogVisible.value = true;
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      color: 'red-9',
+      message: getApiErrorMessage(error, t('inventarioRevisiones.documentoElementoFetchError')),
+    });
+  } finally {
+    openingDocumento.value = false;
+  }
+}
+
+// El documento ya está subido: si falla la asociación, se avisa y el documento queda en «Documentos».
+async function onDocumentoSaved(documento?: Documento) {
+  documentoDialogVisible.value = false;
+  const revision = documentoRevision.value;
+  if (!documento || !revision) return;
+  const previous = revision.documento;
+  try {
+    await revisionesStore.setDocumentoRevision(revision.id, documento.id);
+    $q.notify({
+      type: 'positive',
+      color: 'teal-9',
+      message: t('inventarioRevisiones.documentoAttachSuccess'),
+    });
+    emit('changed');
+    emit('documentoChanged');
+    await reload();
+    if (previous) offerDeletePrevious(previous.id);
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      color: 'red-9',
+      message: getApiErrorMessage(error, t('inventarioRevisiones.documentoAttachError')),
+    });
+  }
+}
+
+function onUnlinkConfirm(row: Revision) {
+  $q.dialog({
+    title: t('inventarioRevisiones.unlinkDialogTitle'),
+    message: t('inventarioRevisiones.unlinkDialogMessage', {
+      name: row.documento?.descripcion ?? '',
+    }),
+    cancel: true,
+    persistent: true,
+  }).onOk(() => {
+    void onUnlink(row);
+  });
+}
+
+async function onUnlink(row: Revision) {
+  const previous = row.documento;
+  try {
+    await revisionesStore.setDocumentoRevision(row.id, null);
+    $q.notify({
+      type: 'positive',
+      color: 'teal-9',
+      message: t('inventarioRevisiones.unlinkSuccess'),
+    });
+    emit('changed');
+    emit('documentoChanged');
+    await reload();
+    if (previous) offerDeletePrevious(previous.id);
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      color: 'red-9',
+      message: getApiErrorMessage(error, t('inventarioRevisiones.unlinkError')),
+    });
+  }
+}
+
+// El documento anterior se conserva por defecto; solo se ofrece borrarlo con `documentos.eliminar`.
+function offerDeletePrevious(documentoId: number) {
+  if (!canDeleteDocumento.value) return;
+  $q.dialog({
+    title: t('inventarioRevisiones.deletePreviousTitle'),
+    message: t('inventarioRevisiones.deletePreviousMessage'),
+    cancel: { label: t('inventarioRevisiones.deletePreviousKeep'), flat: true },
+    ok: { label: t('inventarioRevisiones.deletePreviousConfirm'), color: 'negative' },
+    persistent: true,
+  }).onOk(() => {
+    void deletePrevious(documentoId);
+  });
+}
+
+async function deletePrevious(documentoId: number) {
+  try {
+    await documentosStore.deleteDocumento(documentoId, { refresh: false });
+    $q.notify({
+      type: 'positive',
+      color: 'teal-9',
+      message: t('inventarioRevisiones.deletePreviousSuccess'),
+    });
+    emit('documentoChanged');
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      color: 'red-9',
+      message: getApiErrorMessage(error, t('inventarioRevisiones.deletePreviousError')),
     });
   }
 }

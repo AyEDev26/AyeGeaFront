@@ -815,6 +815,25 @@ export default {
       'Are you sure you want to delete the revision "{name}"? This action cannot be undone.',
     deleteSuccess: 'Revision deleted.',
     deleteError: 'The revision could not be deleted.',
+    attachDocumentoTooltip: 'Attach document',
+    replaceDocumentoTooltip: 'Replace document',
+    documentoAttachSuccess: 'Document linked to the revision.',
+    documentoAttachError:
+      'The document was uploaded but could not be linked to the revision. It is available in the «Documents» folder.',
+    documentoElementoFetchError: 'Could not load the element data.',
+    unlinkDocumentoTooltip: 'Unlink document',
+    unlinkDialogTitle: 'Unlink document',
+    unlinkDialogMessage:
+      'Are you sure you want to unlink the document "{name}" from this revision? The document is kept in «Documents».',
+    unlinkSuccess: 'Document unlinked from the revision.',
+    unlinkError: 'The document could not be unlinked.',
+    deletePreviousTitle: 'Also delete the previous document?',
+    deletePreviousMessage:
+      'The previous document has been unlinked from the revision and is kept in «Documents». If you delete it, it will also disappear from any other element, category or subcategory it is linked to.',
+    deletePreviousKeep: 'Keep',
+    deletePreviousConfirm: 'Delete',
+    deletePreviousSuccess: 'Previous document deleted.',
+    deletePreviousError: 'The previous document could not be deleted.',
     retry: 'Retry',
     fetchError: 'The revisions of this item could not be loaded.',
     filters: {
@@ -828,6 +847,7 @@ export default {
       prioridad: 'Priority',
       estado: 'Status',
       coste: 'Cost',
+      documento: 'Document',
       actions: 'Actions',
     },
   },

@@ -55,11 +55,16 @@
             v-else-if="carpeta.kind === 'costes'"
             :labels="carpeta.labels ?? []"
           />
-          <InventarioDocumentos v-else-if="carpeta.kind === 'documentos'" :id="id" />
+          <InventarioDocumentos
+            v-else-if="carpeta.kind === 'documentos'"
+            :id="id"
+            :refresh-key="documentosRefreshKey"
+          />
           <InventarioRevisiones
             v-else-if="carpeta.kind === 'revisiones'"
             :id="id"
             @changed="refreshKey++"
+            @documento-changed="documentosRefreshKey++"
           />
           <InventarioMantenimientos
             v-else-if="carpeta.kind === 'mantenimientos'"
@@ -105,13 +110,7 @@ type CarpetaKey =
   | 'plantillas';
 
 type CarpetaKind =
-  | 'form'
-  | 'table'
-  | 'costes'
-  | 'documentos'
-  | 'revisiones'
-  | 'mantenimientos'
-  | 'itvs';
+  'form' | 'table' | 'costes' | 'documentos' | 'revisiones' | 'mantenimientos' | 'itvs';
 
 interface CarpetaConfig {
   key: CarpetaKey;
@@ -132,6 +131,8 @@ const router = useRouter();
 
 // Sube cuando una carpeta cambia datos que se reflejan en «Información» (p. ej. revisiones).
 const refreshKey = ref(0);
+// Sube cuando otra carpeta cambia documentos del elemento (la carpeta «Documentos» se recarga).
+const documentosRefreshKey = ref(0);
 
 const TIPO_KEYS = { 1: 'vehiculos', 2: 'maquinaria', 3: 'epis' } as const;
 const tipoKey = computed(() => TIPO_KEYS[props.tipoId]);

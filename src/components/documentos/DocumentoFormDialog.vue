@@ -179,7 +179,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  saved: [];
+  saved: [documento?: Documento];
 }>();
 
 const visible = defineModel<boolean>({ required: true });
@@ -278,6 +278,7 @@ async function onSubmit() {
   // Desde la ficha no se recarga el listado /documentos.
   const writeOptions = props.elemento ? { refresh: false } : {};
 
+  let createdDocumento: Documento | undefined;
   saving.value = true;
   try {
     if (isEditMode.value && props.documento) {
@@ -307,7 +308,7 @@ async function onSubmit() {
       }
       $q.notify({ type: 'positive', color: 'teal-9', message: t('documentoForm.updated') });
     } else if (fichero.value) {
-      await documentosStore.createDocumento(
+      createdDocumento = await documentosStore.createDocumento(
         {
           fichero: fichero.value,
           descripcion: descripcion.value,
@@ -321,7 +322,7 @@ async function onSubmit() {
       );
       $q.notify({ type: 'positive', color: 'teal-9', message: t('documentoForm.created') });
     }
-    emit('saved');
+    emit('saved', createdDocumento);
   } catch (error) {
     $q.notify({
       type: 'negative',
