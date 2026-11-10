@@ -125,6 +125,19 @@
         </q-item>
 
         <q-item
+          v-if="auth.hasPermission('mantenimiento_revisiones.ver')"
+          clickable
+          to="/vencimientos"
+          class="drawer-item"
+          active-class="drawer-item--active"
+        >
+          <q-item-section avatar>
+            <q-icon name="event_busy" />
+          </q-item-section>
+          <q-item-section>{{ t('layout.nav.vencimientos') }}</q-item-section>
+        </q-item>
+
+        <q-item
           v-if="auth.hasPermission('documentos.ver')"
           clickable
           to="/documentos"

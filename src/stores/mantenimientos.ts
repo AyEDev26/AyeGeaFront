@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { api } from '@/boot/axios';
 import type { PaginationMeta } from '@/stores/users';
+import type { ElemInventarioRef } from '@/stores/revisiones';
 
 interface IdDescripcion {
   id: number;
@@ -16,6 +17,7 @@ interface IdName {
 export interface Mantenimiento {
   id: number;
   elemInventarioId: number;
+  elemInventario: ElemInventarioRef | null;
   descripcion: string | null;
   fechaMantenimiento: string; // fecha prevista
   kmsMantenimiento: number | null;
@@ -50,7 +52,8 @@ export interface MantenimientoRealizarForm {
 }
 
 export interface MantenimientosFilters {
-  elemInventarioId: number;
+  elemInventarioId?: number;
+  fechaHasta?: string; // YYYY-MM-DD
   estadoId?: number;
   prioridadId?: number;
   page?: number;
@@ -63,6 +66,7 @@ export const MANTENIMIENTO_ESTADO = { PENDIENTE: 1, REALIZADA: 2, CANCELADA: 3 }
 interface MantenimientoResource {
   id: number;
   elem_inventario_id: number;
+  elem_inventario?: ElemInventarioRef | null;
   descripcion: string | null;
   fecha_mantenimiento: string;
   kms_mantenimiento: number | string | null;
@@ -96,6 +100,7 @@ function mapMantenimiento(m: MantenimientoResource): Mantenimiento {
   return {
     id: m.id,
     elemInventarioId: m.elem_inventario_id,
+    elemInventario: m.elem_inventario ?? null,
     descripcion: m.descripcion ?? null,
     fechaMantenimiento: m.fecha_mantenimiento,
     kmsMantenimiento: toNumberOrNull(m.kms_mantenimiento),
@@ -148,7 +153,10 @@ export const useMantenimientosStore = defineStore('mantenimientos', () => {
         data: { items: MantenimientoResource[]; meta: RawPaginationMeta };
       }>('/mantenimientos', {
         params: {
-          elem_inventario_id: filters.elemInventarioId,
+          ...(filters.elemInventarioId != null
+            ? { elem_inventario_id: filters.elemInventarioId }
+            : {}),
+          ...(filters.fechaHasta ? { fecha_hasta: filters.fechaHasta } : {}),
           page: filters.page ?? 1,
           per_page: filters.perPage ?? 15,
           ...(filters.estadoId != null ? { estado_id: filters.estadoId } : {}),

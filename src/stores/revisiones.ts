@@ -8,6 +8,11 @@ interface IdDescripcion {
   descripcion: string;
 }
 
+export interface ElemInventarioRef {
+  id: number;
+  nombre: string;
+}
+
 interface IdName {
   id: number;
   name: string;
@@ -16,6 +21,7 @@ interface IdName {
 export interface Revision {
   id: number;
   elemInventarioId: number;
+  elemInventario: ElemInventarioRef | null;
   nombre: string | null;
   fechaRevision: string; // fecha prevista
   fechaProximaRevision: string | null;
@@ -42,7 +48,8 @@ export interface RevisionForm {
 }
 
 export interface RevisionesFilters {
-  elemInventarioId: number;
+  elemInventarioId?: number;
+  fechaHasta?: string; // YYYY-MM-DD
   estadoId?: number;
   prioridadId?: number;
   page?: number;
@@ -60,6 +67,7 @@ export const REVISION_ESTADO = { PENDIENTE: 1, REALIZADA: 2, CANCELADA: 3 } as c
 interface RevisionResource {
   id: number;
   elem_inventario_id: number;
+  elem_inventario?: ElemInventarioRef | null;
   nombre: string | null;
   fecha_revision: string;
   fecha_proxima_revision: string | null;
@@ -88,6 +96,7 @@ function mapRevision(r: RevisionResource): Revision {
   return {
     id: r.id,
     elemInventarioId: r.elem_inventario_id,
+    elemInventario: r.elem_inventario ?? null,
     nombre: r.nombre ?? null,
     fechaRevision: r.fecha_revision,
     fechaProximaRevision: r.fecha_proxima_revision ?? null,
@@ -138,7 +147,10 @@ export const useRevisionesStore = defineStore('revisiones', () => {
         data: { items: RevisionResource[]; meta: RawPaginationMeta };
       }>('/revisiones', {
         params: {
-          elem_inventario_id: filters.elemInventarioId,
+          ...(filters.elemInventarioId != null
+            ? { elem_inventario_id: filters.elemInventarioId }
+            : {}),
+          ...(filters.fechaHasta ? { fecha_hasta: filters.fechaHasta } : {}),
           page: filters.page ?? 1,
           per_page: filters.perPage ?? 15,
           ...(filters.estadoId != null ? { estado_id: filters.estadoId } : {}),

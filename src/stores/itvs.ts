@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { api } from '@/boot/axios';
 import type { PaginationMeta } from '@/stores/users';
+import type { ElemInventarioRef } from '@/stores/revisiones';
 
 interface IdDescripcion {
   id: number;
@@ -16,6 +17,7 @@ interface IdName {
 export interface Itv {
   id: number;
   elemInventarioId: number;
+  elemInventario: ElemInventarioRef | null;
   fechaItv: string; // fecha prevista
   fechaProximaItv: string | null;
   resultado: string | null; // máx. 100
@@ -53,7 +55,8 @@ export interface ItvRealizarForm {
 }
 
 export interface ItvsFilters {
-  elemInventarioId: number;
+  elemInventarioId?: number;
+  fechaHasta?: string; // YYYY-MM-DD
   estadoId?: number;
   page?: number;
   perPage?: number;
@@ -65,6 +68,7 @@ export const ITV_ESTADO = { PENDIENTE: 1, REALIZADA: 2, CANCELADA: 3 } as const;
 interface ItvResource {
   id: number;
   elem_inventario_id: number;
+  elem_inventario?: ElemInventarioRef | null;
   fecha_itv: string;
   fecha_proxima_itv: string | null;
   resultado: string | null;
@@ -98,6 +102,7 @@ function mapItv(i: ItvResource): Itv {
   return {
     id: i.id,
     elemInventarioId: i.elem_inventario_id,
+    elemInventario: i.elem_inventario ?? null,
     fechaItv: i.fecha_itv,
     fechaProximaItv: i.fecha_proxima_itv ?? null,
     resultado: i.resultado ?? null,
@@ -151,7 +156,10 @@ export const useItvsStore = defineStore('itvs', () => {
         data: { items: ItvResource[]; meta: RawPaginationMeta };
       }>('/itvs', {
         params: {
-          elem_inventario_id: filters.elemInventarioId,
+          ...(filters.elemInventarioId != null
+            ? { elem_inventario_id: filters.elemInventarioId }
+            : {}),
+          ...(filters.fechaHasta ? { fecha_hasta: filters.fechaHasta } : {}),
           page: filters.page ?? 1,
           per_page: filters.perPage ?? 15,
           ...(filters.estadoId != null ? { estado_id: filters.estadoId } : {}),

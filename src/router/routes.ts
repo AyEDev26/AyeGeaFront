@@ -161,6 +161,15 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'vencimientos',
+        component: () => import('@/pages/VencimientosPage.vue'),
+        meta: {
+          requiresAuth: true,
+          requiresPermission: 'mantenimiento_revisiones.ver',
+          breadcrumb: [{ label: 'layout.nav.vencimientos' }],
+        },
+      },
+      {
         // Sin requiresPermission: el guard solo admite un permiso y el hub se abre con cualquiera
         // de varios; la propia página oculta las tarjetas sin permiso.
         path: 'admin/administracion',
