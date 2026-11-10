@@ -321,6 +321,18 @@ const columns = computed<QTableColumn<Itv>[]>(() => {
       align: 'left',
     },
     {
+      name: 'fechaRealizacion',
+      label: t('inventarioItvs.columns.fechaRealizacion'),
+      field: (row) => formatDate(row.fechaRealizacion),
+      align: 'left',
+    },
+    {
+      name: 'fechaCancelacion',
+      label: t('inventarioItvs.columns.fechaCancelacion'),
+      field: (row) => formatDate(row.fechaCancelacion),
+      align: 'left',
+    },
+    {
       name: 'coste',
       label: t('inventarioItvs.columns.coste'),
       field: (row) => formatCoste(row.coste),

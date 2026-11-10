@@ -118,6 +118,26 @@
             lazy-rules
             @update:model-value="clearServerError('coste')"
           />
+
+          <q-input
+            v-if="isEditMode && mantenimiento?.fechaRealizacion"
+            :model-value="realizacionText"
+            outlined
+            dense
+            readonly
+            class="elegant-input"
+            :label="t('mantenimientoForm.realizadoEl')"
+          />
+
+          <q-input
+            v-if="isEditMode && mantenimiento?.fechaCancelacion"
+            :model-value="cancelacionText"
+            outlined
+            dense
+            readonly
+            class="elegant-input"
+            :label="t('mantenimientoForm.canceladoEl')"
+          />
         </q-form>
       </q-card-section>
 
@@ -159,7 +179,7 @@ const emit = defineEmits<{
 const visible = defineModel<boolean>({ required: true });
 
 const $q = useQuasar();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const mantenimientosStore = useMantenimientosStore();
 
 const isEditMode = computed(() => props.mantenimiento !== null);
@@ -192,6 +212,24 @@ function toDateInput(value: string | null | undefined): string | null {
 function toNumberOrNull(value: number | string | null): number | null {
   return value === null || value === '' ? null : Number(value);
 }
+
+// Texto de solo lectura «fecha · usuario»; sin usuario, solo la fecha.
+function formatActionInfo(
+  date: string | null | undefined,
+  user: { name: string } | null | undefined,
+) {
+  if (!date) return '';
+  const parsed = new Date(date.length === 10 ? `${date}T00:00:00` : date);
+  const formatted = Number.isNaN(parsed.getTime()) ? date : parsed.toLocaleDateString(locale.value);
+  return user?.name ? `${formatted} · ${user.name}` : formatted;
+}
+
+const realizacionText = computed(() =>
+  formatActionInfo(props.mantenimiento?.fechaRealizacion, props.mantenimiento?.usuarioRealizacion),
+);
+const cancelacionText = computed(() =>
+  formatActionInfo(props.mantenimiento?.fechaCancelacion, props.mantenimiento?.usuarioCancelacion),
+);
 
 function resetForm() {
   descripcion.value = props.mantenimiento?.descripcion ?? '';

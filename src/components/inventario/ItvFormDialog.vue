@@ -130,6 +130,26 @@
             :error-message="serverErrors.fechaProximaItv"
             @update:model-value="clearServerError('fechaProximaItv')"
           />
+
+          <q-input
+            v-if="isEditMode && itv?.fechaRealizacion"
+            :model-value="realizacionText"
+            outlined
+            dense
+            readonly
+            class="elegant-input"
+            :label="t('itvForm.realizadoEl')"
+          />
+
+          <q-input
+            v-if="isEditMode && itv?.fechaCancelacion"
+            :model-value="cancelacionText"
+            outlined
+            dense
+            readonly
+            class="elegant-input"
+            :label="t('itvForm.canceladoEl')"
+          />
         </q-form>
       </q-card-section>
 
@@ -170,7 +190,7 @@ const emit = defineEmits<{
 const visible = defineModel<boolean>({ required: true });
 
 const $q = useQuasar();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const itvsStore = useItvsStore();
 
 const isEditMode = computed(() => props.itv !== null);
@@ -207,6 +227,24 @@ function toDateInput(value: string | null | undefined): string | null {
 function toNumberOrNull(value: number | string | null): number | null {
   return value === null || value === '' ? null : Number(value);
 }
+
+// Texto de solo lectura «fecha · usuario»; sin usuario, solo la fecha.
+function formatActionInfo(
+  date: string | null | undefined,
+  user: { name: string } | null | undefined,
+) {
+  if (!date) return '';
+  const parsed = new Date(date.length === 10 ? `${date}T00:00:00` : date);
+  const formatted = Number.isNaN(parsed.getTime()) ? date : parsed.toLocaleDateString(locale.value);
+  return user?.name ? `${formatted} · ${user.name}` : formatted;
+}
+
+const realizacionText = computed(() =>
+  formatActionInfo(props.itv?.fechaRealizacion, props.itv?.usuarioRealizacion),
+);
+const cancelacionText = computed(() =>
+  formatActionInfo(props.itv?.fechaCancelacion, props.itv?.usuarioCancelacion),
+);
 
 function resetForm() {
   fechaItv.value = toDateInput(props.itv?.fechaItv);

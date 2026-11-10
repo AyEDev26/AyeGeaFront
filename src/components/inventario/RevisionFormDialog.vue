@@ -93,6 +93,26 @@
             :error-message="serverErrors.fechaProximaRevision"
             @update:model-value="clearServerError('fechaProximaRevision')"
           />
+
+          <q-input
+            v-if="isEditMode && revision?.fechaRealizacion"
+            :model-value="realizacionText"
+            outlined
+            dense
+            readonly
+            class="elegant-input"
+            :label="t('revisionForm.realizadoEl')"
+          />
+
+          <q-input
+            v-if="isEditMode && revision?.fechaCancelacion"
+            :model-value="cancelacionText"
+            outlined
+            dense
+            readonly
+            class="elegant-input"
+            :label="t('revisionForm.canceladoEl')"
+          />
         </q-form>
       </q-card-section>
 
@@ -134,7 +154,7 @@ const emit = defineEmits<{
 const visible = defineModel<boolean>({ required: true });
 
 const $q = useQuasar();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const revisionesStore = useRevisionesStore();
 
 const isEditMode = computed(() => props.revision !== null);
@@ -159,6 +179,24 @@ const costeRules = [
 function toDateInput(value: string | null | undefined): string | null {
   return value ? value.slice(0, 10) : null;
 }
+
+// Texto de solo lectura «fecha · usuario»; sin usuario, solo la fecha.
+function formatActionInfo(
+  date: string | null | undefined,
+  user: { name: string } | null | undefined,
+) {
+  if (!date) return '';
+  const parsed = new Date(date.length === 10 ? `${date}T00:00:00` : date);
+  const formatted = Number.isNaN(parsed.getTime()) ? date : parsed.toLocaleDateString(locale.value);
+  return user?.name ? `${formatted} · ${user.name}` : formatted;
+}
+
+const realizacionText = computed(() =>
+  formatActionInfo(props.revision?.fechaRealizacion, props.revision?.usuarioRealizacion),
+);
+const cancelacionText = computed(() =>
+  formatActionInfo(props.revision?.fechaCancelacion, props.revision?.usuarioCancelacion),
+);
 
 function resetForm() {
   nombre.value = props.revision?.nombre ?? '';

@@ -320,6 +320,18 @@ const columns = computed<QTableColumn<Revision>[]>(() => {
       align: 'left',
     },
     {
+      name: 'fechaRealizacion',
+      label: t('inventarioRevisiones.columns.fechaRealizacion'),
+      field: (row) => formatDate(row.fechaRealizacion),
+      align: 'left',
+    },
+    {
+      name: 'fechaCancelacion',
+      label: t('inventarioRevisiones.columns.fechaCancelacion'),
+      field: (row) => formatDate(row.fechaCancelacion),
+      align: 'left',
+    },
+    {
       name: 'coste',
       label: t('inventarioRevisiones.columns.coste'),
       field: (row) => formatCoste(row.coste),
