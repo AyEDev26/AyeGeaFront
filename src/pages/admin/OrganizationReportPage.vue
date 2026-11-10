@@ -76,14 +76,7 @@
         <div>{{ t('admin.organizationReport.empty') }}</div>
       </div>
 
-      <q-tree
-        v-else
-        ref="treeRef"
-        :nodes="tree"
-        node-key="key"
-        no-selection-unset
-        class="org-tree"
-      >
+      <q-tree v-else ref="treeRef" :nodes="tree" node-key="key" no-selection-unset class="org-tree">
         <template #default-header="{ node }">
           <div v-if="node.kind === 'delegacion'" class="org-line org-delegacion">
             <q-icon name="business" color="teal-8" size="sm" />

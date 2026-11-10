@@ -64,7 +64,7 @@ export default defineRouter(({ store }) => {
       }
     }
 
-    if (to.meta.requiresPermission &&!auth.hasPermission(to.meta.requiresPermission)) {
+    if (to.meta.requiresPermission && !auth.hasPermission(to.meta.requiresPermission)) {
       Notify.create({ type: 'negative', message: 'No tienes permiso para acceder a esta sección' });
       return { path: '/' };
     }

@@ -29,7 +29,12 @@
           indicator-color="teal-9"
           class="q-mt-md"
         >
-          <q-tab v-for="group in permissionGroups" :key="group.key" :name="group.key" :label="group.label" />
+          <q-tab
+            v-for="group in permissionGroups"
+            :key="group.key"
+            :name="group.key"
+            :label="group.label"
+          />
         </q-tabs>
 
         <q-tab-panels v-model="activeTab">

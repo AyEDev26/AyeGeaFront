@@ -1,10 +1,5 @@
 <template>
-  <q-btn
-    unelevated
-    no-caps
-    class="language-switcher-btn"
-    :ripple="false"
-  >
+  <q-btn unelevated no-caps class="language-switcher-btn" :ripple="false">
     <span class="lang-flag">{{ currentOption.flag }}</span>
     <span class="lang-label">{{ currentOption.label }}</span>
     <q-icon name="expand_more" size="20px" class="lang-caret" />

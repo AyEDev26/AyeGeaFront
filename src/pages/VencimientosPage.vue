@@ -27,8 +27,8 @@
       </div>
       <div class="text-body2 text-blue-grey-7 q-mb-md">{{ t('vencimientos.subtitle') }}</div>
 
-      <div class="row q-col-gutter-md q-mb-lg">
-        <div v-for="u in URGENCIAS" :key="u" class="col-12 col-sm-4">
+      <div class="row q-col-gutter-md q-mb-lg items-start">
+        <div v-for="u in URGENCIAS" :key="u" class="col-12 col-sm-4 col-md-3">
           <q-card
             flat
             bordered
@@ -50,57 +50,54 @@
             </q-card-section>
           </q-card>
         </div>
-      </div>
-
-      <div class="row q-col-gutter-sm q-mb-md items-center">
-        <div class="col-12 col-md-4">
-          <q-select
-            v-model="tipoFilter"
-            outlined
-            dense
-            multiple
-            use-chips
-            clearable
-            emit-value
-            map-options
-            class="elegant-input"
-            :label="t('vencimientos.filters.tipo')"
-            :options="tipoOptions"
-          />
-        </div>
-        <div class="col-12 col-md-4">
-          <q-select
-            v-model="elemFilter"
-            outlined
-            dense
-            clearable
-            use-input
-            input-debounce="0"
-            emit-value
-            map-options
-            class="elegant-input"
-            :label="t('vencimientos.filters.activo')"
-            :options="elemOptionsFiltered"
-            @filter="onElemFilter"
-          >
-            <template #no-option>
-              <q-item>
-                <q-item-section class="text-grey">{{
-                  t('vencimientos.filters.noOptions')
-                }}</q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-        </div>
-        <div v-if="hasActiveFilters" class="col-12 col-md-auto">
-          <q-btn
-            flat
-            no-caps
-            color="grey-8"
-            icon="filter_alt_off"
-            :label="t('vencimientos.filters.clear')"
-            @click="clearFilters"
-          />
+        <div class="col-12 col-md-3 vencimientos-filters">
+          <div class="column q-gutter-y-sm">
+            <q-select
+              v-model="tipoFilter"
+              outlined
+              dense
+              multiple
+              use-chips
+              clearable
+              emit-value
+              map-options
+              class="elegant-input"
+              :label="t('vencimientos.filters.tipo')"
+              :options="tipoOptions"
+            />
+            <q-select
+              v-model="elemFilter"
+              outlined
+              dense
+              clearable
+              use-input
+              input-debounce="0"
+              emit-value
+              map-options
+              class="elegant-input"
+              :label="t('vencimientos.filters.activo')"
+              :options="elemOptionsFiltered"
+              @filter="onElemFilter"
+            >
+              <template #no-option>
+                <q-item>
+                  <q-item-section class="text-grey">{{
+                    t('vencimientos.filters.noOptions')
+                  }}</q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+            <div v-if="hasActiveFilters">
+              <q-btn
+                flat
+                no-caps
+                color="grey-8"
+                icon="filter_alt_off"
+                :label="t('vencimientos.filters.clear')"
+                @click="clearFilters"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -521,6 +518,12 @@ onMounted(load);
 </script>
 
 <style scoped>
+.vencimientos-filters {
+  min-width: 0;
+}
+.vencimientos-filters :deep(.q-field) {
+  max-width: 100%;
+}
 .kpi-card {
   border-left-width: 4px;
 }
