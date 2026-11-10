@@ -1249,7 +1249,6 @@ export default {
       backToList: 'Volver al listado',
       informacion: 'Información',
       alertas: 'Alertas',
-      tareas: 'Tareas',
       mantenimientos: 'Mantenimientos',
       itvs: 'ITVs',
       revisiones: 'Revisiones',

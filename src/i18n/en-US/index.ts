@@ -1248,7 +1248,6 @@ export default {
       backToList: 'Back to list',
       informacion: 'Information',
       alertas: 'Alerts',
-      tareas: 'Tasks',
       mantenimientos: 'Maintenance',
       itvs: 'Vehicle inspections',
       revisiones: 'Reviews',

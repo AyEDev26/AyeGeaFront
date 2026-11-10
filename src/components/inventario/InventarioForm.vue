@@ -59,157 +59,224 @@
           />
         </div>
 
-        <!-- Datos generales -->
-        <section class="form-section form-section--general">
-          <div class="form-section__title text-subtitle1 text-weight-bold font-outfit q-mb-sm">
-            {{ t('inventario.form.sections.general') }}
+        <div class="row q-col-gutter-md items-stretch">
+          <!-- Imagen -->
+          <div class="col-12 col-md-auto">
+            <section class="form-section full-height">
+              <div class="form-section__title text-subtitle1 text-weight-bold font-outfit q-mb-sm">
+                {{ t('inventario.form.sections.imagen') }}
+              </div>
+              <div class="row items-center q-col-gutter-x-md q-col-gutter-y-xs">
+                <div class="col-12">
+                  <q-img
+                    v-if="imagePreviewUrl"
+                    :src="imagePreviewUrl"
+                    fit="contain"
+                    class="rounded-borders"
+                    style="width: 200px; height: 150px"
+                  />
+                  <div
+                    v-else
+                    class="flex flex-center rounded-borders text-grey-7 bg-grey-2"
+                    style="width: 200px; height: 150px"
+                  >
+                    {{ t('inventario.form.image.none') }}
+                  </div>
+                </div>
+                <div class="col-12">
+                  <input
+                    ref="fileInputRef"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    class="hidden"
+                    @change="onFileSelected"
+                  />
+                  <div class="q-gutter-x-sm">
+                    <q-btn
+                      outline
+                      no-caps
+                      color="primary"
+                      icon="image"
+                      class="elegant-btn"
+                      :label="
+                        imagePreviewUrl
+                          ? t('inventario.form.image.replace')
+                          : t('inventario.form.image.pick')
+                      "
+                      :loading="uploadingImage"
+                      @click="fileInputRef?.click()"
+                    />
+                    <q-btn
+                      v-if="pendingImage"
+                      flat
+                      no-caps
+                      color="grey-7"
+                      :label="t('inventario.form.image.remove')"
+                      @click="clearPendingImage"
+                    />
+                  </div>
+                  <div v-if="!isEditMode" class="text-caption text-grey-7 q-mt-sm">
+                    {{ t('inventario.form.image.pendingHint') }}
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
-          <div class="row q-col-gutter-x-md q-col-gutter-y-xs">
-            <div class="col-12 col-sm-6">
-              <q-input
-                v-model="form.nombre"
-                outlined
-                dense
-                hide-bottom-space
-                class="elegant-input"
-                :label="t('inventario.form.labels.nombre') + ' *'"
-                :rules="nombreRules"
-                lazy-rules
-                :error="!!serverErrors.nombre"
-                :error-message="serverErrors.nombre"
-                @update:model-value="clearServerError('nombre')"
-              />
-            </div>
-            <div class="col-12 col-sm-6 col-md-3">
-              <q-input
-                v-model="form.referencia"
-                outlined
-                dense
-                hide-bottom-space
-                class="elegant-input"
-                :label="t('inventario.form.labels.referencia')"
-                :rules="maxLengthRules(20)"
-                lazy-rules
-                :error="!!serverErrors.referencia"
-                :error-message="serverErrors.referencia"
-                @update:model-value="clearServerError('referencia')"
-              />
-            </div>
-            <div class="col-12 col-sm-6 col-md-3">
-              <q-input
-                v-model="form.nSerie"
-                outlined
-                dense
-                hide-bottom-space
-                class="elegant-input"
-                :label="t('inventario.form.labels.nSerie')"
-                :rules="maxLengthRules(45)"
-                lazy-rules
-                :error="!!serverErrors.nSerie"
-                :error-message="serverErrors.nSerie"
-                @update:model-value="clearServerError('nSerie')"
-              />
-            </div>
-            <div class="col-12">
-              <q-input
-                v-model="form.descripcion"
-                outlined
-                dense
-                hide-bottom-space
-                class="elegant-input"
-                :label="t('inventario.form.labels.descripcion')"
-                :rules="maxLengthRules(250)"
-                lazy-rules
-                :error="!!serverErrors.descripcion"
-                :error-message="serverErrors.descripcion"
-                @update:model-value="clearServerError('descripcion')"
-              />
-            </div>
-            <div class="col-12 col-sm-6 col-md-3">
-              <q-select
-                v-model="form.categoriaId"
-                outlined
-                dense
-                hide-bottom-space
-                use-input
-                hide-selected
-                fill-input
-                input-debounce="0"
-                emit-value
-                map-options
-                option-value="id"
-                option-label="label"
-                class="elegant-input"
-                :options="categoriaSelect.shown.value"
-                :label="t('inventario.form.labels.categoria') + ' *'"
-                :rules="[requiredRule]"
-                lazy-rules
-                :error="!!serverErrors.categoriaId"
-                :error-message="serverErrors.categoriaId"
-                @filter="categoriaSelect.onFilter"
-                @update:model-value="onCategoriaChange"
-              />
-            </div>
-            <div class="col-12 col-sm-6 col-md-3">
-              <q-select
-                v-model="form.subcategoriaId"
-                outlined
-                dense
-                hide-bottom-space
-                clearable
-                use-input
-                hide-selected
-                fill-input
-                input-debounce="0"
-                emit-value
-                map-options
-                option-value="id"
-                option-label="label"
-                class="elegant-input"
-                :disable="!form.categoriaId"
-                :options="subcategoriaSelect.shown.value"
-                :label="t('inventario.form.labels.subcategoria')"
-                :error="!!serverErrors.subcategoriaId"
-                :error-message="serverErrors.subcategoriaId"
-                @filter="subcategoriaSelect.onFilter"
-                @update:model-value="clearServerError('subcategoriaId')"
-              />
-            </div>
-            <div class="col-12 col-sm-6 col-md-3">
-              <q-select
-                v-model="form.estadoId"
-                outlined
-                dense
-                hide-bottom-space
-                emit-value
-                map-options
-                option-value="id"
-                option-label="label"
-                class="elegant-input"
-                :options="estadoOptions"
-                :label="t('inventario.form.labels.estado')"
-                :error="!!serverErrors.estadoId"
-                :error-message="serverErrors.estadoId"
-                @update:model-value="clearServerError('estadoId')"
-              />
-            </div>
-            <div class="col-12">
-              <q-input
-                v-model="form.comentario"
-                outlined
-                dense
-                hide-bottom-space
-                class="elegant-input"
-                :label="t('inventario.form.labels.comentario')"
-                :rules="maxLengthRules(255)"
-                lazy-rules
-                :error="!!serverErrors.comentario"
-                :error-message="serverErrors.comentario"
-                @update:model-value="clearServerError('comentario')"
-              />
-            </div>
+
+          <!-- Datos generales -->
+          <div class="col-12 col-md">
+            <section class="form-section form-section--general full-height">
+              <div class="form-section__title text-subtitle1 text-weight-bold font-outfit q-mb-sm">
+                {{ t('inventario.form.sections.general') }}
+              </div>
+              <div class="row q-col-gutter-x-md q-col-gutter-y-xs">
+                <div class="col-12 col-sm-6">
+                  <q-input
+                    v-model="form.nombre"
+                    outlined
+                    dense
+                    hide-bottom-space
+                    class="elegant-input"
+                    :label="t('inventario.form.labels.nombre') + ' *'"
+                    :rules="nombreRules"
+                    lazy-rules
+                    :error="!!serverErrors.nombre"
+                    :error-message="serverErrors.nombre"
+                    @update:model-value="clearServerError('nombre')"
+                  />
+                </div>
+                <div class="col-12 col-sm-6 col-md-3">
+                  <q-input
+                    v-model="form.referencia"
+                    outlined
+                    dense
+                    hide-bottom-space
+                    class="elegant-input"
+                    :label="t('inventario.form.labels.referencia')"
+                    :rules="maxLengthRules(20)"
+                    lazy-rules
+                    :error="!!serverErrors.referencia"
+                    :error-message="serverErrors.referencia"
+                    @update:model-value="clearServerError('referencia')"
+                  />
+                </div>
+                <div class="col-12 col-sm-6 col-md-3">
+                  <q-input
+                    v-model="form.nSerie"
+                    outlined
+                    dense
+                    hide-bottom-space
+                    class="elegant-input"
+                    :label="t('inventario.form.labels.nSerie')"
+                    :rules="maxLengthRules(45)"
+                    lazy-rules
+                    :error="!!serverErrors.nSerie"
+                    :error-message="serverErrors.nSerie"
+                    @update:model-value="clearServerError('nSerie')"
+                  />
+                </div>
+                <div class="col-12">
+                  <q-input
+                    v-model="form.descripcion"
+                    outlined
+                    dense
+                    hide-bottom-space
+                    class="elegant-input"
+                    :label="t('inventario.form.labels.descripcion')"
+                    :rules="maxLengthRules(250)"
+                    lazy-rules
+                    :error="!!serverErrors.descripcion"
+                    :error-message="serverErrors.descripcion"
+                    @update:model-value="clearServerError('descripcion')"
+                  />
+                </div>
+                <div class="col-12 col-sm-6 col-md-3">
+                  <q-select
+                    v-model="form.categoriaId"
+                    outlined
+                    dense
+                    hide-bottom-space
+                    use-input
+                    hide-selected
+                    fill-input
+                    input-debounce="0"
+                    emit-value
+                    map-options
+                    option-value="id"
+                    option-label="label"
+                    class="elegant-input"
+                    :options="categoriaSelect.shown.value"
+                    :label="t('inventario.form.labels.categoria') + ' *'"
+                    :rules="[requiredRule]"
+                    lazy-rules
+                    :error="!!serverErrors.categoriaId"
+                    :error-message="serverErrors.categoriaId"
+                    @filter="categoriaSelect.onFilter"
+                    @update:model-value="onCategoriaChange"
+                  />
+                </div>
+                <div class="col-12 col-sm-6 col-md-3">
+                  <q-select
+                    v-model="form.subcategoriaId"
+                    outlined
+                    dense
+                    hide-bottom-space
+                    clearable
+                    use-input
+                    hide-selected
+                    fill-input
+                    input-debounce="0"
+                    emit-value
+                    map-options
+                    option-value="id"
+                    option-label="label"
+                    class="elegant-input"
+                    :disable="!form.categoriaId"
+                    :options="subcategoriaSelect.shown.value"
+                    :label="t('inventario.form.labels.subcategoria')"
+                    :error="!!serverErrors.subcategoriaId"
+                    :error-message="serverErrors.subcategoriaId"
+                    @filter="subcategoriaSelect.onFilter"
+                    @update:model-value="clearServerError('subcategoriaId')"
+                  />
+                </div>
+                <div class="col-12 col-sm-6 col-md-3">
+                  <q-select
+                    v-model="form.estadoId"
+                    outlined
+                    dense
+                    hide-bottom-space
+                    emit-value
+                    map-options
+                    option-value="id"
+                    option-label="label"
+                    class="elegant-input"
+                    :options="estadoOptions"
+                    :label="t('inventario.form.labels.estado')"
+                    :error="!!serverErrors.estadoId"
+                    :error-message="serverErrors.estadoId"
+                    @update:model-value="clearServerError('estadoId')"
+                  />
+                </div>
+                <div class="col-12">
+                  <q-input
+                    v-model="form.comentario"
+                    outlined
+                    dense
+                    hide-bottom-space
+                    class="elegant-input"
+                    :label="t('inventario.form.labels.comentario')"
+                    :rules="maxLengthRules(255)"
+                    lazy-rules
+                    :error="!!serverErrors.comentario"
+                    :error-message="serverErrors.comentario"
+                    @update:model-value="clearServerError('comentario')"
+                  />
+                </div>
+              </div>
+            </section>
           </div>
-        </section>
+        </div>
 
         <!-- Ubicación y proveedor -->
         <section class="form-section">
@@ -900,67 +967,6 @@
                   }
                 "
               />
-            </div>
-          </div>
-        </section>
-
-        <!-- Imagen -->
-        <section class="form-section">
-          <div class="form-section__title text-subtitle1 text-weight-bold font-outfit q-mb-sm">
-            {{ t('inventario.form.sections.imagen') }}
-          </div>
-          <div class="row items-center q-col-gutter-x-md q-col-gutter-y-xs">
-            <div class="col-12 col-sm-auto">
-              <q-img
-                v-if="imagePreviewUrl"
-                :src="imagePreviewUrl"
-                fit="contain"
-                class="rounded-borders"
-                style="width: 200px; height: 150px"
-              />
-              <div
-                v-else
-                class="flex flex-center rounded-borders text-grey-7 bg-grey-2"
-                style="width: 200px; height: 150px"
-              >
-                {{ t('inventario.form.image.none') }}
-              </div>
-            </div>
-            <div class="col-12 col-sm">
-              <input
-                ref="fileInputRef"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                class="hidden"
-                @change="onFileSelected"
-              />
-              <div class="q-gutter-x-sm">
-                <q-btn
-                  outline
-                  no-caps
-                  color="primary"
-                  icon="image"
-                  class="elegant-btn"
-                  :label="
-                    imagePreviewUrl
-                      ? t('inventario.form.image.replace')
-                      : t('inventario.form.image.pick')
-                  "
-                  :loading="uploadingImage"
-                  @click="fileInputRef?.click()"
-                />
-                <q-btn
-                  v-if="pendingImage"
-                  flat
-                  no-caps
-                  color="grey-7"
-                  :label="t('inventario.form.image.remove')"
-                  @click="clearPendingImage"
-                />
-              </div>
-              <div v-if="!isEditMode" class="text-caption text-grey-7 q-mt-sm">
-                {{ t('inventario.form.image.pendingHint') }}
-              </div>
             </div>
           </div>
         </section>

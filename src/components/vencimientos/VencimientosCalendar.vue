@@ -58,8 +58,8 @@
             class="cal-mark"
             :class="`text-${URGENCIA_META[v.urgencia].color}`"
           >
-            <q-icon :name="URGENCIA_META[v.urgencia].icon" size="12px" />
-            <q-icon :name="TIPO_ICON[v.tipo]" size="12px" class="text-blue-grey-8" />
+            <q-icon :name="URGENCIA_META[v.urgencia].icon" size="20px" />
+            <q-icon :name="TIPO_ICON[v.tipo]" size="20px" class="text-blue-grey-8" />
           </span>
           <span v-if="cell.items.length > MAX_MARKS" class="text-caption text-blue-grey-8">
             +{{ cell.items.length - MAX_MARKS }}
@@ -230,7 +230,7 @@ const selectedLabel = computed(() =>
   margin-bottom: 4px;
 }
 .cal-cell {
-  min-height: 64px;
+  min-height: 84px;
   padding: 4px;
   border: 1px solid rgb(0 0 0 / 12%);
   border-radius: 6px;
@@ -282,7 +282,7 @@ const selectedLabel = computed(() =>
 }
 @media (max-width: 599px) {
   .cal-cell {
-    min-height: 52px;
+    min-height: 64px;
     padding: 2px;
   }
 }

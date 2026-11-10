@@ -102,7 +102,6 @@ import InventarioItvs from '@/components/inventario/InventarioItvs.vue';
 type CarpetaKey =
   | 'informacion'
   | 'alertas'
-  | 'tareas'
   | 'mantenimientos'
   | 'itvs'
   | 'revisiones'
@@ -154,12 +153,6 @@ const ALERTAS: CarpetaConfig = {
   kind: 'table',
   icon: 'notifications',
   columns: col('fecha', 'tipo', 'descripcion', 'prioridad', 'estado'),
-};
-const TAREAS: CarpetaConfig = {
-  key: 'tareas',
-  kind: 'table',
-  icon: 'task_alt',
-  columns: col('descripcion', 'responsable', 'vencimiento', 'prioridad', 'estado'),
 };
 const MANTENIMIENTOS: CarpetaConfig = {
   key: 'mantenimientos',
@@ -228,7 +221,6 @@ const PLANTILLAS: CarpetaConfig = {
 const VEHICULOS: CarpetaConfig[] = [
   INFORMACION,
   ALERTAS,
-  TAREAS,
   MANTENIMIENTOS,
   ITVS,
   REVISIONES,
@@ -245,7 +237,7 @@ const MAQUINARIA: CarpetaConfig[] = VEHICULOS.filter((c) => c.key !== 'itvs');
 const CARPETAS: Record<TipoElemInventarioId, CarpetaConfig[]> = {
   1: VEHICULOS,
   2: MAQUINARIA,
-  3: [INFORMACION, TAREAS, COSTES, DOCUMENTOS, MANUALES, PLANTILLAS],
+  3: [INFORMACION, COSTES, DOCUMENTOS, MANUALES, PLANTILLAS],
 };
 
 const carpetas = computed(() => CARPETAS[props.tipoId]);
