@@ -176,6 +176,7 @@ import { useQuasar, type QForm } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useItvsStore, type Itv } from '@/stores/itvs';
 import { getApiErrorMessage } from '@/utils/api-error';
+import { todayLocal } from '@/utils/date';
 import GlassCard from '@/components/common/GlassCard.vue';
 
 const props = defineProps<{
@@ -247,7 +248,7 @@ const cancelacionText = computed(() =>
 );
 
 function resetForm() {
-  fechaItv.value = toDateInput(props.itv?.fechaItv);
+  fechaItv.value = props.itv ? toDateInput(props.itv.fechaItv) : todayLocal();
   fechaProximaItv.value = toDateInput(props.itv?.fechaProximaItv);
   resultado.value = props.itv?.resultado ?? '';
   observaciones.value = props.itv?.observaciones ?? '';

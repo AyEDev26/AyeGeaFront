@@ -139,6 +139,7 @@ import { useQuasar, type QForm } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useRevisionesStore, type Revision } from '@/stores/revisiones';
 import { getApiErrorMessage } from '@/utils/api-error';
+import { todayLocal } from '@/utils/date';
 import GlassCard from '@/components/common/GlassCard.vue';
 
 const props = defineProps<{
@@ -200,7 +201,7 @@ const cancelacionText = computed(() =>
 
 function resetForm() {
   nombre.value = props.revision?.nombre ?? '';
-  fechaRevision.value = toDateInput(props.revision?.fechaRevision);
+  fechaRevision.value = props.revision ? toDateInput(props.revision.fechaRevision) : todayLocal();
   fechaProximaRevision.value = toDateInput(props.revision?.fechaProximaRevision);
   prioridadId.value = props.revision?.prioridadId ?? null;
   coste.value = props.revision?.coste ?? null;

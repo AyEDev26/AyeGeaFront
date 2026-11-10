@@ -1,12 +1,5 @@
 import type { ElemInventarioForm, TipoElemInventarioId } from '@/stores/elemsInventario';
-
-// Fecha local en formato YYYY-MM-DD (toISOString usaría UTC y podría dar el día anterior).
-function todayLocal(): string {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${now.getFullYear()}-${month}-${day}`;
-}
+import { todayLocal } from '@/utils/date';
 
 // Copia profunda del formulario guardado con los datos propios de cada unidad reiniciados
 // (incluidos los campos de solo lectura; kmsIniciales y horasIniciales sí se copian).

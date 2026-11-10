@@ -164,6 +164,7 @@ import { useQuasar, type QForm } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useMantenimientosStore, type Mantenimiento } from '@/stores/mantenimientos';
 import { getApiErrorMessage } from '@/utils/api-error';
+import { todayLocal } from '@/utils/date';
 import GlassCard from '@/components/common/GlassCard.vue';
 
 const props = defineProps<{
@@ -233,7 +234,9 @@ const cancelacionText = computed(() =>
 
 function resetForm() {
   descripcion.value = props.mantenimiento?.descripcion ?? '';
-  fechaMantenimiento.value = toDateInput(props.mantenimiento?.fechaMantenimiento);
+  fechaMantenimiento.value = props.mantenimiento
+    ? toDateInput(props.mantenimiento.fechaMantenimiento)
+    : todayLocal();
   prioridadId.value = props.mantenimiento?.prioridadId ?? null;
   kmsMantenimiento.value = props.mantenimiento?.kmsMantenimiento ?? null;
   horasMantenimiento.value = props.mantenimiento?.horasMantenimiento ?? null;
